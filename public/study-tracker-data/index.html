@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QA Study Tracker</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        <span>🧑‍💻</span><span>QA Tracker</span>
+      </div>
+      <div class="brand-tagline">Study progress &amp; syllabus manager</div>
+    </div>
+    <ul id="sidebar-nav"></ul>
+  </nav>
+
+  <!-- OVERLAY (mobile) -->
+  <div id="overlay"></div>
+
+  <!-- MAIN -->
+  <div id="main">
+    <div id="topbar">
+      <button id="hamburger" aria-label="Open menu">☰</button>
+      <span class="topbar-title">QA Study Tracker</span>
+    </div>
+    <div id="tab-content"></div>
+  </div>
+
+  <script src="syllabus.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
