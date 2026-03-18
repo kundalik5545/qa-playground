@@ -1,4 +1,5 @@
 import HeroSection from "@/components/hero";
+import SiteAlertPopup from "@/components/SiteAlertPopup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -107,8 +108,7 @@ const studyTrackerSyllabi = [
   },
   {
     label: "Playwright",
-    badgeClass:
-      "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+    badgeClass: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
     barClass: "bg-red-600",
     accentClass: "border-l-red-600",
     pct: 15,
@@ -146,28 +146,8 @@ const LandingPage = () => {
       {/* Hero Section */}
       <HeroSection />
 
-      {/* Stats Bar */}
-      <section
-        aria-label="Platform statistics"
-        className="py-8 px-4 border-y border-border"
-      >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-          {statsData.map((stat, i) => (
-            <div key={i} className="text-center">
-              <p className="text-2xl md:text-3xl font-bold gradient-title">
-                {stat.value}
-              </p>
-              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* Three Main Features */}
-      <section
-        aria-label="Main platform features"
-        className="py-14 px-4"
-      >
+      <section aria-label="Main platform features" className="py-14 px-4">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold gradient-title mb-3">
             Everything You Need to Level Up Your QA Career
@@ -194,7 +174,10 @@ const LandingPage = () => {
                 iFrames, shadow DOM, and more. Designed specifically for
                 Selenium, Playwright, and Cypress practice.
               </p>
-              <Link href="/practice" aria-label="Start practicing automation testing elements">
+              <Link
+                href="/practice"
+                aria-label="Start practicing automation testing elements"
+              >
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
                   Start Practicing
                 </Button>
@@ -245,7 +228,10 @@ const LandingPage = () => {
                 Automation, API Testing, and Playwright syllabi with visual
                 progress charts and daily activity logs.
               </p>
-              <Link href="/study-tracker" aria-label="Open the QA Study Tracker">
+              <Link
+                href="/study-tracker"
+                aria-label="Open the QA Study Tracker"
+              >
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
                   Track Your Progress
                 </Button>
@@ -284,7 +270,10 @@ const LandingPage = () => {
                 in your browser — no login needed.
               </p>
 
-              <ul className="space-y-3 mb-8" aria-label="Study Tracker features">
+              <ul
+                className="space-y-3 mb-8"
+                aria-label="Study Tracker features"
+              >
                 {studyTrackerFeatures.map((f, i) => (
                   <li key={i} className="flex items-center gap-3 text-sm">
                     {f.icon}
@@ -293,7 +282,10 @@ const LandingPage = () => {
                 ))}
               </ul>
 
-              <Link href="/study-tracker" aria-label="Open the QA Study Tracker dashboard">
+              <Link
+                href="/study-tracker"
+                aria-label="Open the QA Study Tracker dashboard"
+              >
                 <Button
                   size="lg"
                   className="bg-purple-600 hover:bg-purple-700 text-white px-8"
@@ -410,7 +402,8 @@ const LandingPage = () => {
             Practice Any Element, Any Scenario
           </h2>
           <p className="text-center text-muted-foreground mb-10 max-w-xl mx-auto">
-            Every element is purpose-built for automation testing. No distractions — just clean, testable UI.
+            Every element is purpose-built for automation testing. No
+            distractions — just clean, testable UI.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {featuresData.map((f, i) => (
@@ -439,11 +432,25 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* How It Works */}
+      {/* Stats Bar */}
       <section
-        aria-label="How QA Playground works"
-        className="py-14 px-4"
+        aria-label="Platform statistics"
+        className="py-8 px-4 border-y border-border"
       >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
+          {statsData.map((stat, i) => (
+            <div key={i} className="text-center">
+              <p className="text-2xl md:text-3xl font-bold gradient-title">
+                {stat.value}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How It Works */}
+      {/* <section aria-label="How QA Playground works" className="py-14 px-4">
         <h2 className="text-2xl font-bold text-center mb-3">How It Works</h2>
         <p className="text-center text-muted-foreground mb-10 max-w-xl mx-auto">
           Get up and running in minutes — no setup complexity, no paywalls.
@@ -459,11 +466,13 @@ const LandingPage = () => {
                 {step.icon}
               </div>
               <h3 className="font-semibold mb-2">{step.title}</h3>
-              <p className="text-sm text-muted-foreground">{step.description}</p>
+              <p className="text-sm text-muted-foreground">
+                {step.description}
+              </p>
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* Testimonials */}
       <section
@@ -502,6 +511,8 @@ const LandingPage = () => {
           ))}
         </div>
       </section>
+
+      <SiteAlertPopup />
     </div>
   );
 };
