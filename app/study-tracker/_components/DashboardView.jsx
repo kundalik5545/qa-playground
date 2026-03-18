@@ -559,19 +559,27 @@ export default function DashboardView({
             No activity yet. Start checking off topics!
           </div>
         ) : (
-          recentLog.map((entry, i) => {
-            const syl = state.syllabi[entry.tabId];
+          recentLog.map(({ date, entries }) => {
+            const d = new Date(date + "T00:00:00");
+            const label = d.toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
             return (
-              <div key={i} className="st-activity-day">
-                <span className="st-act-date">{entry.date}</span>
-                {syl && (
-                  <span
-                    className="st-act-chip"
-                    style={{ background: syl.color + "18", color: syl.color }}
-                  >
-                    {syl.icon} {syl.label} +{entry.count}
-                  </span>
-                )}
+              <div key={date} className="st-activity-day">
+                <span className="st-act-date">{label}</span>
+                <div className="st-act-chips">
+                  {entries.map((entry, i) => {
+                    const syl = state.syllabi[entry.tabId];
+                    if (!syl) return null;
+                    return (
+                      <span
+                        key={i}
+                        className="st-act-chip"
+                        style={{ background: syl.color + "18", color: syl.color }}
+                      >
+                        {syl.icon} +{entry.count} in {syl.label}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             );
           })
@@ -601,7 +609,7 @@ function QuickStat({ icon, label, value, sub, color, bg }) {
 
 function OverviewCard({ icon, label, pct, sub, color, onClick }) {
   return (
-    <div className="st-ov-card" onClick={onClick}>
+    <div className="st-ov-card" style={{ borderTopColor: color }} onClick={onClick}>
       <div className="st-ov-icon">{icon}</div>
       <div className="st-ov-label">{label}</div>
       <div className="st-ov-pct" style={{ color }}>
