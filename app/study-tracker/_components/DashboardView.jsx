@@ -15,11 +15,11 @@ export default function DashboardView({
   onImport,
   onNavigate,
 }) {
-  const pieRef = useRef(null);       // Today's Tasks doughnut
-  const overallRef = useRef(null);   // Overall Progress doughnut
-  const lineRef = useRef(null);      // Topics Completed line
-  const barRef = useRef(null);       // Progress by Syllabus bar
-  const doughnutRef = useRef(null);  // Completion Breakdown doughnut
+  const pieRef = useRef(null); // Today's Tasks doughnut
+  const overallRef = useRef(null); // Overall Progress doughnut
+  const lineRef = useRef(null); // Topics Completed line
+  const barRef = useRef(null); // Progress by Syllabus bar
+  const doughnutRef = useRef(null); // Completion Breakdown doughnut
   const taskChartRef = useRef(null); // Daily Task Completion % line
   const charts = useRef({});
 
@@ -115,7 +115,8 @@ export default function DashboardView({
 
     // ── Overall Progress doughnut (syllabus topics) ──
     if (overallRef.current) {
-      const total = allStats.total, done = allStats.done;
+      const total = allStats.total,
+        done = allStats.done;
       charts.current.overall = new C(overallRef.current, {
         type: "doughnut",
         data: {
@@ -135,12 +136,20 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: { font: { family: "'DM Sans', sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
+              labels: {
+                font: { family: "'DM Sans', sans-serif", size: 12 },
+                boxWidth: 12,
+                padding: 14,
+              },
             },
             title: {
               display: true,
               text: `${done} / ${total} topics`,
-              font: { family: "'DM Sans', sans-serif", size: 13, weight: "600" },
+              font: {
+                family: "'DM Sans', sans-serif",
+                size: 13,
+                weight: "600",
+              },
               color: "#374151",
               padding: { top: 10 },
             },
@@ -432,7 +441,7 @@ export default function DashboardView({
       </div>
 
       {/* Quick stat cards */}
-      <div className="st-quick-stats">
+      {/* <div className="st-quick-stats">
         <QuickStat
           icon="🎯"
           label="Overall Progress"
@@ -483,10 +492,17 @@ export default function DashboardView({
           color="#7c3aed"
           bg="#f5f3ff"
         />
-      </div>
+      </div> */}
 
       {/* Syllabus overview cards */}
       <div className="st-overview-cards">
+        <OverviewCard
+          icon="🎯"
+          label="Overall"
+          pct={allStats.pct}
+          sub={`${allStats.done} / ${allStats.total} topics`}
+          color="#1f2937"
+        />
         {Object.values(state.syllabi).map((syl) => {
           const s = getSyllabusStats(state.syllabi, state.progress, syl.id);
           return (
@@ -561,7 +577,11 @@ export default function DashboardView({
         ) : (
           recentLog.map(({ date, entries }) => {
             const d = new Date(date + "T00:00:00");
-            const label = d.toLocaleDateString("en-US", { weekday: "short", day: "numeric", month: "short" });
+            const label = d.toLocaleDateString("en-US", {
+              weekday: "short",
+              day: "numeric",
+              month: "short",
+            });
             return (
               <div key={date} className="st-activity-day">
                 <span className="st-act-date">{label}</span>
@@ -573,7 +593,10 @@ export default function DashboardView({
                       <span
                         key={i}
                         className="st-act-chip"
-                        style={{ background: syl.color + "18", color: syl.color }}
+                        style={{
+                          background: syl.color + "18",
+                          color: syl.color,
+                        }}
                       >
                         {syl.icon} +{entry.count} in {syl.label}
                       </span>
@@ -609,7 +632,11 @@ function QuickStat({ icon, label, value, sub, color, bg }) {
 
 function OverviewCard({ icon, label, pct, sub, color, onClick }) {
   return (
-    <div className="st-ov-card" style={{ borderTopColor: color }} onClick={onClick}>
+    <div
+      className="st-ov-card"
+      style={{ borderTopColor: color }}
+      onClick={onClick}
+    >
       <div className="st-ov-icon">{icon}</div>
       <div className="st-ov-label">{label}</div>
       <div className="st-ov-pct" style={{ color }}>
