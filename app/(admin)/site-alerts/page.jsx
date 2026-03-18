@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Plus, RefreshCw, Save, ExternalLink, Eye } from "lucide-react";
+import { Trash2, Plus, RefreshCw, Save, ExternalLink, Eye, Lock } from "lucide-react";
 import { toast } from "sonner";
 import {
   getAlertConfig,
@@ -25,12 +25,90 @@ import {
 } from "@/lib/alertStorage";
 import { basicDetails } from "@/data/BasicSetting";
 
+const SESSION_KEY = "qaPlayground_adminAuth";
+
+function PasswordGate({ onUnlock }) {
+  const [value, setValue] = useState("");
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setLoading(true);
+    setError(false);
+    try {
+      const res = await fetch("/api/admin/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: value }),
+      });
+      if (res.ok) {
+        sessionStorage.setItem(SESSION_KEY, "1");
+        onUnlock();
+      } else {
+        setError(true);
+        setValue("");
+      }
+    } catch {
+      setError(true);
+      setValue("");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <Card className="w-full max-w-sm">
+        <CardHeader className="pb-2 text-center">
+          <div className="flex justify-center mb-3">
+            <div className="p-3 rounded-full bg-muted">
+              <Lock className="h-6 w-6 text-muted-foreground" />
+            </div>
+          </div>
+          <h1 className="text-lg font-semibold">Admin Access</h1>
+          <p className="text-sm text-muted-foreground">
+            Enter the password to manage site alerts.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="admin-password">Password</Label>
+              <Input
+                id="admin-password"
+                type="password"
+                autoFocus
+                value={value}
+                onChange={(e) => {
+                  setValue(e.target.value);
+                  setError(false);
+                }}
+                placeholder="Enter admin password"
+                className={error ? "border-destructive focus-visible:ring-destructive" : ""}
+              />
+              {error && (
+                <p className="text-xs text-destructive">Incorrect password. Try again.</p>
+              )}
+            </div>
+            <Button type="submit" className="w-full" disabled={loading}>
+              {loading ? "Verifying…" : "Unlock"}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 export default function SiteAlertsAdmin() {
+  const [unlocked, setUnlocked] = useState(false);
   const [config, setConfig] = useState(DEFAULT_ALERT_CONFIG);
   const [alertState, setAlertState] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
 
   useEffect(() => {
+    if (sessionStorage.getItem(SESSION_KEY) === "1") setUnlocked(true);
     setConfig(getAlertConfig());
     setAlertState(getAlertState());
   }, []);
@@ -85,6 +163,10 @@ export default function SiteAlertsAdmin() {
       : null;
 
   const responses = alertState?.responses ?? null;
+
+  if (!unlocked) {
+    return <PasswordGate onUnlock={() => setUnlocked(true)} />;
+  }
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
