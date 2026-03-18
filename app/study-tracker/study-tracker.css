@@ -134,6 +134,8 @@
 .st-export-btn:hover { background: #1d4ed8; }
 .st-import-btn { background: #f3f4f6; color: #374151; border: 1px solid #e5e7eb; }
 .st-import-btn:hover { background: #e9eaed; }
+.st-clear-btn { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.st-clear-btn:hover { background: #fecaca; }
 
 /* Quick stat cards */
 .st-quick-stats {
@@ -754,6 +756,39 @@
 .st-habit-analytics-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 
 /* ─── SYLLABUS MANAGER ─── */
+.st-syl-drag-wrap {
+  transition: transform 0.15s, opacity 0.15s;
+  position: relative;
+}
+.st-syl-drag-wrap.dragging {
+  opacity: 0.45;
+  transform: scale(0.98);
+}
+.st-syl-drag-wrap.drop-above::before,
+.st-syl-drag-wrap.drop-below::after {
+  content: "";
+  display: block;
+  height: 3px;
+  border-radius: 99px;
+  background: #2563eb;
+  margin: 0 4px;
+}
+.st-syl-drag-wrap.drop-above::before { margin-bottom: 4px; }
+.st-syl-drag-wrap.drop-below::after  { margin-top: 4px; }
+
+.st-drag-handle {
+  font-size: 1.1rem;
+  color: #d1d5db;
+  cursor: grab;
+  padding: 0 2px;
+  flex-shrink: 0;
+  user-select: none;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.st-drag-handle:hover { color: #6b7280; }
+.st-drag-handle:active { cursor: grabbing; }
+
 .st-syl-mgr-card {
   background: #fff; border: 1px solid #e9eaed; border-radius: 14px;
   margin-bottom: 10px; overflow: hidden; transition: box-shadow 0.18s;

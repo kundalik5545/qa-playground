@@ -9,6 +9,7 @@ import {
   getTodayStr,
   downloadJSON,
   pickJSONFile,
+  STORAGE_KEYS,
 } from "@/lib/studyTrackerStorage";
 import DEFAULT_SYLLABUS_DATA from "@/data/studyTrackerSyllabi";
 import DashboardView from "./DashboardView";
@@ -56,6 +57,24 @@ export default function StudyTrackerApp() {
     };
     downloadJSON(payload, `qa-tracker-${getTodayStr()}.json`);
     showToast("Full data exported!");
+  };
+
+  const handleClearAll = () => {
+    Object.values(STORAGE_KEYS).forEach((k) => localStorage.removeItem(k));
+    const fresh = {
+      syllabi:   JSON.parse(JSON.stringify(DEFAULT_SYLLABUS_DATA)),
+      progress:  {},
+      custom:    {},
+      log:       [],
+      subtopics: {},
+      daily:     {},
+      habits:    [],
+      habitLog:  {},
+    };
+    Object.entries(fresh).forEach(([k, v]) => saveKey(k, v));
+    setState(fresh);
+    setActiveTab("dashboard");
+    showToast("All data cleared and reset to default.");
   };
 
   const handleImport = () => {
@@ -166,6 +185,7 @@ export default function StudyTrackerApp() {
               allStats={allStats}
               onExport={handleExport}
               onImport={handleImport}
+              onClearAll={handleClearAll}
               onNavigate={setActiveTab}
               showToast={showToast}
             />

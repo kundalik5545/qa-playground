@@ -1,18 +1,87 @@
 "use client";
 
 import { useState } from "react";
-import DEFAULT_SYLLABUS_DATA from "@/data/studyTrackerSyllabi";
-import { getSyllabusStats, downloadJSON, getTodayStr } from "@/lib/studyTrackerStorage";
+import { getSyllabusStats, downloadJSON, pickJSONFile } from "@/lib/studyTrackerStorage";
 
 const COLORS = ["#2563eb","#7c3aed","#059669","#dc2626","#f59e0b","#0891b2","#db2777","#ea580c"];
+
+// Regenerate all IDs in a syllabus so imported copies don't collide with existing ones
+function reIdSyllabus(syl) {
+  const newId = "syl-" + Date.now();
+  const sections = (syl.sections || []).map((sec) => {
+    const secId = `${newId}-s${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+    const topics = (sec.topics || []).map((t) => ({
+      ...t,
+      id: `t-${newId}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      subtopics: Array.isArray(t.subtopics) ? [...t.subtopics] : [],
+      resources: Array.isArray(t.resources) ? [...t.resources] : [],
+    }));
+    return { ...sec, id: secId, topics };
+  });
+  return { ...syl, id: newId, sections };
+}
 
 export default function SyllabusManagerView({ state, updateState, showToast }) {
   const [showNewForm, setShowNewForm] = useState(false);
   const [newForm, setNewForm] = useState({ label: "", icon: "📝", color: "#2563eb" });
 
+  // ── Filename helper: qa-playground-syllabus-subjectName-dd-mm-yyyy-HHmm.json ──
+  const makeFilename = (label) => {
+    const now  = new Date();
+    const yyyy = now.getFullYear();
+    const mm   = String(now.getMonth() + 1).padStart(2, "0");
+    const dd   = String(now.getDate()).padStart(2, "0");
+    const uid  = Math.random().toString(36).slice(2, 6);
+    const slug = label.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return `qa-playground-syllabus-${slug}-${yyyy}-${mm}-${dd}-${uid}.json`;
+  };
+
+  // ── Export single syllabus (standardised envelope) ──
   const exportSyllabus = (syl) => {
-    downloadJSON(syl, `qa-syllabus-${syl.id}-${getTodayStr()}.json`);
-    showToast(`${syl.label} exported!`);
+    const payload = {
+      version: 1,
+      type: "qa-tracker-syllabus",
+      exportedAt: new Date().toISOString(),
+      syllabus: syl,
+    };
+    downloadJSON(payload, makeFilename(syl.label));
+    showToast(`"${syl.label}" exported!`);
+  };
+
+  // ── Export ALL syllabi ──
+  const exportAll = () => {
+    const payload = {
+      version: 1,
+      type: "qa-tracker-syllabi-bundle",
+      exportedAt: new Date().toISOString(),
+      syllabi: Object.values(state.syllabi),
+    };
+    downloadJSON(payload, makeFilename("all-syllabi"));
+    showToast("All syllabi exported!");
+  };
+
+  // ── Import syllabus from JSON file ──
+  const importSyllabus = () => {
+    pickJSONFile((data) => {
+      // Support both single and bundle format
+      if (data.type === "qa-tracker-syllabus" && data.syllabus) {
+        const syl = reIdSyllabus(data.syllabus);
+        updateState("syllabi", { ...state.syllabi, [syl.id]: syl });
+        showToast(`"${syl.label}" imported!`);
+        return;
+      }
+      if (data.type === "qa-tracker-syllabi-bundle" && Array.isArray(data.syllabi)) {
+        const added = {};
+        data.syllabi.forEach((s) => {
+          const syl = reIdSyllabus(s);
+          added[syl.id] = syl;
+        });
+        updateState("syllabi", { ...state.syllabi, ...added });
+        showToast(`${data.syllabi.length} syllabus(es) imported!`);
+        return;
+      }
+      showToast("Invalid file — expected a qa-tracker-syllabus export.", true);
+    });
   };
 
   const deleteSyllabus = (id) => {
@@ -47,9 +116,20 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
             <h1 className="st-dash-title">Syllabus Manager</h1>
             <p className="st-dash-subtitle">Create, edit, and organise your study syllabi</p>
           </div>
-          <button className="st-new-syl-btn" onClick={() => setShowNewForm((v) => !v)}>
-            + New Syllabus
-          </button>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <button className="st-action-btn st-import-btn" onClick={importSyllabus} title="Import a syllabus from a .json file">⬆ Import</button>
+            <button className="st-action-btn st-export-btn" onClick={exportAll} title="Export all syllabi to a single .json file">⬇ Export All</button>
+            <button className="st-new-syl-btn" onClick={() => setShowNewForm((v) => !v)}>+ New Syllabus</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Tips banner */}
+      <div style={{ background: "#fffbeb", border: "1px solid #fcd34d", borderRadius: 10, padding: "11px 14px", marginBottom: 14, display: "flex", gap: 10 }}>
+        <span style={{ fontSize: "1rem", flexShrink: 0, marginTop: 1 }}>💡</span>
+        <div style={{ fontSize: "0.8rem", color: "#78350f", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}>
+          <div><strong>Import:</strong> accepts <code style={{ background: "#fef3c7", padding: "1px 5px", borderRadius: 4, fontSize: "0.74rem", color: "#92400e" }}>qa-tracker-syllabus</code> (single) or <code style={{ background: "#fef3c7", padding: "1px 5px", borderRadius: 4, fontSize: "0.74rem", color: "#92400e" }}>qa-tracker-syllabi-bundle</code> (multiple) JSON files. Use <strong>Export All</strong> to download the bundle format.</div>
+          <div style={{ marginTop: 4 }}><strong>Arrange:</strong> drag the <span style={{ fontWeight: 700, letterSpacing: 1 }}>⠿</span> handle on any card to reorder your syllabi however you like — the order is saved automatically.</div>
         </div>
       </div>
 
@@ -87,17 +167,55 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
         <div className="st-syl-mgr-empty">No syllabi yet. Create one above!</div>
       )}
 
-      {Object.values(state.syllabi).map((syl) => (
-        <SyllabusCard
+      <SyllabusList
+        state={state}
+        updateState={updateState}
+        exportSyllabus={exportSyllabus}
+        deleteSyllabus={deleteSyllabus}
+        showToast={showToast}
+      />
+    </div>
+  );
+}
+
+// ── Drag-and-drop ordered list ────────────────────────────────────────────────
+function SyllabusList({ state, updateState, exportSyllabus, deleteSyllabus, showToast }) {
+  const [dragIdx, setDragIdx] = useState(null);
+  const [overIdx, setOverIdx] = useState(null);
+  const sylList = Object.values(state.syllabi);
+
+  const reorder = (fromIdx, toIdx) => {
+    if (fromIdx === toIdx) return;
+    const list = [...sylList];
+    const [moved] = list.splice(fromIdx, 1);
+    list.splice(toIdx, 0, moved);
+    const reordered = {};
+    list.forEach((s) => { reordered[s.id] = s; });
+    updateState("syllabi", reordered);
+  };
+
+  return (
+    <div>
+      {sylList.map((syl, idx) => (
+        <div
           key={syl.id}
-          syl={syl}
-          stats={getSyllabusStats(state.syllabi, state.progress, syl.id)}
-          state={state}
-          updateState={updateState}
-          onExport={() => exportSyllabus(syl)}
-          onDelete={() => deleteSyllabus(syl.id)}
-          showToast={showToast}
-        />
+          draggable
+          onDragStart={() => setDragIdx(idx)}
+          onDragOver={(e) => { e.preventDefault(); setOverIdx(idx); }}
+          onDrop={() => { reorder(dragIdx, idx); setDragIdx(null); setOverIdx(null); }}
+          onDragEnd={() => { setDragIdx(null); setOverIdx(null); }}
+          className={`st-syl-drag-wrap${overIdx === idx && dragIdx !== idx ? (dragIdx < idx ? " drop-below" : " drop-above") : ""}${dragIdx === idx ? " dragging" : ""}`}
+        >
+          <SyllabusCard
+            syl={syl}
+            stats={getSyllabusStats(state.syllabi, state.progress, syl.id)}
+            state={state}
+            updateState={updateState}
+            onExport={() => exportSyllabus(syl)}
+            onDelete={() => deleteSyllabus(syl.id)}
+            showToast={showToast}
+          />
+        </div>
       ))}
     </div>
   );
@@ -143,6 +261,7 @@ function SyllabusCard({ syl, stats, state, updateState, onExport, onDelete, show
     <div className="st-syl-mgr-card">
       {/* Card header */}
       <div className="st-syl-mgr-hdr">
+        <span className="st-drag-handle" title="Drag to reorder">⠿</span>
         <span className="st-syl-mgr-icon">{syl.icon}</span>
         <div className="st-syl-mgr-info">
           <div className="st-syl-mgr-name" style={{ color: syl.color }}>{syl.label}</div>

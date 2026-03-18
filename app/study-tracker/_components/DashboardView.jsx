@@ -4,15 +4,26 @@ import { useEffect, useRef } from "react";
 import {
   getSyllabusStats,
   getLast14Days,
-  habitAppliesOnDate,
   getTodayStr,
 } from "@/lib/studyTrackerStorage";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function DashboardView({
   state,
   allStats,
   onExport,
   onImport,
+  onClearAll,
   onNavigate,
 }) {
   const pieRef = useRef(null); // Today's Tasks doughnut
@@ -27,10 +38,6 @@ export default function DashboardView({
   const today = getTodayStr();
   const todayTasks = state.daily[today] || [];
   const todayTaskDone = todayTasks.filter((t) => t.done).length;
-  const todayHabits = state.habits.filter((h) => habitAppliesOnDate(h, today));
-  const todayHabitDone = todayHabits.filter(
-    (h) => state.habitLog[today]?.[h.id],
-  ).length;
 
   useEffect(() => {
     if (window.Chart) {
@@ -436,63 +443,32 @@ export default function DashboardView({
             <button className="st-action-btn st-import-btn" onClick={onImport}>
               ⬆ Import
             </button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="st-action-btn st-clear-btn">🗑 Clear All</button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear all data?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all your progress, tasks, habits, and custom syllabi, and reset everything back to the default state. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    onClick={onClearAll}
+                  >
+                    Yes, clear all
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </div>
 
-      {/* Quick stat cards */}
-      {/* <div className="st-quick-stats">
-        <QuickStat
-          icon="🎯"
-          label="Overall Progress"
-          value={`${allStats.pct}%`}
-          sub={`${allStats.done} / ${allStats.total} topics`}
-          color="#2563eb"
-          bg="#eff6ff"
-        />
-        <QuickStat
-          icon="📋"
-          label="Today's Tasks"
-          value={
-            todayTasks.length ? `${todayTaskDone} / ${todayTasks.length}` : "—"
-          }
-          sub={
-            todayTasks.length
-              ? todayTaskDone === todayTasks.length
-                ? "All done!"
-                : `${todayTasks.length - todayTaskDone} remaining`
-              : "No tasks added"
-          }
-          color="#10b981"
-          bg="#f0fdf4"
-        />
-        <QuickStat
-          icon="🔥"
-          label="Today's Habits"
-          value={
-            todayHabits.length
-              ? `${todayHabitDone} / ${todayHabits.length}`
-              : "—"
-          }
-          sub={
-            todayHabits.length
-              ? todayHabitDone === todayHabits.length
-                ? "All done!"
-                : `${todayHabits.length - todayHabitDone} remaining`
-              : "No habits today"
-          }
-          color="#f59e0b"
-          bg="#fffbeb"
-        />
-        <QuickStat
-          icon="📚"
-          label="Active Syllabi"
-          value={Object.keys(state.syllabi).length}
-          sub="learning paths"
-          color="#7c3aed"
-          bg="#f5f3ff"
-        />
-      </div> */}
 
       {/* Syllabus overview cards */}
       <div className="st-overview-cards">
@@ -608,24 +584,6 @@ export default function DashboardView({
           })
         )}
       </div>
-    </div>
-  );
-}
-
-function QuickStat({ icon, label, value, sub, color, bg }) {
-  return (
-    <div
-      className="st-quick-stat"
-      style={{ borderLeft: `3px solid ${color}`, background: bg }}
-    >
-      <div className="st-qs-icon" style={{ color }}>
-        {icon}
-      </div>
-      <div className="st-qs-value" style={{ color }}>
-        {value}
-      </div>
-      <div className="st-qs-label">{label}</div>
-      <div className="st-qs-sub">{sub}</div>
     </div>
   );
 }
