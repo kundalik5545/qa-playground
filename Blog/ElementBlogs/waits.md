@@ -1,134 +1,224 @@
 ---
-title: How to handle waits in selenium
-description: "Using selenium we can handle 3 types of alerts such as: Simple Alert, Prompt Alert, & Confirmation Alert. Learn how to handle alerts using selenium with c#."
+title: How to Handle Waits in Selenium and Playwright
+description: Learn how to use implicit wait, explicit wait, and fluent wait in Selenium WebDriver (Java), and auto-waiting with custom timeouts in Playwright (JS) and Playwright (Python).
 author: random coders
-date: 5 march 2025
+date: 18 march 2026
 image: "/Images/blogs/b3.jpg"
-keywords: "simple alert, prompt alert, confirmation alert, alerts using selenium"
-testing: ["sample", "accept"]
+keywords: "selenium waits, explicit wait selenium, implicit wait, WebDriverWait, playwright auto-wait, wait for element visible, fluent wait"
 ---
 
 ## Introduction
 
-In a real-world automation project using Selenium with C#, waits play a crucial role in handling dynamic elements and ensuring test stability. Below are the key use cases for waits in a real automation project:
+Waits are critical for stable automation — without them tests fail on slow networks or dynamic pages. There are three types of waits in Selenium:
 
-To handle them we are having different methods in selenium such as -
+1. **Implicit Wait** — global timeout applied to every `findElement` call
+2. **Explicit Wait** — wait for a specific condition on a specific element
+3. **Fluent Wait** — explicit wait with polling interval and ignored exceptions
 
-1. accept,
-2. dismiss,
-3. sendKeys,
-4. getText,
-5. wait.
-6. switchTo
+Playwright **auto-waits** for elements to be ready before acting — explicit waits are rarely needed, but custom timeouts can be set.
 
-## Waiting for Page to Load
+## Key Methods Summary
 
-📌 Scenario: Your test needs to wait until the web page is fully loaded before interacting with elements.
+| Wait Type | Selenium (Java) | Playwright (JS) | Playwright (Python) |
+|---|---|---|---|
+| Implicit | `implicitlyWait(Duration)` | Not applicable | Not applicable |
+| Wait for visible | `visibilityOfElementLocated(By)` | `toBeVisible()` | `to_be_visible()` |
+| Wait for clickable | `elementToBeClickable(By)` | `toBeEnabled()` | `to_be_enabled()` |
+| Wait for text | `textToBePresentInElement(el, text)` | `toHaveText("text")` | `to_have_text("text")` |
+| Wait for URL | `urlContains("path")` | `toHaveURL(...)` | `to_have_url(...)` |
+| Custom timeout | `new WebDriverWait(driver, Duration)` | `{ timeout: 10000 }` | `timeout=10000` |
 
-✅ Solution: Use driver.Manage().Timeouts().PageLoad to wait until the page loads.
+---
 
-```csharp
-driver.Manage().Timeouts().PageLoad = TimeSpan.FromSeconds(10);
+## 1. Implicit Wait
+
+Sets a default timeout for all `findElement` calls across the session.
+
+### Selenium (Java)
+```java
+driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+// All findElement calls will now wait up to 10s before throwing NoSuchElementException
 ```
 
-## Waiting for an Element to be Clickable
-
-📌 Scenario: The element (e.g., button, link) exists in the DOM but is not yet clickable (e.g., covered by a loader).
-
-✅ Solution: Use WebDriverWait with ExpectedConditions.ElementToBeClickable.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-IWebElement button = wait.Until(ExpectedConditions.ElementToBeClickable(By.Id("submitBtn")));
-button.Click();
+### Playwright (JS)
+```js
+// Playwright auto-waits — no implicit wait needed.
+// To set a global default timeout:
+page.setDefaultTimeout(10000); // 10 seconds
 ```
 
-## Waiting for an Element to be Visible
-
-📌 Scenario: The element is present in the DOM but is hidden (e.g., appears after an AJAX call).
-
-✅ Solution: Use ExpectedConditions.VisibilityOfElementLocated.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-IWebElement message = wait.Until(ExpectedConditions.VisibilityOfElementLocated(By.Id("successMessage")));
-Console.WriteLine(message.Text);
+### Playwright (Python)
+```python
+# Playwright auto-waits — set global timeout if needed:
+page.set_default_timeout(10000)  # 10 seconds
 ```
 
-## Waiting for an Element to be Present in the DOM
+---
 
-📌 Scenario: The element is dynamically added to the DOM after an API call.
+## 2. Explicit Wait — wait for element to be visible
 
-✅ Solution: Use ExpectedConditions.PresenceOfElementLocated.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-IWebElement dynamicElement = wait.Until(ExpectedConditions.PresenceOfElementLocated(By.XPath("//div[@class='dynamic']")));
+### Selenium (Java)
+```java
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+WebElement element = wait.until(
+    ExpectedConditions.visibilityOfElementLocated(By.id("dynamicElement"))
+);
+System.out.println(element.getText());
 ```
 
-## Waiting for Text to Change
-
-📌 Scenario: A text label (e.g., loading status) updates dynamically, and the test must wait until it contains the expected text.
-
-✅ Solution: Use ExpectedConditions.TextToBePresentInElement.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-wait.Until(ExpectedConditions.TextToBePresentInElementLocated(By.Id("status"), "Completed"));
+### Playwright (JS)
+```js
+// Playwright waits automatically — just assert/interact
+await expect(page.locator("#dynamicElement")).toBeVisible({ timeout: 10000 });
+const text = await page.locator("#dynamicElement").textContent();
 ```
 
-## Waiting for a Frame to Load
-
-📌 Scenario: The test must wait for an <iframe> to be available before switching to it.
-
-✅ Solution: Use ExpectedConditions.FrameToBeAvailableAndSwitchToIt.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-wait.Until(ExpectedConditions.FrameToBeAvailableAndSwitchToIt("iframeID"));
+### Playwright (Python)
+```python
+expect(page.locator("#dynamicElement")).to_be_visible(timeout=10000)
+text = page.locator("#dynamicElement").text_content()
 ```
 
-## Waiting for JavaScript Execution to Complete
+---
 
-📌 Scenario: Some elements may not be interactable until JavaScript execution completes.
+## 3. Explicit Wait — wait for element to be clickable
 
-✅ Solution: Use IJavaScriptExecutor to check for document.readyState.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-wait.Until(driver => ((IJavaScriptExecutor)driver).ExecuteScript("return document.readyState").Equals("complete"));
+### Selenium (Java)
+```java
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+WebElement button = wait.until(
+    ExpectedConditions.elementToBeClickable(By.id("submitBtn"))
+);
+button.click();
 ```
 
-## Waiting for an Element to Disappear
-
-    📌 Scenario: A loader or spinner should disappear before proceeding.
-
-✅ Solution: Use ExpectedConditions.InvisibilityOfElementLocated.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-wait.Until(ExpectedConditions.InvisibilityOfElementLocated(By.ClassName("loading-spinner")));
+### Playwright (JS)
+```js
+await page.locator("#submitBtn").waitFor({ state: "visible" });
+await page.locator("#submitBtn").click(); // auto-waits for clickable
 ```
 
-## Waiting for AJAX Requests to Complete
-
-📌 Scenario: The application makes an AJAX request, and the test must wait before interacting with elements.
-
-✅ Solution: Wait for jQuery.active == 0.
-
-```csharp
-WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-wait.Until(driver => (bool)((IJavaScriptExecutor)driver).ExecuteScript("return jQuery.active == 0"));
+### Playwright (Python)
+```python
+page.locator("#submitBtn").wait_for(state="visible")
+page.locator("#submitBtn").click()  # auto-waits for clickable
 ```
 
-## Implementing Implicit Wait (Fallback Option)
+---
 
-📌 Scenario: You want to set a default wait time for all element interactions.
+## 4. Wait for text to appear on page
 
-✅ Solution: Use Implicit Wait, but prefer Explicit Waits for dynamic elements.
+### Selenium (Java)
+```java
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+wait.until(ExpectedConditions.textToBePresentInElementLocated(
+    By.id("statusMsg"), "Completed"
+));
+```
 
-```csharp
-driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
+### Playwright (JS)
+```js
+await expect(page.locator("#statusMsg")).toHaveText("Completed", { timeout: 10000 });
+```
+
+### Playwright (Python)
+```python
+expect(page.locator("#statusMsg")).to_have_text("Completed", timeout=10000)
+```
+
+---
+
+## 5. Wait for element to disappear (spinner/loader)
+
+### Selenium (Java)
+```java
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id("loadingSpinner")));
+```
+
+### Playwright (JS)
+```js
+await page.locator("#loadingSpinner").waitFor({ state: "hidden", timeout: 15000 });
+```
+
+### Playwright (Python)
+```python
+page.locator("#loadingSpinner").wait_for(state="hidden", timeout=15000)
+```
+
+---
+
+## 6. Wait for URL to change
+
+### Selenium (Java)
+```java
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+wait.until(ExpectedConditions.urlContains("/dashboard"));
+```
+
+### Playwright (JS)
+```js
+await expect(page).toHaveURL(/dashboard/, { timeout: 10000 });
+```
+
+### Playwright (Python)
+```python
+expect(page).to_have_url(re.compile("dashboard"), timeout=10000)
+```
+
+---
+
+## 7. Fluent Wait (poll until condition)
+
+### Selenium (Java)
+```java
+Wait<WebDriver> fluentWait = new FluentWait<>(driver)
+    .withTimeout(Duration.ofSeconds(15))
+    .pollingEvery(Duration.ofSeconds(2))
+    .ignoring(NoSuchElementException.class);
+
+WebElement element = fluentWait.until(
+    d -> d.findElement(By.id("asyncData"))
+);
+```
+
+### Playwright (JS)
+```js
+// Use waitForFunction for custom polling
+await page.waitForFunction(() => {
+  const el = document.getElementById("asyncData");
+  return el && el.textContent.trim().length > 0;
+}, { timeout: 15000, polling: 2000 });
+```
+
+### Playwright (Python)
+```python
+page.wait_for_function(
+    "() => document.getElementById('asyncData')?.textContent?.trim().length > 0",
+    timeout=15000,
+    polling_interval=2000
+)
+```
+
+---
+
+## 8. Wait for page to fully load
+
+### Selenium (Java)
+```java
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+wait.until(driver -> ((JavascriptExecutor) driver)
+    .executeScript("return document.readyState").equals("complete"));
+```
+
+### Playwright (JS)
+```js
+await page.waitForLoadState("networkidle"); // or "load" or "domcontentloaded"
+```
+
+### Playwright (Python)
+```python
+page.wait_for_load_state("networkidle")  # or "load" or "domcontentloaded"
 ```
 
 > 📄 **Also Read:** [Top 10 Best Automation Practice Website](https://www.qaplayground.com/blog/top-10-best-automation-practice-website)

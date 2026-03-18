@@ -26,7 +26,7 @@ const Header = () => {
               src="/mainicons/edit.svg"
               width={30}
               height={30}
-              alt="qa-playground"
+              alt="QA PlayGround - Automation Testing Practice Platform"
             />
             <span className="gradient-subTitle font-semibold">
               QA PlayGround

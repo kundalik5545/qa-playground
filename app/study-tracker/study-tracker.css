@@ -832,11 +832,13 @@
 .st-toast.error { background: #dc2626; }
 
 /* ─── RESPONSIVE ─── */
+@media (max-width: 1358px) {
+  .st-daily-main-grid { grid-template-columns: 1fr; }
+}
 @media (max-width: 1100px) {
   .st-charts-row, .st-charts-row-equal { grid-template-columns: 1fr; }
 }
 @media (max-width: 900px) {
-  .st-daily-main-grid { grid-template-columns: 1fr; }
   .st-analytics-cards { grid-template-columns: repeat(2, 1fr); }
   .st-charts-row-2 { grid-template-columns: 1fr; }
   .st-habits-layout { grid-template-columns: 1fr; }

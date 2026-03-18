@@ -52,13 +52,6 @@ const allElements = [
     link: "/practice/alert",
   },
   {
-    title: "Frame",
-    logo: "/mainicons/frame.svg",
-    Description: "Interact with different types of frames/iframes",
-    footerTitle: "Inner HTML",
-    link: "/practice/frame",
-  },
-  {
     title: "Radio",
     logo: "/mainicons/radio.svg",
     Description: "Interact with different types of radio & check boxes",
@@ -72,34 +65,34 @@ const allElements = [
     footerTitle: "Tabs",
     link: "/practice/window",
   },
-  {
-    title: "Elements",
-    logo: "/mainicons/elements.svg",
-    Description: "Play with element and smash them",
-    footerTitle: "Find Elements",
-    link: "/practice/elements",
-  },
-  {
-    title: "Drag",
-    logo: "/mainicons/drag.svg",
-    Description: "Can you Drag me here and there",
-    footerTitle: "Just Drag",
-    link: "/practice/drag",
-  },
-  {
-    title: "Drop",
-    logo: "/mainicons/falling.svg",
-    Description: "Feel free to bounce me",
-    footerTitle: "Drop Me",
-    link: "/practice/drop",
-  },
-  {
-    title: "Sort",
-    logo: "/mainicons/filter.svg",
-    Description: "Sort out the problem quickly",
-    footerTitle: "Sort out",
-    link: "/practice/sort",
-  },
+  // {
+  //   title: "Elements",
+  //   logo: "/mainicons/elements.svg",
+  //   Description: "Play with element and smash them",
+  //   footerTitle: "Find Elements",
+  //   link: "/practice/elements",
+  // },
+  // {
+  //   title: "Drag",
+  //   logo: "/mainicons/drag.svg",
+  //   Description: "Can you Drag me here and there",
+  //   footerTitle: "Just Drag",
+  //   link: "/practice/drag",
+  // },
+  // {
+  //   title: "Drop",
+  //   logo: "/mainicons/falling.svg",
+  //   Description: "Feel free to bounce me",
+  //   footerTitle: "Drop Me",
+  //   link: "/practice/drop",
+  // },
+  // {
+  //   title: "Sort",
+  //   logo: "/mainicons/filter.svg",
+  //   Description: "Sort out the problem quickly",
+  //   footerTitle: "Sort out",
+  //   link: "/practice/sort",
+  // },
   {
     title: "Multi-Select",
     logo: "/mainicons/alert.svg",
@@ -107,13 +100,13 @@ const allElements = [
     footerTitle: "Page",
     link: "/practice/multi-select",
   },
-  {
-    title: "Slider",
-    logo: "/mainicons/slider.svg",
-    Description: "Hmm.. Can you slide me?",
-    footerTitle: "Page",
-    link: "/practice/slider",
-  },
+  // {
+  //   title: "Slider",
+  //   logo: "/mainicons/slider.svg",
+  //   Description: "Hmm.. Can you slide me?",
+  //   footerTitle: "Page",
+  //   link: "/practice/slider",
+  // },
   {
     title: "Waits",
     logo: "/mainicons/waits.svg",
@@ -135,13 +128,13 @@ const allElements = [
   //   footerTitle: "Advance Table",
   //   link: "/practice/advance-table",
   // },
-  {
-    title: "Advance Table",
-    logo: "/mainicons/simtable.svg",
-    Description: "It's little complicated but give a try",
-    footerTitle: "Advance Table",
-    link: "/practice/advance-table",
-  },
+  // {
+  //   title: "Advance Table",
+  //   logo: "/mainicons/simtable.svg",
+  //   Description: "It's little complicated but give a try",
+  //   footerTitle: "Advance Table",
+  //   link: "/practice/advance-table",
+  // },
   {
     title: "Calendar",
     logo: "/mainicons/calendar.svg",
@@ -163,13 +156,13 @@ const allElements = [
     footerTitle: "Upload & Download",
     link: "/practice/upload-download",
   },
-  {
-    title: "Shadow",
-    logo: "/mainicons/mario.svg",
-    Description: "Shadow never leaves us alone",
-    footerTitle: "DOM",
-    link: "/practice/shadow-dom",
-  },
+  // {
+  //   title: "Shadow",
+  //   logo: "/mainicons/mario.svg",
+  //   Description: "Shadow never leaves us alone",
+  //   footerTitle: "DOM",
+  //   link: "/practice/shadow-dom",
+  // },
 ];
 
 const PracticePage = () => {
@@ -177,12 +170,13 @@ const PracticePage = () => {
     <div>
       <div className="practice-section">
         <section className="page-title py-4">
-          <h2 className="text-center text-3xl font-semibold">
-            Ready to be a Pro Enginner?
+          <h1 className="text-center text-3xl font-semibold">
+            Ready to be a Pro Ai Automation Enginner?
+          </h1>
+          <h2 className="text-center text-base mt-2 text-gray-500 ">
+            Practice daily and level up your automation skills with real-world
+            scenarios.
           </h2>
-          <h3 className="text-center text-xl text-gray-500 ">
-            Practice Daily Automation!
-          </h3>
         </section>
         <section className="elements grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 pb-0 gap-8 pt-8 p-5 ">
           {allElements?.map((el, i) => {
@@ -193,7 +187,13 @@ const PracticePage = () => {
               >
                 <CardHeader className="flex flex-row items-center justify-between p-1 shadow-lg dark:shadow-md dark:shadow-gray-800  space-y-0">
                   <p className="px-2 text-xl font-semibold">{el.title}</p>
-                  <Image src={el.logo} width={50} height={50} className="p-1" alt={el.title} />
+                  <Image
+                    src={el.logo}
+                    width={50}
+                    height={50}
+                    className="p-1"
+                    alt={el.title}
+                  />
                 </CardHeader>
                 <CardContent className="p-3 h-28">
                   <p className="py-7 text-base dark:text-gray-200 text-center">
