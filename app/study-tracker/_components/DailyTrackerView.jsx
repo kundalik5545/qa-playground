@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   getTodayStr,
   formatMinutes,
@@ -32,10 +32,10 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     duration: "1month", startDate: getTodayStr(), endDate: "",
   });
 
-  // Strip dates (±3 days from today)
+  // Strip dates (±3 days from selectedDate)
   const stripDates = [];
   for (let i = -3; i <= 3; i++) {
-    const d = new Date(); d.setDate(d.getDate() + i);
+    const d = new Date(selectedDate + "T00:00:00"); d.setDate(d.getDate() + i);
     stripDates.push(d.toISOString().slice(0, 10));
   }
 
@@ -178,38 +178,42 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
           <div>
             {/* Date nav bar */}
             <div className="st-date-nav-bar">
-              <button className="st-date-nav-btn" onClick={() => {
-                const d = new Date(selectedDate + "T00:00:00"); d.setDate(d.getDate() - 1);
-                setSelectedDate(d.toISOString().slice(0, 10));
-              }}>◀</button>
-              <div className="st-date-strip">
-                {stripDates.map((date) => {
-                  const d   = new Date(date + "T00:00:00");
-                  const dot = dotClass(date);
-                  return (
-                    <div
-                      key={date}
-                      className={`st-date-chip${date === selectedDate ? " active" : ""}${date === getTodayStr() ? " today" : ""}`}
-                      onClick={() => setSelectedDate(date)}
-                    >
-                      <span className="st-date-chip-day">{d.toLocaleDateString("en-US", { weekday: "short" })}</span>
-                      <span className="st-date-chip-num">{d.getDate()}</span>
-                      <span className={`st-date-chip-dot${dot ? " " + dot : ""}`} />
-                    </div>
-                  );
-                })}
+              <div className="st-date-nav-main">
+                <button className="st-date-nav-btn" title="Previous week" onClick={() => {
+                  const d = new Date(selectedDate + "T00:00:00"); d.setDate(d.getDate() - 7);
+                  setSelectedDate(d.toISOString().slice(0, 10));
+                }}>◀</button>
+                <div className="st-date-strip">
+                  {stripDates.map((date) => {
+                    const d   = new Date(date + "T00:00:00");
+                    const dot = dotClass(date);
+                    return (
+                      <div
+                        key={date}
+                        className={`st-date-chip${date === selectedDate ? " active" : ""}${date === getTodayStr() ? " today" : ""}`}
+                        onClick={() => setSelectedDate(date)}
+                      >
+                        <span className="st-date-chip-day">{d.toLocaleDateString("en-US", { weekday: "short" })}</span>
+                        <span className="st-date-chip-num">{d.getDate()}</span>
+                        <span className={`st-date-chip-dot${dot ? " " + dot : ""}`} />
+                      </div>
+                    );
+                  })}
+                </div>
+                <button className="st-date-nav-btn" title="Next week" onClick={() => {
+                  const d = new Date(selectedDate + "T00:00:00"); d.setDate(d.getDate() + 7);
+                  setSelectedDate(d.toISOString().slice(0, 10));
+                }}>▶</button>
               </div>
-              <button className="st-date-nav-btn" onClick={() => {
-                const d = new Date(selectedDate + "T00:00:00"); d.setDate(d.getDate() + 1);
-                setSelectedDate(d.toISOString().slice(0, 10));
-              }}>▶</button>
-              <button className="st-today-btn" onClick={() => setSelectedDate(getTodayStr())}>Today</button>
-              <input
-                type="date"
-                className="st-date-picker-input"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-              />
+              <div className="st-date-nav-controls">
+                <button className="st-today-btn" onClick={() => setSelectedDate(getTodayStr())}>Today</button>
+                <input
+                  type="date"
+                  className="st-date-picker-input"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                />
+              </div>
             </div>
 
             {/* Task panel */}
@@ -387,9 +391,6 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
     return { totalItems, doneItems, pct };
   }
 
-  const totalItems = (state.daily ? Object.values(state.daily) : []).flat().length;
-  const doneItems  = (state.daily ? Object.values(state.daily) : []).flat().filter((t) => t.done).length;
-  const pct        = totalItems ? Math.round((doneItems / totalItems) * 100) : 0;
 
   // Recalculate for analytics cards
   let cardDone = 0, cardTotal = 0, cardTime = 0;
