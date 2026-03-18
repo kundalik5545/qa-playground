@@ -117,19 +117,19 @@ const studyTrackerSyllabi = [
 
 const studyTrackerFeatures = [
   {
-    icon: <CheckCircle className="h-5 w-5 text-emerald-500 flex-shrink-0" />,
+    icon: <CheckCircle className="h-5 w-5 text-emerald-600 flex-shrink-0" />,
     text: "Track topic completion across 4 QA syllabi",
   },
   {
-    icon: <BarChart3 className="h-5 w-5 text-blue-500 flex-shrink-0" />,
+    icon: <BarChart3 className="h-5 w-5 text-blue-600 flex-shrink-0" />,
     text: "Visual progress charts — donut, radar, and daily activity line chart",
   },
   {
-    icon: <BookMarked className="h-5 w-5 text-purple-500 flex-shrink-0" />,
+    icon: <BookMarked className="h-5 w-5 text-violet-600 flex-shrink-0" />,
     text: "Add personal notes and resource links per topic",
   },
   {
-    icon: <ClipboardList className="h-5 w-5 text-orange-500 flex-shrink-0" />,
+    icon: <ClipboardList className="h-5 w-5 text-slate-500 flex-shrink-0" />,
     text: "Daily activity log with streak tracking — no login required",
   },
 ];
@@ -354,15 +354,13 @@ const LandingPage = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           <Card className="p-6 shadow-lg rounded-xl text-center">
             <CardContent>
-              <h3 className="text-xl font-semibold text-teal-700">
-                Free Tutorials
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 mt-2">
+              <h3 className="text-xl font-semibold">Free Tutorials</h3>
+              <p className="text-muted-foreground mt-2">
                 Free courses on software testing and automation development.
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 <Link href="/learn/courses">
-                  <Button className="bg-teal-800 text-white px-4 py-2 rounded-full">
+                  <Button variant="default" className="rounded-full px-5">
                     Explore Free Courses
                   </Button>
                 </Link>
@@ -371,7 +369,7 @@ const LandingPage = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Button className="bg-teal-800 text-white px-4 py-2 rounded-full">
+                  <Button variant="outline" className="rounded-full px-5">
                     Automation Framework
                   </Button>
                 </Link>
@@ -381,20 +379,18 @@ const LandingPage = () => {
 
           <Card className="p-6 shadow-lg rounded-xl text-center">
             <CardContent>
-              <h3 className="text-xl font-semibold text-teal-700">
-                Practice Logic
-              </h3>
-              <p className="text-gray-500 dark:text-gray-400 mt-2">
+              <h3 className="text-xl font-semibold">Practice Logic</h3>
+              <p className="text-muted-foreground mt-2">
                 Solve real QA interview questions and logic programs.
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
                 <Link href="/learn/automation-test-cases">
-                  <Button className="bg-teal-800 text-white px-4 py-2 rounded-full">
+                  <Button variant="default" className="rounded-full px-5">
                     Practice Automation TC
                   </Button>
                 </Link>
                 <Link href="/learn/logical-programs-list-to-crack-interviews">
-                  <Button className="bg-teal-800 text-white px-4 py-2 rounded-full">
+                  <Button variant="outline" className="rounded-full px-5">
                     Logical Programs
                   </Button>
                 </Link>
@@ -421,11 +417,18 @@ const LandingPage = () => {
               <Link key={i} href={f.to} aria-label={`Practice ${f.title}`}>
                 <Card className="p-5 shadow hover:shadow-md transition-shadow rounded-xl h-full">
                   <CardContent className="pt-0">
-                    <div className="mb-3" aria-hidden="true">
-                      {f.icon}
+                    <div className="flex items-start justify-between mb-4">
+                      <div aria-hidden="true">{f.icon}</div>
+                      {f.badge && (
+                        <span
+                          className={`text-xs font-semibold px-2.5 py-1 rounded-full ${f.badgeClass}`}
+                        >
+                          {f.badge}
+                        </span>
+                      )}
                     </div>
-                    <h3 className="font-semibold mb-1">{f.title}</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-semibold mb-1.5">{f.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {f.description}
                     </p>
                   </CardContent>

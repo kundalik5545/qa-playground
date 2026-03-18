@@ -54,7 +54,7 @@ button.Click();
 
 This project includes comprehensive documentation for AI agents and developers:
 
-- **`AI_AGENT_RULES.md`** - Detailed rules and patterns for understanding the codebase architecture
+- **`AI_CODING_GUIDELINES.md`** - Detailed rules and patterns for understanding the codebase architecture
 - **`.ai-project-config.json`** - Machine-readable configuration for automated code analysis
 - **Component Patterns** - Standardized structure for practice components and pages
 - **Routing Convention** - Next.js App Router with route groups and dynamic routing
@@ -69,7 +69,7 @@ This project includes comprehensive documentation for AI agents and developers:
 
 ### Development Guidelines
 
-All components follow established patterns documented in `AI_AGENT_RULES.md`. When contributing:
+All components follow established patterns documented in `AI_CODING_GUIDELINES.md`. When contributing:
 
 1. Follow the component structure patterns
 2. Use Tailwind CSS for styling

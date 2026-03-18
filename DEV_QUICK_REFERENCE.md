@@ -178,7 +178,7 @@ All interactive elements include:
 
 ## 📞 Need Help?
 
-- Check `AI_AGENT_RULES.md` for comprehensive documentation
+- Check `AI_CODING_GUIDELINES.md` for comprehensive documentation
 - Review `.ai-project-config.json` for technical specifications
 - Examine existing components for patterns and examples
 - Test changes across different screen sizes and themes
