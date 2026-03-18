@@ -1,33 +1,30 @@
 import {
   Receipt,
-  Globe,
   Zap,
   Unlink2,
-  User,
-  CheckCheckIcon,
-  Cpu,
   Megaphone,
   LayoutDashboard,
   Monitor,
   Telescope,
+  TableProperties,
 } from "lucide-react";
 
 // Stats Data
 export const statsData = [
   {
-    value: "50K+",
+    value: "10K+",
     label: "Active Users",
   },
   {
-    value: "Practice",
-    label: "C#, Java, JavaScript",
+    value: "22+",
+    label: "Practice Elements",
   },
   {
     value: "99.9%",
     label: "Uptime",
   },
   {
-    value: "4.9/5",
+    value: "4.5/5",
     label: "User Rating",
   },
 ];
@@ -35,42 +32,64 @@ export const statsData = [
 // Features Data
 export const featuresData = [
   {
-    icon: <Unlink2 className="h-8 w-8 text-blue-600" />,
+    icon: <Unlink2 className="h-7 w-7 text-blue-600" />,
     to: "/practice",
+    badge: "UI Elements",
+    badgeClass:
+      "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
     title: "Practice Web Elements",
     description:
-      "Get detailed insights into your spending patterns with AI-powered analytics",
+      "22+ interactive UI elements — inputs, buttons, tables, drag-drop, shadow DOM, and more. Each element is designed for Selenium, Playwright, and Cypress automation practice.",
   },
   {
-    icon: <Receipt className="h-8 w-8 text-blue-600" />,
-    to: "/forms/basic-details",
-    title: "Forms",
+    icon: <Receipt className="h-7 w-7 text-blue-600" />,
+    to: "/practice/input",
+    badge: "Forms",
+    badgeClass:
+      "bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300",
+    title: "Forms & Inputs",
     description:
-      "Extract data automatically from receipts using advanced AI technology",
+      "Practice automating text inputs, textareas, checkboxes, radio buttons, and form validation scenarios commonly found in real-world applications.",
   },
   {
-    icon: <Megaphone className="h-8 w-8 text-blue-600" />,
-    to: "/alert-window/browser-window",
-    title: "Alerts & Window",
-    description: "Create and manage budgets with intelligent recommendations",
+    icon: <Megaphone className="h-7 w-7 text-amber-600" />,
+    to: "/practice/alert",
+    badge: "Browser",
+    badgeClass:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
+    title: "Alerts & Windows",
+    description:
+      "Handle browser alerts, confirm dialogs, prompt boxes, and multi-window/tab switching — essential skills for any automation engineer.",
   },
   {
-    icon: <LayoutDashboard className="h-8 w-8 text-blue-600" />,
-    to: "/widget/basic-details",
-    title: "Widget",
-    description: "Manage multiple accounts and credit cards in one place",
+    icon: <LayoutDashboard className="h-7 w-7 text-teal-600" />,
+    to: "/bank",
+    badge: "E2E Testing",
+    badgeClass:
+      "bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300",
+    title: "Bank Demo App",
+    description:
+      "A full simulated banking application with login, accounts, dashboard, and transaction management — ideal for end-to-end automation test suites.",
   },
   {
-    icon: <Zap className="h-8 w-8 text-blue-600" />,
-    to: "/interactions/basic-details",
-    title: "Interactions",
-    description: "Support for multiple currencies with real-time conversion",
+    icon: <Zap className="h-7 w-7 text-violet-600" />,
+    to: "/practice/elements",
+    badge: "Advanced",
+    badgeClass:
+      "bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
+    title: "Interactions & Waits",
+    description:
+      "Practice drag-and-drop, sliders, iFrames, shadow DOM, explicit and implicit waits — complex scenarios that mirror real-world automation challenges.",
   },
   {
-    icon: <Globe className="h-8 w-8 text-blue-600" />,
-    to: "/websites",
-    title: "Websites",
-    description: "Get automated financial insights and recommendations",
+    icon: <TableProperties className="h-7 w-7 text-teal-600" />,
+    to: "/practice/simple-table",
+    badge: "Data",
+    badgeClass:
+      "bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300",
+    title: "Tables & Data",
+    description:
+      "Automate simple and advanced data tables with sorting, filtering, and pagination — a must-have skill for enterprise QA automation engineers.",
   },
 ];
 

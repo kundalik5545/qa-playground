@@ -1,8 +1,8 @@
 export const basicDetails = {
   websiteName: "QA Playground",
   websiteDescription:
-    "💡 Practice selenium automation testing with our demo site and elements. Learn more about selenium webdriver and its methods to automate UI testing.",
-  tagLine: "💡 Learn, practice, and excel automation testing.",
+    "Practice Selenium, Playwright, and Cypress automation testing with 22+ interactive UI elements, a Bank Demo app, and a QA Study Tracker. Free for QA engineers.",
+  tagLine: "Learn, practice, and excel in automation testing.",
   websiteEmail: "randomcoders1@gmail.com",
   websiteURL: "https://www.qaplayground.com",
 };

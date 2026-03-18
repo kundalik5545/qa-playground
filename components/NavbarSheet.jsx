@@ -19,6 +19,7 @@ const SheetOpen = ({ children }) => {
   // Centralized navigation links data
   const navigationLinks = [
     { href: "/", label: "Home", altText: "Navigate to homepage" },
+    { href: "/study-tracker", label: "Study Tracker", altText: "Track your study progress", badge: "New" },
     { href: "/blog", label: "Blog", altText: "Read our latest blog posts" },
     {
       href: "/elements/text-box",
@@ -89,6 +90,11 @@ const SheetOpen = ({ children }) => {
                       className="text-base text-left"
                     >
                       {link.label}
+                      {link.badge && (
+                        <span className="ml-1.5 rounded-full bg-green-500 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                          {link.badge}
+                        </span>
+                      )}
                     </Button>
                   </Link>
                 ))}

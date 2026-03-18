@@ -11,10 +11,10 @@ import Image from "next/image";
 const Header = () => {
   const mainNavLinks = [
     { to: "/", text: "Home" },
-    { to: "/blog", text: "Blog" },
-    { to: "/contact-us", text: "Contact" },
+    { to: "/study-tracker", text: "Study Tracker", badge: "New" },
     { to: "/bank", text: "Bank" },
     { to: "/practice", text: "Practice" },
+    { to: "/blog", text: "Blog" },
   ];
 
   return (
@@ -22,7 +22,12 @@ const Header = () => {
       <nav className="container mx-auto px-1  flex items-center justify-between">
         <Link href="/" passHref>
           <span className="text-2xl flex items-center justify-center gap-2">
-            <Image src="/mainicons/edit.svg" width={30} height={30} />
+            <Image
+              src="/mainicons/edit.svg"
+              width={30}
+              height={30}
+              alt="qa-playground"
+            />
             <span className="gradient-subTitle font-semibold">
               QA PlayGround
             </span>
@@ -38,13 +43,18 @@ const Header = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-4">
-          {mainNavLinks.map(({ to, text }, index) => (
+          {mainNavLinks.map(({ to, text, badge }, index) => (
             <Link key={index} href={to}>
               <Button
                 variant="ghost"
-                className="hover:bg-gray-200 dark:hover:bg-gray-700"
+                className="hover:bg-gray-200 dark:hover:bg-gray-700 relative"
               >
                 {text}
+                {badge && (
+                  <span className="ml-1.5 rounded-full bg-green-500 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                    {badge}
+                  </span>
+                )}
               </Button>
             </Link>
           ))}
