@@ -10,24 +10,25 @@ import {
   LayoutDashboard,
   Monitor,
   Telescope,
+  TableProperties,
 } from "lucide-react";
 
 // Stats Data
 export const statsData = [
   {
-    value: "50K+",
+    value: "10K+",
     label: "Active Users",
   },
   {
-    value: "Practice",
-    label: "C#, Java, JavaScript",
+    value: "22+",
+    label: "Practice Elements",
   },
   {
     value: "99.9%",
     label: "Uptime",
   },
   {
-    value: "4.9/5",
+    value: "4.5/5",
     label: "User Rating",
   },
 ];
@@ -39,38 +40,42 @@ export const featuresData = [
     to: "/practice",
     title: "Practice Web Elements",
     description:
-      "Get detailed insights into your spending patterns with AI-powered analytics",
+      "22+ interactive UI elements — inputs, buttons, tables, drag-drop, shadow DOM, and more. Each element is designed for Selenium, Playwright, and Cypress automation practice.",
   },
   {
     icon: <Receipt className="h-8 w-8 text-blue-600" />,
-    to: "/forms/basic-details",
-    title: "Forms",
+    to: "/practice/input",
+    title: "Forms & Inputs",
     description:
-      "Extract data automatically from receipts using advanced AI technology",
+      "Practice automating text inputs, textareas, checkboxes, radio buttons, and form validation scenarios commonly found in real-world applications.",
   },
   {
     icon: <Megaphone className="h-8 w-8 text-blue-600" />,
-    to: "/alert-window/browser-window",
-    title: "Alerts & Window",
-    description: "Create and manage budgets with intelligent recommendations",
+    to: "/practice/alert",
+    title: "Alerts & Windows",
+    description:
+      "Handle browser alerts, confirm dialogs, prompt boxes, and multi-window/tab switching — essential skills for any automation engineer.",
   },
   {
     icon: <LayoutDashboard className="h-8 w-8 text-blue-600" />,
-    to: "/widget/basic-details",
-    title: "Widget",
-    description: "Manage multiple accounts and credit cards in one place",
+    to: "/bank",
+    title: "Bank Demo App",
+    description:
+      "A full simulated banking application with login, accounts, dashboard, and transaction management — ideal for end-to-end automation test suites.",
   },
   {
     icon: <Zap className="h-8 w-8 text-blue-600" />,
-    to: "/interactions/basic-details",
-    title: "Interactions",
-    description: "Support for multiple currencies with real-time conversion",
+    to: "/practice/elements",
+    title: "Interactions & Waits",
+    description:
+      "Practice drag-and-drop, sliders, iFrames, shadow DOM, explicit and implicit waits — complex scenarios that mirror real-world automation challenges.",
   },
   {
-    icon: <Globe className="h-8 w-8 text-blue-600" />,
-    to: "/websites",
-    title: "Websites",
-    description: "Get automated financial insights and recommendations",
+    icon: <TableProperties className="h-8 w-8 text-blue-600" />,
+    to: "/practice/simple-table",
+    title: "Tables & Data",
+    description:
+      "Automate simple and advanced data tables with sorting, filtering, and pagination — a must-have skill for enterprise QA automation engineers.",
   },
 ];
 

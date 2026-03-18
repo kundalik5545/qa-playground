@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Bash(ls \"d:/new-playground/01_qa_playground/qa-playground/app/\\(study-tracker\\)/\")",
+      "Bash(npx next:*)"
+    ]
+  }
+}

@@ -11,10 +11,10 @@ import Image from "next/image";
 const Header = () => {
   const mainNavLinks = [
     { to: "/", text: "Home" },
-    { to: "/blog", text: "Blog" },
-    { to: "/contact-us", text: "Contact" },
+    { to: "/study-tracker", text: "Study Tracker" },
     { to: "/bank", text: "Bank" },
     { to: "/practice", text: "Practice" },
+    { to: "/blog", text: "Blog" },
   ];
 
   return (
@@ -22,7 +22,12 @@ const Header = () => {
       <nav className="container mx-auto px-1  flex items-center justify-between">
         <Link href="/" passHref>
           <span className="text-2xl flex items-center justify-center gap-2">
-            <Image src="/mainicons/edit.svg" width={30} height={30} />
+            <Image
+              src="/mainicons/edit.svg"
+              width={30}
+              height={30}
+              alt="qa-playground"
+            />
             <span className="gradient-subTitle font-semibold">
               QA PlayGround
             </span>

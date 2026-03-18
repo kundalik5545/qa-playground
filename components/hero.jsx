@@ -5,19 +5,22 @@ import { allUrls } from "@/data/BasicSetting";
 
 const HeroSection = () => {
   return (
-    <section className="mt-24 mb-8 md:mb-16  px-4 bg-background text-foreground">
+    <section
+      aria-label="Hero section"
+      className="mt-24 mb-8 md:mb-16 px-4 bg-background text-foreground"
+    >
       <div className="container mx-auto text-center flex flex-col items-center">
-        <h1 className=" text-4xl md:text-6xl font-bold leading-tight mb-6">
+        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
           Master Automation Testing With
+          <span className="gradient-subTitle pl-5 text-4xl md:text-7xl font-bold leading-tight mb-6">
+            QA PlayGround
+          </span>
         </h1>
-        <span className="gradient-subTitle text-4xl md:text-7xl font-bold leading-tight mb-6">
-          QA PlayGround
-        </span>
 
         <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-4xl mx-auto">
-          Learn and practice automation testing using Selenium. Get hands-on
-          experience with real-world challenges and boost your testing skills to
-          the next level!
+          Practice Selenium, Playwright, and Cypress automation testing with
+          22+ interactive UI elements, a Bank Demo app, and a built-in Study
+          Tracker. Free for QA engineers at every level.
         </p>
 
         <div className="flex flex-wrap justify-center gap-4">
