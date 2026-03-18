@@ -32,6 +32,8 @@ import FilePage from "../_components/FileUploadDownloadPage";
 import CalendarPage from "../_components/CalendarPage";
 import SimpleTablePage from "../_components/TablePage";
 import AdvanceTablePage from "../_components/AdvanceTablePage";
+import MultiSelectPage from "../_components/MultiSelectPage";
+import FormsPage from "../_components/FormsPage";
 
 // Blog Slug to Component Mapping
 const componentMapping = {
@@ -48,6 +50,8 @@ const componentMapping = {
   "upload-download": FilePage,
   "simple-table": SimpleTablePage,
   "advance-table": AdvanceTablePage,
+  "multi-select": MultiSelectPage,
+  forms: FormsPage,
 };
 
 // Fetch all blog slugs dynamically
