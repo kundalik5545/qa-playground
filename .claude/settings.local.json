@@ -8,7 +8,9 @@
       "Bash(mv BANK_MIGRATION.md BANK_MIGRATION_NOTES.md)",
       "Bash(mv QUICK_REFERENCE.md DEV_QUICK_REFERENCE.md)",
       "Bash(sed -i 's/AI_AGENT_RULES\\\\.md/AI_CODING_GUIDELINES.md/g' README.md DEV_QUICK_REFERENCE.md)",
-      "Bash(sed -i 's/AI_AGENT_RULES\\\\.md             Rules for AI agents working on this project/AI_CODING_GUIDELINES.md         Rules and guidelines for AI agents working on this project/' CLAUDE.md)"
+      "Bash(sed -i 's/AI_AGENT_RULES\\\\.md             Rules for AI agents working on this project/AI_CODING_GUIDELINES.md         Rules and guidelines for AI agents working on this project/' CLAUDE.md)",
+      "Bash(ls \"d:/new-playground/01_qa_playground/qa-playground/tailwind.config\"*)",
+      "Bash(npx pnpm:*)"
     ]
   }
 }
