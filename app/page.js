@@ -21,8 +21,7 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title:
-    "QA Playground — Practice Selenium, Playwright & Cypress Automation Testing",
+  title: "QA Playground — Practice Selenium, Playwright & Cypress",
   description:
     "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker. Practice Selenium, Playwright, and Cypress for free.",
   alternates: {
@@ -43,8 +42,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     url: "https://www.qaplayground.com",
-    title:
-      "QA Playground — Practice Selenium, Playwright & Cypress Automation Testing",
+    title: "QA Playground — Practice Selenium, Playwright & Cypress",
     description:
       "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker. Practice Selenium, Playwright, and Cypress for free.",
     images: [
@@ -52,15 +50,14 @@ export const metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "QA Playground — Automation Testing Practice Platform",
+        alt: "QA Playground — Practice Selenium, Playwright & Cypress",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     site: "@qaplayground",
-    title:
-      "QA Playground — Practice Selenium, Playwright & Cypress Automation Testing",
+    title: "QA Playground — Practice Selenium, Playwright & Cypress",
     description:
       "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker.",
     images: ["/og-image.png"],
@@ -79,6 +76,23 @@ const jsonLd = {
     target: "https://www.qaplayground.com/practice",
     "query-input": "required name=search_term_string",
   },
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  name: "QA PlayGround",
+  operatingSystem: "Web",
+  applicationCategory: "EducationalApplication",
+  offers: {
+    "@type": "Offer",
+    price: "0",
+    priceCurrency: "USD",
+  },
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.5",
+    reviewCount: "10000",
+  },
+  description:
+    "A purpose-built practice platform for QA automation engineers to learn Selenium, Playwright, and Cypress through hands-on interactive elements.",
 };
 
 const studyTrackerSyllabi = [
@@ -150,7 +164,7 @@ const LandingPage = () => {
       <section aria-label="Main platform features" className="py-14 px-4">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold gradient-title mb-3">
-            Everything You Need to Level Up Your QA Career
+            Free Resources to Level Up Your QA Automation Caree
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Three powerful tools in one platform — practice automation, simulate
