@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "type": "qa-tracker-syllabus",
+  "exportedAt": "2026-03-20T12:00:00.000Z",
+  "syllabus": {
+    "id": "java-basics",
+    "label": "Java Basics",
+    "icon": "☕",
+    "color": "#ED8B00",
+    "sections": [
+      {
+        "id": "java-basics-s1",
+        "title": "Fundamentals",
+        "topics": [
+          {
+            "id": "java-basics-t1",
+            "title": "Introduction to Java",
+            "subtopics": [
+              "What is Java",
+              "Features of Java",
+              "JDK, JRE, JVM"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t2",
+            "title": "Basic Syntax",
+            "subtopics": [
+              "Main method structure",
+              "Keywords in Java",
+              "Identifiers rules"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t3",
+            "title": "Variables and Data Types",
+            "subtopics": [
+              "Variable declaration",
+              "Primitive and non-primitive types",
+              "Type casting"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t4",
+            "title": "Operators",
+            "subtopics": [
+              "Arithmetic operators",
+              "Relational operators",
+              "Logical operators"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "java-basics-s2",
+        "title": "Control Flow",
+        "topics": [
+          {
+            "id": "java-basics-t5",
+            "title": "Control Statements",
+            "subtopics": [
+              "if and else",
+              "switch case",
+              "nested conditions"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t6",
+            "title": "Looping Statements",
+            "subtopics": [
+              "for loop",
+              "while loop",
+              "do-while loop"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t7",
+            "title": "Scanner Class",
+            "subtopics": [
+              "Taking user input",
+              "Scanner methods",
+              "Common input issues"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "java-basics-s3",
+        "title": "Core Programming",
+        "topics": [
+          {
+            "id": "java-basics-t8",
+            "title": "Methods",
+            "subtopics": [
+              "Method definition",
+              "Parameters and return types",
+              "Method overloading"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t9",
+            "title": "Arrays",
+            "subtopics": [
+              "Array declaration",
+              "Iterating arrays",
+              "Multidimensional arrays"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t10",
+            "title": "Strings",
+            "subtopics": [
+              "String creation",
+              "Common string methods",
+              "String immutability"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t11",
+            "title": "Classes and Objects",
+            "subtopics": [
+              "Class structure",
+              "Object creation",
+              "Accessing members"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "java-basics-s4",
+        "title": "Object-Oriented Programming",
+        "topics": [
+          {
+            "id": "java-basics-t12",
+            "title": "Constructors and Keywords",
+            "subtopics": [
+              "Constructor types",
+              "this keyword",
+              "super keyword"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t13",
+            "title": "Encapsulation and Abstraction",
+            "subtopics": [
+              "Encapsulation concept",
+              "Abstraction concept",
+              "Interface usage"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t14",
+            "title": "Inheritance and Polymorphism",
+            "subtopics": [
+              "Inheritance types",
+              "Polymorphism concept",
+              "Generalization"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t15",
+            "title": "Overloading and Overriding",
+            "subtopics": [
+              "Method overloading",
+              "Method overriding",
+              "Runtime vs compile-time polymorphism"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "java-basics-s5",
+        "title": "Advanced Concepts",
+        "topics": [
+          {
+            "id": "java-basics-t16",
+            "title": "Access Specifiers and Packages",
+            "subtopics": [
+              "Public, private, protected",
+              "Default access",
+              "Package creation"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t17",
+            "title": "Exception Handling",
+            "subtopics": [
+              "try-catch blocks",
+              "finally block",
+              "Custom exceptions"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t18",
+            "title": "Multithreading",
+            "subtopics": [
+              "Thread creation",
+              "Thread lifecycle",
+              "Synchronization basics"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-basics-t19",
+            "title": "Collections Framework",
+            "subtopics": [
+              "List, Set, Map",
+              "Common collection classes",
+              "Iterators"
+            ],
+            "resources": []
+          }
+        ]
+      }
+    ]
+  }
+}
