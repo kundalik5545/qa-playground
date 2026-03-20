@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { getSyllabusStats, downloadJSON, pickJSONFile } from "@/lib/studyTrackerStorage";
 
 const COLORS = ["#2563eb","#7c3aed","#059669","#dc2626","#f59e0b","#0891b2","#db2777","#ea580c"];
@@ -119,6 +120,38 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             <button className="st-action-btn st-import-btn" onClick={importSyllabus} title="Import a syllabus from a .json file">⬆ Import</button>
             <button className="st-action-btn st-export-btn" onClick={exportAll} title="Export all syllabi to a single .json file">⬇ Export All</button>
+            <Link
+              href="/study-tracker/ai-syllabus-prompt"
+              className="st-action-btn"
+              title="Generate a syllabus using AI — get a ready-made prompt for ChatGPT, Claude, or Gemini"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                textDecoration: "none",
+                background: "#eff2ff",
+                color: "#2563eb",
+                border: "1px solid #c7d2fe",
+              }}
+            >
+              ✦ AI Prompt
+            </Link>
+            <Link
+              href="/qa-tools/json-to-file"
+              className="st-action-btn"
+              title="Paste AI-generated JSON and download it as a .json file"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                textDecoration: "none",
+                background: "#f0fdf4",
+                color: "#059669",
+                border: "1px solid #bbf7d0",
+              }}
+            >
+              ⬇ JSON → File
+            </Link>
             <button className="st-new-syl-btn" onClick={() => setShowNewForm((v) => !v)}>+ New Syllabus</button>
           </div>
         </div>

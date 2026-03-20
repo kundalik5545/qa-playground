@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "type": "qa-tracker-syllabus",
+  "exportedAt": "2026-03-20T12:00:00.000Z",
+  "syllabus": {
+    "id": "python",
+    "label": "Python Language",
+    "icon": "🐍",
+    "color": "#3776AB",
+    "sections": [
+      {
+        "id": "python-s1",
+        "title": "Fundamentals",
+        "topics": [
+          {
+            "id": "python-t1",
+            "title": "Introduction to Python",
+            "subtopics": [
+              "What is Python",
+              "Installation and setup",
+              "Running Python scripts"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t2",
+            "title": "Variables and Data Types",
+            "subtopics": [
+              "Primitive data types",
+              "Type casting",
+              "Dynamic typing"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t3",
+            "title": "Operators",
+            "subtopics": [
+              "Arithmetic operators",
+              "Comparison operators",
+              "Logical operators"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-s2",
+        "title": "Control Flow",
+        "topics": [
+          {
+            "id": "python-t4",
+            "title": "Conditional Statements",
+            "subtopics": [
+              "if statements",
+              "else and elif",
+              "nested conditions"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t5",
+            "title": "Loops",
+            "subtopics": [
+              "for loop",
+              "while loop",
+              "break and continue"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t6",
+            "title": "Functions",
+            "subtopics": [
+              "Defining functions",
+              "Arguments and return values",
+              "Lambda functions"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-s3",
+        "title": "Core Data Structures",
+        "topics": [
+          {
+            "id": "python-t7",
+            "title": "Lists",
+            "subtopics": [
+              "List creation",
+              "List methods",
+              "List comprehensions"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t8",
+            "title": "Tuples and Sets",
+            "subtopics": [
+              "Tuple properties",
+              "Set operations",
+              "Differences between list and set"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t9",
+            "title": "Dictionaries",
+            "subtopics": [
+              "Key-value pairs",
+              "Dictionary methods",
+              "Nested dictionaries"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-s4",
+        "title": "Advanced Concepts",
+        "topics": [
+          {
+            "id": "python-t10",
+            "title": "Object-Oriented Programming",
+            "subtopics": [
+              "Classes and objects",
+              "Inheritance",
+              "Encapsulation and polymorphism"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t11",
+            "title": "Modules and Packages",
+            "subtopics": [
+              "Importing modules",
+              "Creating packages",
+              "Standard library overview"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t12",
+            "title": "Exception Handling",
+            "subtopics": [
+              "try-except blocks",
+              "Custom exceptions",
+              "finally and else usage"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-s5",
+        "title": "Practical Usage",
+        "topics": [
+          {
+            "id": "python-t13",
+            "title": "File Handling",
+            "subtopics": [
+              "Reading files",
+              "Writing files",
+              "Working with CSV and JSON"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t14",
+            "title": "Working with Libraries",
+            "subtopics": [
+              "Installing packages with pip",
+              "Virtual environments",
+              "Popular libraries overview"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-t15",
+            "title": "Testing and Best Practices",
+            "subtopics": [
+              "Unit testing basics",
+              "Code readability",
+              "PEP8 guidelines"
+            ],
+            "resources": []
+          }
+        ]
+      }
+    ]
+  }
+}
