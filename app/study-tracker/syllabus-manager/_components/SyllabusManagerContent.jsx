@@ -25,7 +25,9 @@ import {
   pickJsonFile,
   makeExportFilename,
   makeSyllabusId,
+  calcProgress,
 } from "@/lib/syllabusManagerDb";
+import { getIdbItem } from "@/lib/indexedDb";
 import SyllabusCard from "./SyllabusCard";
 import NewSyllabusDialog from "./NewSyllabusDialog";
 import AiPromptDialog from "./AiPromptDialog";
@@ -48,6 +50,7 @@ function useToast() {
 export default function SyllabusManagerContent() {
   const [syllabi, setSyllabi] = useState(null); // { [id]: syllabus }
   const [order, setOrder] = useState(null); // [id, id, ...]
+  const [progressMap, setProgressMap] = useState({}); // { [topicId]: true }
   const [editingId, setEditingId] = useState(null);
   const [newDialogOpen, setNewDialogOpen] = useState(false);
   const [aiDialogOpen, setAiDialogOpen] = useState(false);
@@ -58,8 +61,14 @@ export default function SyllabusManagerContent() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { syllabi: idbSyllabi, order: idbOrder } = await loadSyllabiFromIdb();
+      const [{ syllabi: idbSyllabi, order: idbOrder }, studyState] =
+        await Promise.all([
+          loadSyllabiFromIdb(),
+          getIdbItem("study-tracker-state"),
+        ]);
       if (cancelled) return;
+
+      setProgressMap(studyState?.progress || {});
 
       if (idbSyllabi && Object.keys(idbSyllabi).length > 0) {
         setSyllabi(idbSyllabi);
@@ -305,6 +314,7 @@ export default function SyllabusManagerContent() {
                 <SyllabusCard
                   key={syl.id}
                   syllabus={syl}
+                  progressPct={calcProgress(syl, progressMap)}
                   isEditing={editingId === syl.id}
                   onToggleEdit={handleToggleEdit}
                   onSave={handleSaveEdit}

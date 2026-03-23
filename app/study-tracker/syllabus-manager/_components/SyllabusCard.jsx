@@ -10,6 +10,7 @@ import EditSyllabusPanel from "./EditSyllabusPanel";
 
 export default function SyllabusCard({
   syllabus,
+  progressPct,
   isEditing,
   onToggleEdit,
   onSave,
@@ -43,7 +44,7 @@ export default function SyllabusCard({
       )}
     >
       {/* ── Card header row ── */}
-      <div className="flex items-center gap-3 px-4 py-3">
+      <div className="flex items-center gap-3 px-5 py-4">
         {/* Drag handle */}
         <button
           {...attributes}
@@ -55,16 +56,26 @@ export default function SyllabusCard({
           <GripVertical className="h-4 w-4" />
         </button>
 
-        {/* Colour dot + icon + label */}
-        <span
-          className="h-3 w-3 rounded-full shrink-0"
-          style={{ backgroundColor: syllabus.color }}
-        />
-        <span className="text-lg leading-none shrink-0">{syllabus.icon}</span>
+        {/* Icon + label (colored) */}
+        <span className="text-xl leading-none shrink-0">{syllabus.icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-sm leading-tight truncate">
-            {syllabus.label}
-          </p>
+          <div className="flex items-center gap-2">
+            <span
+              className="font-semibold text-base leading-tight truncate"
+              style={{ color: syllabus.color }}
+            >
+              {syllabus.label}
+            </span>
+            <span
+              className="text-xs font-semibold px-1.5 py-0.5 rounded-full shrink-0"
+              style={{
+                color: syllabus.color,
+                backgroundColor: `${syllabus.color}18`,
+              }}
+            >
+              {progressPct ?? 0}%
+            </span>
+          </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             {topicCount} topic{topicCount !== 1 ? "s" : ""} &middot;{" "}
             {sectionCount} section{sectionCount !== 1 ? "s" : ""}

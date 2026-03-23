@@ -1,4 +1,3 @@
-import "./study-tracker.css";
 import StudyTrackerApp from "./_components/StudyTrackerApp";
 
 export const metadata = {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import {
   getTodayStr,
   formatMinutes,
@@ -12,6 +12,26 @@ import {
   downloadJSON,
   pickJSONFile,
 } from "@/lib/studyTrackerStorage";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+} from "@/components/ui/chart";
 
 const CHECK_SVG = (
   <svg viewBox="0 0 12 12" width={10} height={10}>
@@ -51,27 +71,31 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     stripDates.push(d.toISOString().slice(0, 10));
   }
 
+  const daily = state.daily || {};
+  const habits = state.habits || [];
+  const habitLog = state.habitLog || {};
+
   const habitsForDate = (date) =>
-    state.habits.filter((h) => habitAppliesOnDate(h, date));
+    habits.filter((h) => habitAppliesOnDate(h, date));
 
   // Date strip dot class
   const dotClass = (date) => {
-    const tasks = state.daily[date] || [];
-    const habits = habitsForDate(date);
+    const tasks = daily[date] || [];
+    const habitsOnDate = habitsForDate(date);
     const done =
       tasks.filter((t) => t.done).length +
-      habits.filter((h) => state.habitLog[date]?.[h.id]).length;
-    const total = tasks.length + habits.length;
+      habitsOnDate.filter((h) => habitLog[date]?.[h.id]).length;
+    const total = tasks.length + habitsOnDate.length;
     if (!total) return "";
     return done === total ? "all-done" : "has-tasks";
   };
 
   // Task summary for selected date
-  const tasksForDate = state.daily[selectedDate] || [];
+  const tasksForDate = daily[selectedDate] || [];
   const habitsForSel = habitsForDate(selectedDate);
   const taskDone = tasksForDate.filter((t) => t.done).length;
   const habitDone = habitsForSel.filter(
-    (h) => state.habitLog[selectedDate]?.[h.id],
+    (h) => habitLog[selectedDate]?.[h.id],
   ).length;
   const totalMin =
     tasksForDate.reduce((s, t) => s + (t.timeMin || 0), 0) +
@@ -81,7 +105,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
       .filter((t) => t.done)
       .reduce((s, t) => s + (t.timeMin || 0), 0) +
     habitsForSel
-      .filter((h) => state.habitLog[selectedDate]?.[h.id])
+      .filter((h) => habitLog[selectedDate]?.[h.id])
       .reduce((s, h) => s + (h.timeMin || 0), 0);
   const totalItems = tasksForDate.length + habitsForSel.length;
   const totalDone = taskDone + habitDone;
@@ -108,9 +132,9 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
       timeMin: parseInt(newTaskTime) || 0,
       done: false,
     };
-    const current = state.daily[selectedDate] || [];
+    const current = daily[selectedDate] || [];
     updateState("daily", {
-      ...state.daily,
+      ...daily,
       [selectedDate]: [...current, task],
     });
     setNewTaskTitle("");
@@ -119,23 +143,23 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
   // Toggle task done
   const toggleTask = (idx) => {
-    const tasks = (state.daily[selectedDate] || []).map((t, i) =>
+    const tasks = (daily[selectedDate] || []).map((t, i) =>
       i === idx ? { ...t, done: !t.done } : t,
     );
-    updateState("daily", { ...state.daily, [selectedDate]: tasks });
+    updateState("daily", { ...daily, [selectedDate]: tasks });
   };
 
   // Delete task
   const deleteTask = (idx) => {
-    const tasks = (state.daily[selectedDate] || []).filter((_, i) => i !== idx);
-    updateState("daily", { ...state.daily, [selectedDate]: tasks });
+    const tasks = (daily[selectedDate] || []).filter((_, i) => i !== idx);
+    updateState("daily", { ...daily, [selectedDate]: tasks });
   };
 
   // Toggle habit done
   const toggleHabit = (habitId) => {
-    const dayLog = { ...(state.habitLog[selectedDate] || {}) };
+    const dayLog = { ...(habitLog[selectedDate] || {}) };
     dayLog[habitId] = !dayLog[habitId];
-    updateState("habitLog", { ...state.habitLog, [selectedDate]: dayLog });
+    updateState("habitLog", { ...habitLog, [selectedDate]: dayLog });
   };
 
   // Add habit
@@ -161,7 +185,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
       endDate,
       active: true,
     };
-    updateState("habits", [...state.habits, habit]);
+    updateState("habits", [...habits, habit]);
     setHabitForm((f) => ({ ...f, title: "", time: "" }));
     showToast(`Habit "${habit.title}" created!`);
   };
@@ -170,7 +194,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
   const deleteHabit = (idx) => {
     updateState(
       "habits",
-      state.habits.filter((_, i) => i !== idx),
+      habits.filter((_, i) => i !== idx),
     );
   };
 
@@ -180,11 +204,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
       version: 1,
       type: "qa-tracker-tasks",
       exportedAt: new Date().toISOString(),
-      data: {
-        daily: state.daily,
-        habits: state.habits,
-        habitLog: state.habitLog,
-      },
+      data: { daily, habits, habitLog },
     };
     downloadJSON(payload, `qa-tasks-${getTodayStr()}.json`);
     showToast("Tasks exported!");
@@ -332,7 +352,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
                       </span>
                     </div>
                     {habitsForSel.map((h) => {
-                      const done = !!state.habitLog[selectedDate]?.[h.id];
+                      const done = !!habitLog[selectedDate]?.[h.id];
                       return (
                         <div
                           key={h.id}
@@ -456,229 +476,80 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
 // ── Analytics panel ──────────────────────────────────────────────────────────
 function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
-  const progressRef = useRef(null);
-  const timePieRef = useRef(null);
-  const barRef = useRef(null);
-  const charts = useRef({});
+  const daily = state.daily || {};
+  const habits = state.habits || [];
+  const habitLog = state.habitLog || {};
 
   const days = filterMode === "weekly" ? 7 : 30;
 
-  useEffect(() => {
-    const loadAndRender = () => {
-      if (window.Chart) {
-        renderCharts();
-        return;
-      }
-      const s = document.createElement("script");
-      s.src =
-        "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js";
-      s.onload = renderCharts;
-      document.head.appendChild(s);
-    };
-    loadAndRender();
-    return () => {
-      Object.values(charts.current).forEach((c) => {
-        try {
-          c.destroy();
-        } catch (_) {}
-      });
-      charts.current = {};
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state, filterMode, selectedDate]);
-
-  function renderCharts() {
-    Object.values(charts.current).forEach((c) => {
-      try {
-        c.destroy();
-      } catch (_) {}
-    });
-    charts.current = {};
-    const C = window.Chart;
-    if (!C) return;
-
-    const labels = [],
-      completed = [],
-      totals = [];
-    for (let i = days - 1; i >= 0; i--) {
-      const d = new Date();
-      d.setDate(d.getDate() - i);
-      const str = d.toISOString().slice(0, 10);
-      labels.push(
-        filterMode === "weekly"
-          ? d.toLocaleDateString("en-US", { weekday: "short" })
-          : d.getDate().toString(),
-      );
-      const tasks = state.daily[str] || [];
-      const habits = state.habits.filter((h) => habitAppliesOnDate(h, str));
-      completed.push(
-        tasks.filter((t) => t.done).length +
-          habits.filter((h) => state.habitLog[str]?.[h.id]).length,
-      );
-      totals.push(tasks.length + habits.length);
-    }
-
-    const totalItems = totals.reduce((a, b) => a + b, 0);
-    const doneItems = completed.reduce((a, b) => a + b, 0);
-    const pct = totalItems ? Math.round((doneItems / totalItems) * 100) : 0;
-    const ratePct = totals.map((t, i) =>
-      t ? Math.round((completed[i] / t) * 100) : null,
-    );
-
-    // Completion rate line
-    if (progressRef.current) {
-      charts.current.progress = new C(progressRef.current, {
-        type: "line",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Completion %",
-              data: ratePct,
-              borderColor: "#f59e0b",
-              backgroundColor: "rgba(245,158,11,0.08)",
-              borderWidth: 2.5,
-              pointBackgroundColor: "#f59e0b",
-              pointRadius: 4,
-              fill: true,
-              tension: 0.35,
-              spanGaps: true,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            y: {
-              min: 0,
-              max: 100,
-              ticks: {
-                callback: (v) => v + "%",
-                font: { family: "'DM Sans'" },
-              },
-              grid: { color: "#f3f4f6" },
-            },
-            x: {
-              ticks: { font: { family: "'DM Sans'", size: 11 } },
-              grid: { display: false },
-            },
-          },
-        },
-      });
-    }
-
-    // Time pie for selected date
-    const sTasks = state.daily[selectedDate] || [];
-    const sHabits = state.habits.filter((h) =>
-      habitAppliesOnDate(h, selectedDate),
-    );
-    const doneT =
-      sTasks.filter((t) => t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
-      sHabits
-        .filter((h) => state.habitLog[selectedDate]?.[h.id])
-        .reduce((s, h) => s + (h.timeMin || 0), 0);
-    const remT =
-      sTasks.filter((t) => !t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
-      sHabits
-        .filter((h) => !state.habitLog[selectedDate]?.[h.id])
-        .reduce((s, h) => s + (h.timeMin || 0), 0);
-    if (timePieRef.current) {
-      charts.current.timePie = new C(timePieRef.current, {
-        type: "doughnut",
-        data: {
-          labels: ["Done", "Remaining"],
-          datasets: [
-            {
-              data: [doneT || 0, remT || (doneT ? 0 : 1)],
-              backgroundColor: ["#10b981", "#e5e7eb"],
-              borderWidth: 0,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { font: { family: "'DM Sans'", size: 12 } },
-            },
-          },
-        },
-      });
-    }
-
-    // Tasks per day bar
-    if (barRef.current) {
-      charts.current.bar = new C(barRef.current, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Done",
-              data: completed,
-              backgroundColor: "#10b981",
-              borderRadius: 4,
-            },
-            {
-              label: "Remaining",
-              data: totals.map((t, i) => t - completed[i]),
-              backgroundColor: "#e5e7eb",
-              borderRadius: 4,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { font: { family: "'DM Sans'", size: 12 } },
-            },
-          },
-          scales: {
-            x: {
-              stacked: true,
-              ticks: { font: { family: "'DM Sans'", size: 11 } },
-              grid: { display: false },
-            },
-            y: {
-              stacked: true,
-              beginAtZero: true,
-              ticks: { stepSize: 1, font: { family: "'DM Sans'" } },
-              grid: { color: "#f3f4f6" },
-            },
-          },
-        },
-      });
-    }
-
-    return { totalItems, doneItems, pct };
-  }
-
-  // Recalculate for analytics cards
+  // Build chart data
+  const completionRateData = [];
+  const tasksPerDayData = [];
   let cardDone = 0,
     cardTotal = 0,
     cardTime = 0;
+
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const str = d.toISOString().slice(0, 10);
-    const tasks = state.daily[str] || [];
-    const habits = state.habits.filter((h) => habitAppliesOnDate(h, str));
-    cardTotal += tasks.length + habits.length;
-    cardDone +=
+    const label =
+      filterMode === "weekly"
+        ? d.toLocaleDateString("en-US", { weekday: "short" })
+        : d.getDate().toString();
+
+    const tasks = daily[str] || [];
+    const habitsOnDay = habits.filter((h) => habitAppliesOnDate(h, str));
+    const total = tasks.length + habitsOnDay.length;
+    const done =
       tasks.filter((t) => t.done).length +
-      habits.filter((h) => state.habitLog[str]?.[h.id]).length;
+      habitsOnDay.filter((h) => habitLog[str]?.[h.id]).length;
+    const remaining = total - done;
+    const pct = total ? Math.round((done / total) * 100) : null;
+
+    completionRateData.push({ date: label, completion: pct });
+    tasksPerDayData.push({ date: label, done, remaining });
+
+    cardTotal += total;
+    cardDone += done;
     cardTime +=
       tasks.filter((t) => t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
-      habits
-        .filter((h) => state.habitLog[str]?.[h.id])
+      habitsOnDay
+        .filter((h) => habitLog[str]?.[h.id])
         .reduce((s, h) => s + (h.timeMin || 0), 0);
   }
   const cardPct = cardTotal ? Math.round((cardDone / cardTotal) * 100) : 0;
+
+  // Time allocation pie data for selected date
+  const sTasks = daily[selectedDate] || [];
+  const sHabits = habits.filter((h) =>
+    habitAppliesOnDate(h, selectedDate),
+  );
+  const doneTime =
+    sTasks.filter((t) => t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
+    sHabits
+      .filter((h) => habitLog[selectedDate]?.[h.id])
+      .reduce((s, h) => s + (h.timeMin || 0), 0);
+  const remTime =
+    sTasks.filter((t) => !t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
+    sHabits
+      .filter((h) => !habitLog[selectedDate]?.[h.id])
+      .reduce((s, h) => s + (h.timeMin || 0), 0);
+  const pieData =
+    doneTime + remTime > 0
+      ? [
+          { name: "Done", value: doneTime },
+          { name: "Remaining", value: remTime },
+        ]
+      : [{ name: "No data", value: 1 }];
+
+  const completionChartConfig = {
+    completion: { label: "Completion %", color: "#f59e0b" },
+  };
+  const tasksChartConfig = {
+    done: { label: "Done", color: "#10b981" },
+    remaining: { label: "Remaining", color: "#e5e7eb" },
+  };
 
   return (
     <div className="st-daily-right">
@@ -699,6 +570,8 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
           </button>
         </div>
       </div>
+
+      {/* Stats cards */}
       <div className="st-analytics-cards">
         <div className="st-ana-card">
           <div className="st-ana-val">{cardDone}</div>
@@ -717,6 +590,8 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
           <div className="st-ana-lbl">Time Done</div>
         </div>
       </div>
+
+      {/* Completion Rate line chart */}
       <div className="st-chart-card" style={{ marginBottom: 10 }}>
         <h3 className="st-chart-title">
           Completion Rate{" "}
@@ -724,18 +599,78 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
             ({filterMode === "weekly" ? "last 7 days" : "last 30 days"})
           </span>
         </h3>
-        <canvas ref={progressRef} height={140} />
+        <ChartContainer config={completionChartConfig} className="h-[140px] w-full">
+          <LineChart data={completionRateData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+            <CartesianGrid vertical={false} stroke="#f3f4f6" />
+            <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+            <YAxis domain={[0, 100]} tickFormatter={(v) => v + "%"} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+            <ChartTooltip content={<ChartTooltipContent formatter={(v) => (v !== null ? v + "%" : "—")} />} />
+            <Line
+              type="monotone"
+              dataKey="completion"
+              stroke="#f59e0b"
+              strokeWidth={2.5}
+              dot={{ r: 4, fill: "#f59e0b" }}
+              connectNulls
+            />
+          </LineChart>
+        </ChartContainer>
       </div>
+
+      {/* Time Allocation + Tasks per Day */}
       <div className="st-charts-row-2">
         <div className="st-chart-card">
           <h3 className="st-chart-title">Time Allocation</h3>
           <div className="st-pie-wrap">
-            <canvas ref={timePieRef} />
+            <ChartContainer config={{ done: { label: "Done", color: "#10b981" }, remaining: { label: "Remaining", color: "#e5e7eb" } }} className="h-[180px] w-full">
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={45}
+                  outerRadius={70}
+                  dataKey="value"
+                  paddingAngle={pieData.length > 1 ? 2 : 0}
+                >
+                  {pieData.map((entry) => (
+                    <Cell
+                      key={entry.name}
+                      fill={
+                        entry.name === "Done"
+                          ? "#10b981"
+                          : entry.name === "Remaining"
+                            ? "#e5e7eb"
+                            : "#e5e7eb"
+                      }
+                    />
+                  ))}
+                </Pie>
+                <ChartTooltip content={<ChartTooltipContent formatter={(v, n) => [formatMinutes(v), n]} hideLabel />} />
+                <Legend
+                  iconType="square"
+                  iconSize={10}
+                  formatter={(value) => value}
+                  wrapperStyle={{ fontSize: 12 }}
+                />
+              </PieChart>
+            </ChartContainer>
           </div>
         </div>
+
         <div className="st-chart-card">
           <h3 className="st-chart-title">Tasks per Day</h3>
-          <canvas ref={barRef} height={180} />
+          <ChartContainer config={tasksChartConfig} className="h-[180px] w-full">
+            <BarChart data={tasksPerDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+              <CartesianGrid vertical={false} stroke="#f3f4f6" />
+              <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="done" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="remaining" stackId="a" fill="#e5e7eb" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ChartContainer>
         </div>
       </div>
     </div>
@@ -750,163 +685,43 @@ function HabitsView({
   onAddHabit,
   onDeleteHabit,
 }) {
-  const barRef = useRef(null);
-  const weekRef = useRef(null);
-  const charts = useRef({});
+  const today = getTodayStr();
+  const habits = state.habits || [];
+  const habitLog = state.habitLog || {};
 
-  useEffect(() => {
-    const load = () => {
-      if (window.Chart) {
-        renderHabitCharts();
-        return;
-      }
-      const s = document.createElement("script");
-      s.src =
-        "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js";
-      s.onload = renderHabitCharts;
-      document.head.appendChild(s);
+  // Habit completion rates bar data
+  const palette = ["#2563eb", "#7c3aed", "#059669", "#dc2626", "#f59e0b", "#0891b2", "#db2777"];
+  const completionRatesData = habits.map((h, i) => {
+    const s = countHabitScheduled(h, today);
+    const d = countHabitDone(h, habitLog);
+    return {
+      name: h.title.length > 14 ? h.title.slice(0, 14) + "…" : h.title,
+      completion: s ? Math.round((d / s) * 100) : 0,
+      fill: palette[i % palette.length],
     };
-    load();
-    return () => {
-      Object.values(charts.current).forEach((c) => {
-        try {
-          c.destroy();
-        } catch (_) {}
-      });
-      charts.current = {};
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.habits, state.habitLog]);
+  });
 
-  function renderHabitCharts() {
-    Object.values(charts.current).forEach((c) => {
-      try {
-        c.destroy();
-      } catch (_) {}
-    });
-    charts.current = {};
-    const C = window.Chart;
-    if (!C) return;
-    const today = getTodayStr();
-    const palette = [
-      "#2563eb",
-      "#7c3aed",
-      "#059669",
-      "#dc2626",
-      "#f59e0b",
-      "#0891b2",
-      "#db2777",
-    ];
-
-    // Completion rates per habit
-    if (barRef.current && state.habits.length) {
-      const labels = state.habits.map((h) =>
-        h.title.length > 14 ? h.title.slice(0, 14) + "…" : h.title,
-      );
-      const rates = state.habits.map((h) => {
-        const s = countHabitScheduled(h, today),
-          d = countHabitDone(h, state.habitLog);
-        return s ? Math.round((d / s) * 100) : 0;
-      });
-      const colors = state.habits.map((_, i) => palette[i % palette.length]);
-      charts.current.bar = new C(barRef.current, {
-        type: "bar",
-        data: {
-          labels,
-          datasets: [
-            {
-              label: "Completion %",
-              data: rates,
-              backgroundColor: colors,
-              borderRadius: 5,
-            },
-          ],
-        },
-        options: {
-          indexAxis: "y",
-          responsive: true,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: {
-              min: 0,
-              max: 100,
-              ticks: {
-                callback: (v) => v + "%",
-                font: { family: "'DM Sans'" },
-              },
-              grid: { color: "#f3f4f6" },
-            },
-            y: {
-              ticks: { font: { family: "'DM Sans'", size: 11 } },
-              grid: { display: false },
-            },
-          },
-        },
-      });
-    }
-
-    // This week
-    if (weekRef.current) {
-      const wlabels = [],
-        wDone = [],
-        wSched = [];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const str = d.toISOString().slice(0, 10);
-        wlabels.push(d.toLocaleDateString("en-US", { weekday: "short" }));
-        const habitsDay = state.habits.filter((h) =>
-          habitAppliesOnDate(h, str),
-        );
-        wSched.push(habitsDay.length);
-        wDone.push(habitsDay.filter((h) => state.habitLog[str]?.[h.id]).length);
-      }
-      charts.current.week = new C(weekRef.current, {
-        type: "bar",
-        data: {
-          labels: wlabels,
-          datasets: [
-            {
-              label: "Done",
-              data: wDone,
-              backgroundColor: "#10b981",
-              borderRadius: 4,
-            },
-            {
-              label: "Scheduled",
-              data: wSched.map((s, i) => s - wDone[i]),
-              backgroundColor: "#e5e7eb",
-              borderRadius: 4,
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "bottom",
-              labels: { font: { family: "'DM Sans'", size: 12 } },
-            },
-          },
-          scales: {
-            x: {
-              stacked: true,
-              ticks: { font: { family: "'DM Sans'", size: 11 } },
-              grid: { display: false },
-            },
-            y: {
-              stacked: true,
-              beginAtZero: true,
-              ticks: { stepSize: 1, font: { family: "'DM Sans'" } },
-              grid: { color: "#f3f4f6" },
-            },
-          },
-        },
-      });
-    }
+  // Habits this week bar data
+  const weekData = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const str = d.toISOString().slice(0, 10);
+    const label = d.toLocaleDateString("en-US", { weekday: "short" });
+    const habitsDay = habits.filter((h) => habitAppliesOnDate(h, str));
+    const scheduled = habitsDay.length;
+    const done = habitsDay.filter((h) => habitLog[str]?.[h.id]).length;
+    weekData.push({ date: label, done, remaining: scheduled - done });
   }
 
-  const today = getTodayStr();
+  const weekChartConfig = {
+    done: { label: "Done", color: "#10b981" },
+    remaining: { label: "Scheduled", color: "#e5e7eb" },
+  };
+  const ratesChartConfig = {
+    completion: { label: "Completion %", color: "#2563eb" },
+  };
+
   const computedEnd =
     habitForm.duration === "indefinite"
       ? null
@@ -1056,14 +871,14 @@ function HabitsView({
           <h3 className="st-chart-title" style={{ marginBottom: 12 }}>
             Your Habits
           </h3>
-          {state.habits.length === 0 ? (
+          {habits.length === 0 ? (
             <div className="st-no-tasks" style={{ padding: 18 }}>
               No habits yet. Create one using the form!
             </div>
           ) : (
-            state.habits.map((h, i) => {
+            habits.map((h, i) => {
               const sched = countHabitScheduled(h, today);
-              const done = countHabitDone(h, state.habitLog);
+              const done = countHabitDone(h, habitLog);
               const rate = sched ? Math.round((done / sched) * 100) : 0;
               return (
                 <div key={h.id} className="st-habit-list-item">
@@ -1103,11 +918,58 @@ function HabitsView({
       <div className="st-habit-analytics-row">
         <div className="st-chart-card">
           <h3 className="st-chart-title">Habit Completion Rates</h3>
-          <canvas ref={barRef} height={160} />
+          {habits.length === 0 ? (
+            <div className="st-no-tasks" style={{ padding: 18, textAlign: "center" }}>
+              No habits to display.
+            </div>
+          ) : (
+            <ChartContainer config={ratesChartConfig} className="h-[160px] w-full">
+              <BarChart
+                layout="vertical"
+                data={completionRatesData}
+                margin={{ top: 4, right: 16, left: 8, bottom: 0 }}
+              >
+                <CartesianGrid horizontal={false} stroke="#f3f4f6" />
+                <XAxis
+                  type="number"
+                  domain={[0, 100]}
+                  tickFormatter={(v) => v + "%"}
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={false}
+                  width={80}
+                />
+                <ChartTooltip content={<ChartTooltipContent formatter={(v) => v + "%"} />} />
+                <Bar dataKey="completion" radius={5}>
+                  {completionRatesData.map((entry) => (
+                    <Cell key={entry.name} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ChartContainer>
+          )}
         </div>
+
         <div className="st-chart-card">
           <h3 className="st-chart-title">Habits This Week</h3>
-          <canvas ref={weekRef} height={160} />
+          <ChartContainer config={weekChartConfig} className="h-[160px] w-full">
+            <BarChart data={weekData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+              <CartesianGrid vertical={false} stroke="#f3f4f6" />
+              <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <ChartLegend content={<ChartLegendContent />} />
+              <Bar dataKey="done" stackId="a" fill="#10b981" radius={[0, 0, 0, 0]} />
+              <Bar dataKey="remaining" stackId="a" fill="#e5e7eb" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ChartContainer>
         </div>
       </div>
     </div>
