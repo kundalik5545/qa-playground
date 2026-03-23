@@ -84,7 +84,9 @@ export default function SyllabusManagerContent() {
   const persist = useCallback((nextSyllabi, nextOrder) => {
     setSyllabi(nextSyllabi);
     setOrder(nextOrder);
-    saveSyllabiToIdb(nextSyllabi, nextOrder);
+    saveSyllabiToIdb(nextSyllabi, nextOrder).then(() => {
+      window.dispatchEvent(new CustomEvent("syllabi-updated"));
+    });
   }, []);
 
   // ── Sorted list for rendering ──────────────────────────────────────────

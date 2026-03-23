@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -43,31 +43,29 @@ export default function StudySidebar({ collapsed, onToggle }) {
   const pathname = usePathname();
   const [syllabiList, setSyllabiList] = useState([]);
 
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      const { syllabi, order } = await loadSyllabiFromIdb();
-      if (cancelled) return;
-
-      if (syllabi && Object.keys(syllabi).length > 0) {
-        const orderedIds =
-          Array.isArray(order) && order.length > 0
-            ? order
-            : Object.keys(syllabi);
-        setSyllabiList(
-          orderedIds.filter((id) => syllabi[id]).map((id) => syllabi[id]),
-        );
-      } else {
-        const defaults = getDefaultSyllabi();
-        const defaultOrder = getDefaultOrder();
-        await saveSyllabiToIdb(defaults, defaultOrder);
-        setSyllabiList(defaultOrder.map((id) => defaults[id]));
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
+  const reloadSyllabi = useCallback(async () => {
+    const { syllabi, order } = await loadSyllabiFromIdb();
+    if (syllabi && Object.keys(syllabi).length > 0) {
+      const orderedIds =
+        Array.isArray(order) && order.length > 0
+          ? order
+          : Object.keys(syllabi);
+      setSyllabiList(
+        orderedIds.filter((id) => syllabi[id]).map((id) => syllabi[id]),
+      );
+    } else {
+      const defaults = getDefaultSyllabi();
+      const defaultOrder = getDefaultOrder();
+      await saveSyllabiToIdb(defaults, defaultOrder);
+      setSyllabiList(defaultOrder.map((id) => defaults[id]));
+    }
   }, []);
+
+  useEffect(() => {
+    reloadSyllabi();
+    window.addEventListener("syllabi-updated", reloadSyllabi);
+    return () => window.removeEventListener("syllabi-updated", reloadSyllabi);
+  }, [reloadSyllabi]);
 
   return (
     <TooltipProvider delayDuration={0}>
