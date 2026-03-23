@@ -157,3 +157,15 @@ body.bank-page main {
   max-width: 100% !important;
   margin: 0 !important;
 }
+
+/* Admin App Specific Styles */
+body.admin-page header:not([id="main-navbar"]):not([id="admin-navbar"]),
+body.admin-page footer:not([id="app-footer"]) {
+  display: none !important;
+}
+
+body.admin-page main {
+  padding: 0 !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+}

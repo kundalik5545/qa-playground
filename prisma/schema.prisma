@@ -65,6 +65,7 @@ model AlertResponse {
   responses  Json
   answeredAt DateTime @default(now())
   userAgent  String?
+  country    String?
 
   @@map("alert_responses")
 }
