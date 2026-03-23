@@ -15,7 +15,11 @@
       "Bash(mkdir -p \"D:/new-playground/01_qa_playground/qa-playground/docs\")",
       "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/AI_CODING_GUIDELINES.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
       "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/BANK_MIGRATION_NOTES.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
-      "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/DEV_QUICK_REFERENCE.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")"
+      "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/DEV_QUICK_REFERENCE.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
+      "Bash(node -e \"const p = require\\(''./node_modules/next-themes/package.json''\\); console.log\\(p.version\\)\")",
+      "Bash(node -e \"const nt = require\\(''./node_modules/next-themes''\\); console.log\\(Object.keys\\(nt\\)\\)\")",
+      "Bash(node -e \"const fs = require\\(''fs''\\); const idx = ''./node_modules/next-themes/dist/index.js''; if\\(fs.existsSync\\(idx\\)\\) console.log\\(fs.readFileSync\\(idx,''utf8''\\).slice\\(0,500\\)\\)\")",
+      "Bash(npm show:*)"
     ]
   }
 }

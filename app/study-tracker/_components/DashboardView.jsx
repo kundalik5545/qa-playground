@@ -26,17 +26,16 @@ export default function DashboardView({
   onClearAll,
   onNavigate,
 }) {
-  const pieRef = useRef(null); // Today's Tasks doughnut
-  const overallRef = useRef(null); // Overall Progress doughnut
-  const lineRef = useRef(null); // Topics Completed line
-  const barRef = useRef(null); // Progress by Syllabus bar
-  const doughnutRef = useRef(null); // Completion Breakdown doughnut
-  const taskChartRef = useRef(null); // Daily Task Completion % line
+  const pieRef = useRef(null);
+  const overallRef = useRef(null);
+  const lineRef = useRef(null);
+  const barRef = useRef(null);
+  const doughnutRef = useRef(null);
+  const taskChartRef = useRef(null);
   const charts = useRef({});
 
-  // Today's quick stats
   const today = getTodayStr();
-  const todayTasks = state.daily[today] || [];
+  const todayTasks = (state.daily && state.daily[today]) || [];
   const todayTaskDone = todayTasks.filter((t) => t.done).length;
 
   useEffect(() => {
@@ -74,7 +73,6 @@ export default function DashboardView({
     );
     const days = getLast14Days();
 
-    // ── Today's Tasks doughnut ──
     if (pieRef.current) {
       const done = todayTaskDone;
       const total = todayTasks.length;
@@ -120,7 +118,6 @@ export default function DashboardView({
       });
     }
 
-    // ── Overall Progress doughnut (syllabus topics) ──
     if (overallRef.current) {
       const total = allStats.total,
         done = allStats.done;
@@ -165,7 +162,6 @@ export default function DashboardView({
       });
     }
 
-    // ── Topics completed (line) — last 14 days ──
     if (lineRef.current) {
       const datasets = syllabusIds.map((id) => {
         const syl = state.syllabi[id];
@@ -223,7 +219,6 @@ export default function DashboardView({
       });
     }
 
-    // ── Progress by syllabus (bar) ──
     if (barRef.current) {
       charts.current.bar = new C(barRef.current, {
         type: "bar",
@@ -302,7 +297,6 @@ export default function DashboardView({
       });
     }
 
-    // ── Completion breakdown doughnut (per syllabus) ──
     if (doughnutRef.current) {
       charts.current.doughnut = new C(doughnutRef.current, {
         type: "doughnut",
@@ -334,7 +328,6 @@ export default function DashboardView({
       });
     }
 
-    // ── Daily tasks chart — last 14 days (completion % line) ──
     if (taskChartRef.current) {
       const taskData = days.map((day) => {
         const tasks = state.daily[day] || [];
@@ -410,10 +403,9 @@ export default function DashboardView({
     }
   }
 
-  // Group log entries by date, most recent first, max 7 days
   const recentByDate = [];
   const seen = new Map();
-  for (const entry of [...state.log].reverse()) {
+  for (const entry of [...(state.log || [])].reverse()) {
     if (!seen.has(entry.date)) {
       seen.set(entry.date, []);
       recentByDate.push({ date: entry.date, entries: seen.get(entry.date) });
@@ -427,7 +419,6 @@ export default function DashboardView({
 
   return (
     <div>
-      {/* Header */}
       <div className="st-dash-header">
         <div className="st-dash-header-row">
           <div>
@@ -445,13 +436,17 @@ export default function DashboardView({
             </button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button className="st-action-btn st-clear-btn">🗑 Clear All</button>
+                <button className="st-action-btn st-clear-btn">
+                  🗑 Clear All
+                </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <AlertDialogTitle>Clear all data?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete all your progress, tasks, habits, and custom syllabi, and reset everything back to the default state. This action cannot be undone.
+                    This will permanently delete all your progress, tasks,
+                    habits, and custom syllabi, and reset everything back to the
+                    default state. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -469,8 +464,6 @@ export default function DashboardView({
         </div>
       </div>
 
-
-      {/* Syllabus overview cards */}
       <div className="st-overview-cards">
         <OverviewCard
           icon="🎯"
@@ -479,7 +472,7 @@ export default function DashboardView({
           sub={`${allStats.done} / ${allStats.total} topics`}
           color="#1f2937"
         />
-        {Object.values(state.syllabi).map((syl) => {
+        {Object.values(state.syllabi || {}).map((syl) => {
           const s = getSyllabusStats(state.syllabi, state.progress, syl.id);
           return (
             <OverviewCard
@@ -495,7 +488,6 @@ export default function DashboardView({
         })}
       </div>
 
-      {/* Row 1: Today's Tasks pie + Daily Task Completion % line */}
       <div className="st-charts-row">
         <div className="st-chart-card">
           <h3 className="st-chart-title">Today's Tasks</h3>
@@ -512,7 +504,6 @@ export default function DashboardView({
         </div>
       </div>
 
-      {/* Row 2: Overall Progress pie + Topics Completed line */}
       <div className="st-charts-row">
         <div className="st-chart-card">
           <h3 className="st-chart-title">Overall Progress</h3>
@@ -529,7 +520,6 @@ export default function DashboardView({
         </div>
       </div>
 
-      {/* Row 3: Progress by Syllabus + Completion Breakdown */}
       <div className="st-charts-row-equal" style={{ marginBottom: 14 }}>
         <div className="st-chart-card">
           <h3 className="st-chart-title">Progress by Syllabus</h3>
@@ -543,7 +533,6 @@ export default function DashboardView({
         </div>
       </div>
 
-      {/* Recent activity */}
       <div className="st-recent-activity">
         <h3 className="st-chart-title">Recent Activity</h3>
         {recentLog.length === 0 ? (

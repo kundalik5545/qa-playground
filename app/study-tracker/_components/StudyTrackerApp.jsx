@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   loadAllState,
+  loadStateFromIdb,
   saveKey,
+  clearAllData,
   getSyllabusStats,
   getAllStats,
   getTodayStr,
@@ -22,9 +24,21 @@ export default function StudyTrackerApp() {
   const [state, setState] = useState(null);
   const [toast, setToast] = useState({ msg: "", show: false, error: false });
 
-  // Load state on mount
+  // Load state on mount (IndexedDB priority)
   useEffect(() => {
-    setState(loadAllState());
+    let cancelled = false;
+    (async () => {
+      const idbState = await loadStateFromIdb();
+      if (cancelled) return;
+      if (idbState) {
+        setState(idbState);
+      } else {
+        setState(loadAllState());
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const showToast = useCallback((msg, isError = false) => {
@@ -37,6 +51,18 @@ export default function StudyTrackerApp() {
     setState((prev) => {
       const next = { ...prev, [key]: value };
       saveKey(key, value);
+      if (key === "syllabi" && prev.syllabusOrder) {
+        const currentOrder = prev.syllabusOrder || Object.keys(value);
+        const filtered = currentOrder.filter((id) => value[id]);
+        const newIds = Object.keys(value).filter(
+          (id) => !filtered.includes(id),
+        );
+        next.syllabusOrder = [...filtered, ...newIds];
+        saveKey("order", next.syllabusOrder);
+      }
+      if (key === "syllabusOrder") {
+        saveKey("order", value);
+      }
       return next;
     });
   }, []);
@@ -59,17 +85,18 @@ export default function StudyTrackerApp() {
     showToast("Full data exported!");
   };
 
-  const handleClearAll = () => {
-    Object.values(STORAGE_KEYS).forEach((k) => localStorage.removeItem(k));
+  const handleClearAll = async () => {
+    await clearAllData();
     const fresh = {
-      syllabi:   JSON.parse(JSON.stringify(DEFAULT_SYLLABUS_DATA)),
-      progress:  {},
-      custom:    {},
-      log:       [],
+      syllabi: JSON.parse(JSON.stringify(DEFAULT_SYLLABUS_DATA)),
+      syllabusOrder: Object.keys(DEFAULT_SYLLABUS_DATA),
+      progress: {},
+      custom: {},
+      log: [],
       subtopics: {},
-      daily:     {},
-      habits:    [],
-      habitLog:  {},
+      daily: {},
+      habits: [],
+      habitLog: {},
     };
     Object.entries(fresh).forEach(([k, v]) => saveKey(k, v));
     setState(fresh);
@@ -148,25 +175,32 @@ export default function StudyTrackerApp() {
           <li>
             <span className="st-nav-sep">Syllabi</span>
           </li>
-          {Object.values(state.syllabi).map((syl) => {
-            const stats = getSyllabusStats(
-              state.syllabi,
-              state.progress,
-              syl.id,
-            );
-            return (
-              <NavBtn
-                key={syl.id}
-                id={syl.id}
-                label={syl.label}
-                icon={syl.icon}
-                active={activeTab}
-                onClick={setActiveTab}
-                badge={stats.pct + "%"}
-                badgeStyle={{ background: syl.color + "22", color: syl.color }}
-              />
-            );
-          })}
+          {(state.syllabusOrder || Object.keys(state.syllabi || {})).map(
+            (sylId) => {
+              const syl = state.syllabi[sylId];
+              if (!syl) return null;
+              const stats = getSyllabusStats(
+                state.syllabi,
+                state.progress,
+                syl.id,
+              );
+              return (
+                <NavBtn
+                  key={syl.id}
+                  id={syl.id}
+                  label={syl.label}
+                  icon={syl.icon}
+                  active={activeTab}
+                  onClick={setActiveTab}
+                  badge={stats.pct + "%"}
+                  badgeStyle={{
+                    background: syl.color + "22",
+                    color: syl.color,
+                  }}
+                />
+              );
+            },
+          )}
         </ul>
       </nav>
 
@@ -207,7 +241,7 @@ export default function StudyTrackerApp() {
             />
           )}
 
-          {state.syllabi[activeTab] && (
+          {state.syllabi && state.syllabi[activeTab] && (
             <SyllabusView
               syllabus={state.syllabi[activeTab]}
               state={state}

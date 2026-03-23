@@ -1,0 +1,193 @@
+{
+  "version": 1,
+  "type": "qa-tracker-syllabus",
+  "exportedAt": "2026-03-23T18:15:30Z",
+  "syllabus": {
+    "id": "python-playwright-mastery",
+    "label": "Python Playwright Automation",
+    "icon": "🎭",
+    "color": "#2EAD33",
+    "sections": [
+      {
+        "id": "python-playwright-mastery-s1",
+        "title": "Foundations & Setup",
+        "topics": [
+          {
+            "id": "python-playwright-mastery-t1",
+            "title": "Environment Configuration",
+            "subtopics": [
+              "Python venv setup",
+              "Playwright CLI installation",
+              "Browser binary management"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t2",
+            "title": "Core Concepts",
+            "subtopics": [
+              "Browser, Context, and Page",
+              "Synchronous vs Asynchronous API",
+              "Headless vs Headed modes"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t3",
+            "title": "First Script",
+            "subtopics": [
+              "Navigating to URLs",
+              "Basic page interactions",
+              "Assertion basics"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-playwright-mastery-s2",
+        "title": "Locators & Actions",
+        "topics": [
+          {
+            "id": "python-playwright-mastery-t4",
+            "title": "Locating Elements",
+            "subtopics": [
+              "Recommended built-in locators",
+              "CSS and XPath selectors",
+              "Filtering and Chaining locators"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t5",
+            "title": "User Interactions",
+            "subtopics": [
+              "Text input and Buttons",
+              "Checkboxes and Radio buttons",
+              "Select dropdowns"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t6",
+            "title": "Advanced Actions",
+            "subtopics": [
+              "Drag and Drop",
+              "Mouse hovers",
+              "Keyboard shortcuts"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-playwright-mastery-s3",
+        "title": "Waiting & Synchronization",
+        "topics": [
+          {
+            "id": "python-playwright-mastery-t7",
+            "title": "Auto-waiting Logic",
+            "subtopics": [
+              "Actionability checks",
+              "Implicit vs Explicit waits",
+              "Handling flaky elements"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t8",
+            "title": "Navigation & Loading",
+            "subtopics": [
+              "Wait until Load States",
+              "Network idle events",
+              "URL and State assertions"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t9",
+            "title": "Custom Wait Conditions",
+            "subtopics": [
+              "Waiting for Function",
+              "Waiting for Selector",
+              "Polling intervals"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-playwright-mastery-s4",
+        "title": "Advanced Workflows",
+        "topics": [
+          {
+            "id": "python-playwright-mastery-t10",
+            "title": "Dialogs & Frames",
+            "subtopics": [
+              "JS Alerts and Confirms",
+              "Handling iFrames",
+              "Multiple Tabs/Windows"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t11",
+            "title": "Network Interception",
+            "subtopics": [
+              "Monitoring API requests",
+              "Mocking API responses",
+              "Route modification"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t12",
+            "title": "Authentication",
+            "subtopics": [
+              "Storage State persistence",
+              "Reusing auth cookies",
+              "Bypassing login steps"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "python-playwright-mastery-s5",
+        "title": "Framework Integration",
+        "topics": [
+          {
+            "id": "python-playwright-mastery-t13",
+            "title": "Pytest Integration",
+            "subtopics": [
+              "Pytest-playwright plugin",
+              "Using fixtures",
+              "CLI arguments for Pytest"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t14",
+            "title": "Reporting & Debugging",
+            "subtopics": [
+              "Trace Viewer usage",
+              "Screenshots and Video recording",
+              "Allure report integration"
+            ],
+            "resources": []
+          },
+          {
+            "id": "python-playwright-mastery-t15",
+            "title": "CI/CD & Docker",
+            "subtopics": [
+              "GitHub Actions workflow",
+              "Running in Docker",
+              "Parallel test execution"
+            ],
+            "resources": []
+          }
+        ]
+      }
+    ]
+  }
+}

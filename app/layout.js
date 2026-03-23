@@ -60,7 +60,7 @@ export default function RootLayout({ children }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         {/* Buy Me Coffee */}
-        <script
+        <Script
           type="text/javascript"
           src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
           data-name="bmc-button"
@@ -72,7 +72,7 @@ export default function RootLayout({ children }) {
           data-outline-color="#000000"
           data-font-color="#000000"
           data-coffee-color="#ffffff"
-        ></script>
+        />
 
         {/* Google tag (gtag.js) */}
         <Script
@@ -89,12 +89,12 @@ export default function RootLayout({ children }) {
           `}
         </Script>
 
-        <script
+        <Script
           id="usercentrics-cmp"
           src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
           data-settings-id="RCGf52YH07pmK7"
           async
-        ></script>
+        />
       </head>
 
       <body className={inter.className}>
