@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(ls *.md)"
+      "Bash(ls *.md)",
+      "Bash(npx prisma:*)",
+      "Bash(cp \"app/\\(secured-admin\\)/admin/site-alerts/page.jsx\" \"app/\\(admin-protected\\)/admin/site-alerts/page.jsx\")",
+      "Bash(cp \"app/\\(secured-admin\\)/admin/responses/page.jsx\" \"app/\\(admin-protected\\)/admin/responses/page.jsx\")",
+      "Bash(cp \"app/\\(secured-admin\\)/admin/_components/SignOutButton.jsx\" \"app/\\(admin-protected\\)/admin/_components/SignOutButton.jsx\")",
+      "Bash(find d:new-playground01_qa_playgroundqa-playgroundapp -path *admin* -name *.jsx -o -path *admin* -name *.js)"
+    ],
+    "additionalDirectories": [
+      "d:\\new-playground\\01_qa_playground\\qa-playground\\app\\api\\auth"
     ]
   }
 }

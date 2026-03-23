@@ -56,6 +56,7 @@ const companyLinks = [
   { href: "/about-us", label: "About Us" },
   { href: "/contact-us", label: "Contact Us" },
   { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/admin/login", label: "Admin" },
 ];
 
 const socialLinks = [

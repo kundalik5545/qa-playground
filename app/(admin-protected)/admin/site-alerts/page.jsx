@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Trash2, Plus, RefreshCw, Save, ExternalLink, Eye, Lock } from "lucide-react";
+import { Trash2, Plus, RefreshCw, Save, Eye } from "lucide-react";
 import { toast } from "sonner";
 import {
   getAlertConfig,
@@ -23,92 +23,13 @@ import {
   getAlertState,
   DEFAULT_ALERT_CONFIG,
 } from "@/lib/alertStorage";
-import { basicDetails } from "@/data/BasicSetting";
-
-const SESSION_KEY = "qaPlayground_adminAuth";
-
-function PasswordGate({ onUnlock }) {
-  const [value, setValue] = useState("");
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
-    setError(false);
-    try {
-      const res = await fetch("/api/admin/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: value }),
-      });
-      if (res.ok) {
-        sessionStorage.setItem(SESSION_KEY, "1");
-        onUnlock();
-      } else {
-        setError(true);
-        setValue("");
-      }
-    } catch {
-      setError(true);
-      setValue("");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="pb-2 text-center">
-          <div className="flex justify-center mb-3">
-            <div className="p-3 rounded-full bg-muted">
-              <Lock className="h-6 w-6 text-muted-foreground" />
-            </div>
-          </div>
-          <h1 className="text-lg font-semibold">Admin Access</h1>
-          <p className="text-sm text-muted-foreground">
-            Enter the password to manage site alerts.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="admin-password">Password</Label>
-              <Input
-                id="admin-password"
-                type="password"
-                autoFocus
-                value={value}
-                onChange={(e) => {
-                  setValue(e.target.value);
-                  setError(false);
-                }}
-                placeholder="Enter admin password"
-                className={error ? "border-destructive focus-visible:ring-destructive" : ""}
-              />
-              {error && (
-                <p className="text-xs text-destructive">Incorrect password. Try again.</p>
-              )}
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Verifying…" : "Unlock"}
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
 
 export default function SiteAlertsAdmin() {
-  const [unlocked, setUnlocked] = useState(false);
   const [config, setConfig] = useState(DEFAULT_ALERT_CONFIG);
   const [alertState, setAlertState] = useState(null);
   const [previewVisible, setPreviewVisible] = useState(false);
 
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_KEY) === "1") setUnlocked(true);
     setConfig(getAlertConfig());
     setAlertState(getAlertState());
   }, []);
@@ -162,20 +83,13 @@ export default function SiteAlertsAdmin() {
         ).toLocaleDateString()
       : null;
 
-  const responses = alertState?.responses ?? null;
-
-  if (!unlocked) {
-    return <PasswordGate onUnlock={() => setUnlocked(true)} />;
-  }
-
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Site Alert Settings</h1>
         <p className="text-muted-foreground text-sm mt-1">
           Configure the popup shown to visitors on the homepage. Responses are
-          emailed to{" "}
-          <span className="font-medium">{basicDetails.websiteEmail}</span>.
+          stored in the database.
         </p>
       </div>
 
@@ -199,19 +113,6 @@ export default function SiteAlertsAdmin() {
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Shows again after</span>
               <span>{nextShowDate}</span>
-            </div>
-          )}
-          {responses && (
-            <div className="border rounded-lg p-3 bg-muted/40 space-y-1">
-              <p className="font-medium text-xs mb-2">Last responses:</p>
-              {config.questions.map((q) => (
-                <div key={q.id} className="flex justify-between gap-4">
-                  <span className="text-muted-foreground truncate">{q.text}</span>
-                  <span className="font-medium shrink-0">
-                    {responses[q.id] ?? "—"}
-                  </span>
-                </div>
-              ))}
             </div>
           )}
           <Button
@@ -268,35 +169,6 @@ export default function SiteAlertsAdmin() {
                 <SelectItem value="365">Once a year</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label className="flex items-center gap-2">
-              Formspree endpoint
-              <a
-                href="https://formspree.io"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-blue-500 flex items-center gap-1 font-normal"
-              >
-                Get a free endpoint <ExternalLink className="h-3 w-3" />
-              </a>
-            </Label>
-            <Input
-              placeholder="https://formspree.io/f/xxxxxxxx"
-              value={config.formspreeEndpoint}
-              onChange={(e) =>
-                setConfig((prev) => ({
-                  ...prev,
-                  formspreeEndpoint: e.target.value,
-                }))
-              }
-            />
-            <p className="text-xs text-muted-foreground">
-              Sign up at formspree.io → New Form → set email to{" "}
-              <span className="font-medium">{basicDetails.websiteEmail}</span> →
-              paste the endpoint URL here.
-            </p>
           </div>
         </CardContent>
       </Card>
@@ -356,7 +228,7 @@ export default function SiteAlertsAdmin() {
                   <SelectContent>
                     <SelectItem value="yesno">Yes / No buttons</SelectItem>
                     <SelectItem value="thumbs">
-                      👍 Thumbs up / 👎 Thumbs down
+                      Thumbs up / Thumbs down
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -391,7 +263,6 @@ export default function SiteAlertsAdmin() {
         Save Settings
       </Button>
 
-      {/* Inline preview modal (no side-effects) */}
       {previewVisible && config.questions.length > 0 && (
         <AlertPreview
           config={config}

@@ -8,6 +8,7 @@ import {
   shouldShowAlert,
   saveAlertState,
 } from "@/lib/alertStorage";
+import { saveAlertResponse } from "@/app/actions/alertActions";
 
 export default function SiteAlertPopup() {
   const [visible, setVisible] = useState(false);
@@ -36,7 +37,7 @@ export default function SiteAlertPopup() {
       return;
     }
 
-    // Last question answered — save state and submit
+    // Last question answered — save state and persist to DB
     saveAlertState({
       answeredAt: new Date().toISOString(),
       responses: newAnswers,
@@ -45,31 +46,9 @@ export default function SiteAlertPopup() {
     setDone(true);
     setTimeout(() => setVisible(false), 2000);
 
-    if (config.formspreeEndpoint) {
-      try {
-        const payload = {
-          source: "QA Playground Homepage Alert",
-          timestamp: new Date().toISOString(),
-        };
-        config.questions.forEach((q) => {
-          payload[q.text] = newAnswers[q.id] ?? "—";
-        });
-        const res = await fetch(config.formspreeEndpoint, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(payload),
-        });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          console.error("Formspree error:", res.status, body);
-        }
-      } catch (err) {
-        console.error("Alert submit failed:", err);
-      }
-    }
+    saveAlertResponse(newAnswers).catch((err) =>
+      console.error("Alert response save failed:", err)
+    );
   }
 
   function handleDismiss() {
