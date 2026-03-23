@@ -201,7 +201,7 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
       </div>
 
       {/* ── Overview Cards ── */}
-      <div className="flex gap-3 overflow-x-auto pb-1">
+      <div className="flex gap-4 overflow-x-auto pb-2">
         <OverviewCard
           icon="🎯"
           label="Overall"
@@ -424,10 +424,10 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
                 <Tooltip
                   contentStyle={TS}
                   formatter={(value, name, props) => {
-                    const d = barData[props.index];
-                    if (name === "Completed") {
-                      const total = d.Completed + d.Remaining;
-                      const pct = total ? Math.round((d.Completed / total) * 100) : 0;
+                    const d = props?.payload;
+                    if (name === "Completed" && d) {
+                      const total = (d.Completed ?? 0) + (d.Remaining ?? 0);
+                      const pct = total ? Math.round(((d.Completed ?? 0) / total) * 100) : 0;
                       return [`${value} (${pct}%)`, name];
                     }
                     return [value, name];
@@ -541,25 +541,32 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
 function OverviewCard({ icon, label, pct, sub, color, onClick }) {
   return (
     <div
-      className={`shrink-0 w-44 rounded-lg border bg-card p-4 flex flex-col gap-1.5 transition-shadow${onClick ? " cursor-pointer hover:shadow-md" : ""}`}
-      style={{ borderTop: `3px solid ${color}` }}
+      className={`shrink-0 w-48 rounded-xl bg-card p-4 flex flex-col gap-1.5 shadow-sm transition-shadow duration-200${onClick ? " cursor-pointer hover:shadow-lg" : ""}`}
+      style={{
+        borderTop: `4px solid ${color}`,
+        boxShadow: `0 2px 8px 0 ${color}18, 0 1px 3px 0 rgba(0,0,0,0.08)`,
+      }}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
       onKeyDown={onClick ? (e) => e.key === "Enter" && onClick() : undefined}
     >
-      <span className="text-xl leading-none">{icon}</span>
-      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mt-0.5">
+      <span className="text-2xl leading-none">{icon}</span>
+      <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground mt-1">
         {label}
       </p>
-      <p className="text-3xl font-bold leading-none" style={{ color }}>
+      <p className="text-[2rem] font-bold leading-none mt-0.5" style={{ color }}>
         {pct}%
       </p>
       <p className="text-xs text-muted-foreground">{sub}</p>
-      <div className="h-1.5 bg-muted rounded-full overflow-hidden mt-1">
+      <div className="h-1 bg-muted rounded-full overflow-hidden mt-2">
         <div
-          className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, backgroundColor: color }}
+          className="h-full rounded-full transition-all duration-700"
+          style={{
+            width: pct > 0 ? `${pct}%` : "0%",
+            backgroundColor: color,
+            minWidth: pct > 0 ? "4px" : "0",
+          }}
         />
       </div>
     </div>

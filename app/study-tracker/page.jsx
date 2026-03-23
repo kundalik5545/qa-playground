@@ -11,6 +11,12 @@ import {
   downloadJSON,
   pickJSONFile,
 } from "@/lib/studyTrackerStorage";
+import {
+  loadSyllabiFromIdb,
+  getDefaultSyllabi,
+  getDefaultOrder,
+  saveSyllabiToIdb,
+} from "@/lib/syllabusManagerDb";
 import DEFAULT_SYLLABUS_DATA from "@/data/studyTrackerSyllabi";
 import DashboardView from "./_components/DashboardView";
 
@@ -21,9 +27,30 @@ export default function StudyTrackerPage() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const idbState = await loadStateFromIdb();
+      // Load syllabi from Syllabus Manager IDB (sm-syllabi) — source of truth
+      // Load tracker state (progress, daily, log) from study-tracker-state
+      const [{ syllabi: idbSyllabi, order: idbOrder }, trackerState] =
+        await Promise.all([loadSyllabiFromIdb(), loadStateFromIdb()]);
       if (cancelled) return;
-      setState(idbState ?? loadAllState());
+
+      // Seed syllabus manager if empty
+      let syllabi = idbSyllabi;
+      let order = idbOrder;
+      if (!syllabi || Object.keys(syllabi).length === 0) {
+        syllabi = getDefaultSyllabi();
+        order = getDefaultOrder();
+        await saveSyllabiToIdb(syllabi, order);
+      }
+
+      const base = trackerState || loadAllState();
+      setState({
+        ...base,
+        syllabi,
+        syllabusOrder:
+          Array.isArray(order) && order.length > 0
+            ? order
+            : Object.keys(syllabi),
+      });
     })();
     return () => {
       cancelled = true;
