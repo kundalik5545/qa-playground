@@ -78,9 +78,10 @@
 ├── next-sitemap.config.js        Sitemap generation (qaplayground.com)
 ├── next-sitemap.config.js        Sitemap: https://www.qaplayground.com
 ├── .ai-project-config.json       Machine-readable project metadata (do not delete)
-├── AI_CODING_GUIDELINES.md         Rules and guidelines for AI agents
-├── BANK_MIGRATION_NOTES.md         Bank feature migration notes
-└── DEV_QUICK_REFERENCE.md          Quick dev reference
+└── docs/                         Project documentation
+    ├── AI_CODING_GUIDELINES.md   Rules and guidelines for AI agents
+    ├── BANK_MIGRATION_NOTES.md   Bank feature migration notes
+    └── DEV_QUICK_REFERENCE.md    Quick dev reference
 ```
 
 ### app/ — Routes & Layouts

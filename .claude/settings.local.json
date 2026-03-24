@@ -10,7 +10,12 @@
       "Bash(sed -i 's/AI_AGENT_RULES\\\\.md/AI_CODING_GUIDELINES.md/g' README.md DEV_QUICK_REFERENCE.md)",
       "Bash(sed -i 's/AI_AGENT_RULES\\\\.md             Rules for AI agents working on this project/AI_CODING_GUIDELINES.md         Rules and guidelines for AI agents working on this project/' CLAUDE.md)",
       "Bash(ls \"d:/new-playground/01_qa_playground/qa-playground/tailwind.config\"*)",
-      "Bash(npx pnpm:*)"
+      "Bash(npx pnpm:*)",
+      "WebFetch(domain:www.qaplayground.com)",
+      "Bash(mkdir -p \"D:/new-playground/01_qa_playground/qa-playground/docs\")",
+      "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/AI_CODING_GUIDELINES.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
+      "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/BANK_MIGRATION_NOTES.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
+      "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/DEV_QUICK_REFERENCE.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")"
     ]
   }
 }

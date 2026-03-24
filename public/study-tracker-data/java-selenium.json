@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "type": "qa-tracker-syllabus",
+  "exportedAt": "2026-03-20T06:30:00.000Z",
+  "syllabus": {
+    "id": "java-selenium",
+    "label": "Java for Selenium Automation",
+    "icon": "\u2615",
+    "color": "#f59e0b",
+    "sections": [
+      {
+        "id": "java-selenium-s1",
+        "title": "Java Fundamentals for QA",
+        "topics": [
+          {
+            "id": "java-selenium-t1",
+            "title": "Java Basics",
+            "subtopics": [
+              "JDK, JRE, JVM",
+              "Data Types & Variables",
+              "Operators",
+              "Control Statements"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t2",
+            "title": "Object-Oriented Programming",
+            "subtopics": [
+              "Classes & Objects",
+              "Inheritance",
+              "Polymorphism",
+              "Encapsulation"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t3",
+            "title": "Methods & Constructors",
+            "subtopics": [
+              "Method Declaration",
+              "Method Overloading",
+              "Constructors",
+              "this & super keywords"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "java-selenium-s2",
+        "title": "Core Java for Automation",
+        "topics": [
+          {
+            "id": "java-selenium-t4",
+            "title": "Collections Framework",
+            "subtopics": [
+              "List Interface",
+              "Set Interface",
+              "Map Interface",
+              "Iteration Techniques"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t5",
+            "title": "Exception Handling",
+            "subtopics": [
+              "try-catch-finally",
+              "Checked vs Unchecked Exceptions",
+              "Throw & Throws",
+              "Custom Exceptions"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t6",
+            "title": "Strings & Utilities",
+            "subtopics": [
+              "String vs StringBuilder",
+              "Common String Methods",
+              "Date & Time API",
+              "Utility Classes"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t7",
+            "title": "File Handling",
+            "subtopics": [
+              "File Class",
+              "Reading Files",
+              "Writing Files",
+              "Properties File Handling"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "java-selenium-s3",
+        "title": "Java for Selenium Integration",
+        "topics": [
+          {
+            "id": "java-selenium-t8",
+            "title": "Maven & Project Setup",
+            "subtopics": [
+              "Maven Basics",
+              "pom.xml Configuration",
+              "Dependencies Management",
+              "Project Structure"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t9",
+            "title": "TestNG Framework",
+            "subtopics": [
+              "Annotations",
+              "Assertions",
+              "TestNG XML",
+              "Parallel Execution"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t10",
+            "title": "Logging & Reporting",
+            "subtopics": [
+              "Log4j Basics",
+              "Logging Levels",
+              "Extent Reports",
+              "Custom Reporting"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "java-selenium-s4",
+        "title": "Advanced Java for Automation",
+        "topics": [
+          {
+            "id": "java-selenium-t11",
+            "title": "Java Streams & Lambda",
+            "subtopics": [
+              "Lambda Expressions",
+              "Stream API",
+              "Filtering & Mapping",
+              "Collectors"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t12",
+            "title": "Multithreading",
+            "subtopics": [
+              "Thread Class",
+              "Runnable Interface",
+              "Synchronization",
+              "Thread Pools"
+            ],
+            "resources": []
+          },
+          {
+            "id": "java-selenium-t13",
+            "title": "Design Patterns in Automation",
+            "subtopics": [
+              "Singleton Pattern",
+              "Factory Pattern",
+              "Page Object Model",
+              "Dependency Injection"
+            ],
+            "resources": []
+          }
+        ]
+      }
+    ]
+  }
+}

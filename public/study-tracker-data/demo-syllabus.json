@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "type": "qa-tracker-syllabus",
+  "exportedAt": "2026-03-20T07:01:01.793Z",
+  "syllabus": {
+    "id": "playwright",
+    "label": "Playwright",
+    "icon": "🎭",
+    "color": "#dc2626",
+    "sections": [
+      {
+        "id": "pw-s1",
+        "title": "Playwright Fundamentals",
+        "topics": [
+          {
+            "id": "pw-t1",
+            "title": "Setup & Configuration",
+            "subtopics": [
+              "Installation",
+              "playwright.config.ts",
+              "Browsers & Devices"
+            ],
+            "resources": []
+          },
+          {
+            "id": "pw-t2",
+            "title": "Playwright Architecture",
+            "subtopics": [
+              "Auto-waiting",
+              "Selectors",
+              "Browser Contexts",
+              "Pages"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "pw-s2",
+        "title": "Core Features",
+        "topics": [
+          {
+            "id": "pw-t3",
+            "title": "Actions & Assertions",
+            "subtopics": [
+              "click, fill, check",
+              "expect() API",
+              "Soft Assertions"
+            ],
+            "resources": []
+          },
+          {
+            "id": "pw-t4",
+            "title": "Fixtures & Hooks",
+            "subtopics": [
+              "Built-in Fixtures",
+              "Custom Fixtures",
+              "beforeAll/afterEach"
+            ],
+            "resources": []
+          },
+          {
+            "id": "pw-t5",
+            "title": "Page Object Model",
+            "subtopics": [
+              "POM with Playwright",
+              "Component Objects"
+            ],
+            "resources": []
+          },
+          {
+            "id": "pw-t6",
+            "title": "Network Interception",
+            "subtopics": [
+              "route.fulfill()",
+              "Mocking APIs",
+              "Request Logging"
+            ],
+            "resources": []
+          }
+        ]
+      },
+      {
+        "id": "pw-s3",
+        "title": "Advanced Playwright",
+        "topics": [
+          {
+            "id": "pw-t7",
+            "title": "Visual Testing",
+            "subtopics": [
+              "Screenshot Comparison",
+              "toHaveScreenshot()",
+              "Threshold Config"
+            ],
+            "resources": []
+          },
+          {
+            "id": "pw-t8",
+            "title": "Tracing & Debugging",
+            "subtopics": [
+              "Trace Viewer",
+              "UI Mode",
+              "PWDEBUG"
+            ],
+            "resources": []
+          },
+          {
+            "id": "pw-t9",
+            "title": "Parallel Execution",
+            "subtopics": [
+              "Workers Config",
+              "Sharding",
+              "Test Grouping"
+            ],
+            "resources": []
+          },
+          {
+            "id": "pw-t10",
+            "title": "CI/CD with Playwright",
+            "subtopics": [
+              "GitHub Actions",
+              "HTML Reporter",
+              "Allure Integration"
+            ],
+            "resources": []
+          }
+        ]
+      }
+    ]
+  }
+}

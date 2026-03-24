@@ -171,7 +171,7 @@ const PracticePage = () => {
       <div className="practice-section">
         <section className="page-title py-4">
           <h1 className="text-center text-3xl font-semibold">
-            Ready to be a Pro Ai Automation Enginner?
+            Ready to be a Pro Ai Automation Engineer?
           </h1>
           <h2 className="text-center text-base mt-2 text-gray-500 ">
             Practice daily and level up your automation skills with real-world
