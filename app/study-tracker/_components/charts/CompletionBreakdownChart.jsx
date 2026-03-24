@@ -12,18 +12,18 @@ export default function CompletionBreakdownChart({ completionPieData, hasComplet
       </CardHeader>
       <CardContent>
         {!hasCompletionData ? (
-          <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">
+          <div className="flex items-center justify-center h-[340px] text-sm text-muted-foreground">
             No completed topics yet
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={340}>
             <PieChart>
               <Pie
                 data={completionPieData}
                 cx="50%"
                 cy="45%"
-                innerRadius={52}
-                outerRadius={82}
+                innerRadius={68}
+                outerRadius={108}
                 dataKey="value"
                 nameKey="name"
                 strokeWidth={2}

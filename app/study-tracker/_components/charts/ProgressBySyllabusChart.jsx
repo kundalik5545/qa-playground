@@ -21,7 +21,7 @@ export default function ProgressBySyllabusChart({ barData }) {
         <h2 className="font-semibold text-base">Progress by Syllabus</h2>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={260}>
+        <ResponsiveContainer width="100%" height={340}>
           <BarChart
             data={barData}
             margin={{ top: 4, right: 8, left: -16, bottom: 56 }}

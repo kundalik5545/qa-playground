@@ -14,14 +14,14 @@ export default function OverallProgressChart({ overallPieData, allStats }) {
         </p>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={300}>
           <PieChart>
             <Pie
               data={overallPieData}
               cx="50%"
               cy="50%"
-              innerRadius={62}
-              outerRadius={88}
+              innerRadius={78}
+              outerRadius={108}
               dataKey="value"
               nameKey="name"
               strokeWidth={0}

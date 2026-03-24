@@ -52,6 +52,8 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
         const total = tasks.length;
         return {
           date: day.slice(5),
+          Done: done,
+          Total: total,
           pct: total > 0 ? Math.round((done / total) * 100) : null,
         };
       }),
@@ -210,7 +212,7 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
       </div>
 
       {/* ── Row 1: Today's Tasks | Daily Task Completion % ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
         <TodaysTasksChart
           taskPieData={taskPieData}
           hasTasksToday={hasTasksToday}
@@ -221,7 +223,7 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
       </div>
 
       {/* ── Row 2: Overall Progress | Topics Completed ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
         <OverallProgressChart overallPieData={overallPieData} allStats={allStats} />
         <TopicsCompletedChart
           topicsLineData={topicsLineData}

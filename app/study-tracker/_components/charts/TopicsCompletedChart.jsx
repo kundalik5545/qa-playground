@@ -25,7 +25,7 @@ export default function TopicsCompletedChart({ topicsLineData, syllabi, syllabus
         </h2>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={300}>
           <LineChart
             data={topicsLineData}
             margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
