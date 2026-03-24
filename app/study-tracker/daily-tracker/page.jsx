@@ -6,6 +6,7 @@ import {
   loadStateFromIdb,
   saveKey,
 } from "@/lib/studyTrackerStorage";
+import { cn } from "@/lib/utils";
 import DailyTrackerView from "../_components/DailyTrackerView";
 
 export default function DailyTrackerPage() {
@@ -52,12 +53,18 @@ export default function DailyTrackerPage() {
         updateState={updateState}
         showToast={showToast}
       />
-      {/* Toast */}
-      <div
-        className={`st-toast${toast.show ? " show" : ""}${toast.error ? " error" : ""}`}
-      >
-        {toast.msg}
-      </div>
+      {toast.show && (
+        <div
+          className={cn(
+            "fixed bottom-6 left-1/2 -translate-x-1/2 z-50 rounded-lg px-4 py-2.5 text-sm font-medium shadow-lg transition-all",
+            toast.error
+              ? "bg-destructive text-destructive-foreground"
+              : "bg-foreground text-background",
+          )}
+        >
+          {toast.msg}
+        </div>
+      )}
     </>
   );
 }

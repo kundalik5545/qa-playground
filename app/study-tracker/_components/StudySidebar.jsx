@@ -11,13 +11,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import {
-  LayoutDashboard,
-  CalendarDays,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { LayoutDashboard, CalendarDays, BookOpen, GraduationCap, PanelLeft } from "lucide-react";
 import {
   loadSyllabiFromIdb,
   saveSyllabiToIdb,
@@ -78,24 +72,51 @@ export default function StudySidebar({ collapsed, onToggle }) {
     <TooltipProvider delayDuration={0}>
       <aside
         className={cn(
-          "fixed top-16 left-0 h-[calc(100vh-4rem)] border-r border-border bg-background flex flex-col z-40 transition-all duration-300",
+          "fixed top-16 left-0 h-[calc(100vh-4rem)] border-r border-border bg-background flex flex-col z-40 transition-all duration-300 overflow-hidden",
           collapsed ? "w-14" : "w-64",
         )}
       >
-        {/* Toggle button */}
-        <button
-          onClick={onToggle}
-          className="absolute -right-3 top-4 z-50 flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-sm hover:text-foreground"
+        {/* Sidebar header */}
+        <div
+          className={cn(
+            "flex h-12 items-center border-b border-border shrink-0",
+            collapsed ? "justify-center px-2" : "gap-2 px-3",
+          )}
         >
           {collapsed ? (
-            <ChevronRight className="h-3 w-3" />
+            /* Collapsed — toggle button IS the header */
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  onClick={onToggle}
+                  className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                  aria-label="Expand sidebar"
+                >
+                  <PanelLeft className="h-4 w-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="right">Expand sidebar</TooltipContent>
+            </Tooltip>
           ) : (
-            <ChevronLeft className="h-3 w-3" />
+            /* Expanded — logo + name + collapse button */
+            <>
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
+                <GraduationCap className="h-4 w-4" />
+              </div>
+              <span className="flex-1 text-sm font-semibold truncate">Study Tracker</span>
+              <button
+                onClick={onToggle}
+                className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+                aria-label="Collapse sidebar"
+              >
+                <PanelLeft className="h-4 w-4" />
+              </button>
+            </>
           )}
-        </button>
+        </div>
 
         {/* Main nav */}
-        <nav className="flex flex-col gap-1 p-2 flex-1 overflow-y-auto overflow-x-hidden">
+        <nav className="flex flex-col gap-0.5 p-2 flex-1 overflow-y-auto overflow-x-hidden">
           {navItems.map(({ label, href, icon: Icon }) => {
             const isActive = pathname === href;
             return (

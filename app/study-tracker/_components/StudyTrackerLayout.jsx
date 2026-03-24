@@ -8,13 +8,18 @@ export default function StudyTrackerLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex w-full py-16">
+    <div className="flex py-16">
       <StudySidebar
         collapsed={collapsed}
         onToggle={() => setCollapsed((v) => !v)}
       />
-      <main className="flex-1 overflow-auto transition-all duration-300 ml-0">
-        <div className="p-6 container mx-auto">{children}</div>
+      <main
+        className={cn(
+          "flex-1 min-w-0 transition-all duration-300 man-class",
+          collapsed ? "ml-0" : "ml-24",
+        )}
+      >
+        {children}
       </main>
     </div>
   );

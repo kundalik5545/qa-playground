@@ -32,6 +32,7 @@ import {
   ChartLegend,
   ChartLegendContent,
 } from "@/components/ui/chart";
+import { cn } from "@/lib/utils";
 
 const CHECK_SVG = (
   <svg viewBox="0 0 12 12" width={10} height={10}>
@@ -48,7 +49,7 @@ const CHECK_SVG = (
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function DailyTrackerView({ state, updateState, showToast }) {
-  const [view, setView] = useState("tasks"); // "tasks" | "habits"
+  const [view, setView] = useState("tasks");
   const [selectedDate, setSelectedDate] = useState(getTodayStr());
   const [filterMode, setFilterMode] = useState("weekly");
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -63,7 +64,6 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     endDate: "",
   });
 
-  // Strip dates (±3 days from selectedDate)
   const stripDates = [];
   for (let i = -3; i <= 3; i++) {
     const d = new Date(selectedDate + "T00:00:00");
@@ -78,7 +78,6 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
   const habitsForDate = (date) =>
     habits.filter((h) => habitAppliesOnDate(h, date));
 
-  // Date strip dot class
   const dotClass = (date) => {
     const tasks = daily[date] || [];
     const habitsOnDate = habitsForDate(date);
@@ -90,7 +89,6 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     return done === total ? "all-done" : "has-tasks";
   };
 
-  // Task summary for selected date
   const tasksForDate = daily[selectedDate] || [];
   const habitsForSel = habitsForDate(selectedDate);
   const taskDone = tasksForDate.filter((t) => t.done).length;
@@ -123,7 +121,6 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     return selectedDate === getTodayStr() ? "Today — " + dateStr : dateStr;
   };
 
-  // Add daily task
   const addTask = () => {
     if (!newTaskTitle.trim()) return;
     const task = {
@@ -133,15 +130,11 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
       done: false,
     };
     const current = daily[selectedDate] || [];
-    updateState("daily", {
-      ...daily,
-      [selectedDate]: [...current, task],
-    });
+    updateState("daily", { ...daily, [selectedDate]: [...current, task] });
     setNewTaskTitle("");
     setNewTaskTime("");
   };
 
-  // Toggle task done
   const toggleTask = (idx) => {
     const tasks = (daily[selectedDate] || []).map((t, i) =>
       i === idx ? { ...t, done: !t.done } : t,
@@ -149,20 +142,17 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     updateState("daily", { ...daily, [selectedDate]: tasks });
   };
 
-  // Delete task
   const deleteTask = (idx) => {
     const tasks = (daily[selectedDate] || []).filter((_, i) => i !== idx);
     updateState("daily", { ...daily, [selectedDate]: tasks });
   };
 
-  // Toggle habit done
   const toggleHabit = (habitId) => {
     const dayLog = { ...(habitLog[selectedDate] || {}) };
     dayLog[habitId] = !dayLog[habitId];
     updateState("habitLog", { ...habitLog, [selectedDate]: dayLog });
   };
 
-  // Add habit
   const addHabit = () => {
     if (!habitForm.title.trim()) return;
     if (habitForm.recurrence === "custom" && !habitForm.customDays.length) {
@@ -190,15 +180,10 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     showToast(`Habit "${habit.title}" created!`);
   };
 
-  // Delete habit
   const deleteHabit = (idx) => {
-    updateState(
-      "habits",
-      habits.filter((_, i) => i !== idx),
-    );
+    updateState("habits", habits.filter((_, i) => i !== idx));
   };
 
-  // Export/import tasks
   const exportTasks = () => {
     const payload = {
       version: 1,
@@ -209,6 +194,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     downloadJSON(payload, `qa-tasks-${getTodayStr()}.json`);
     showToast("Tasks exported!");
   };
+
   const importTasks = () => {
     pickJSONFile((data) => {
       if (data.type !== "qa-tracker-tasks") {
@@ -226,23 +212,23 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
   return (
     <div>
       {/* Header */}
-      <div className="st-dash-header">
-        <div className="st-dash-header-row">
+      <div className="mb-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="st-dash-title">Daily Progress Tracker</h1>
-            <p className="st-dash-subtitle">
+            <h1 className="text-2xl font-bold tracking-tight">Daily Progress Tracker</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
               Daily tasks &amp; recurring habits with time tracking
             </p>
           </div>
-          <div className="st-dash-actions">
+          <div className="flex gap-2">
             <button
-              className="st-action-btn st-export-btn"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
               onClick={exportTasks}
             >
               ⬇ Export Tasks
             </button>
             <button
-              className="st-action-btn st-import-btn"
+              className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-sm font-medium hover:bg-muted transition-colors"
               onClick={importTasks}
             >
               ⬆ Import Tasks
@@ -252,15 +238,25 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
       </div>
 
       {/* View tabs */}
-      <div className="st-view-tabs">
+      <div className="mb-4 flex gap-1.5">
         <button
-          className={`st-view-tab${view === "tasks" ? " active" : ""}`}
+          className={cn(
+            "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+            view === "tasks"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-muted",
+          )}
           onClick={() => setView("tasks")}
         >
           📋 Daily Tasks
         </button>
         <button
-          className={`st-view-tab${view === "habits" ? " active" : ""}`}
+          className={cn(
+            "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
+            view === "habits"
+              ? "bg-primary text-primary-foreground"
+              : "text-muted-foreground hover:bg-muted",
+          )}
           onClick={() => setView("habits")}
         >
           🔄 Recurring Habits
@@ -269,14 +265,14 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
       {/* ── TASKS VIEW ── */}
       {view === "tasks" && (
-        <div className="st-daily-main-grid">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 items-start">
           {/* Left: date strip + task list */}
           <div>
             {/* Date nav bar */}
-            <div className="st-date-nav-bar">
-              <div className="st-date-nav-main">
+            <div className="mb-3 flex items-center justify-between gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
+              <div className="flex items-center gap-1.5">
                 <button
-                  className="st-date-nav-btn"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors"
                   title="Previous week"
                   onClick={() => {
                     const d = new Date(selectedDate + "T00:00:00");
@@ -286,29 +282,40 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
                 >
                   ◀
                 </button>
-                <div className="st-date-strip">
+                <div className="flex gap-0.5">
                   {stripDates.map((date) => {
                     const d = new Date(date + "T00:00:00");
                     const dot = dotClass(date);
+                    const isSelected = date === selectedDate;
+                    const isToday = date === getTodayStr();
                     return (
                       <div
                         key={date}
-                        className={`st-date-chip${date === selectedDate ? " active" : ""}${date === getTodayStr() ? " today" : ""}`}
+                        className={cn(
+                          "flex w-9 cursor-pointer flex-col items-center gap-0.5 rounded-lg py-1 text-xs hover:bg-muted transition-colors",
+                          isSelected && "bg-primary/10",
+                          isToday && "ring-1 ring-primary ring-offset-1",
+                        )}
                         onClick={() => setSelectedDate(date)}
                       >
-                        <span className="st-date-chip-day">
+                        <span className="text-[10px] font-medium uppercase text-muted-foreground">
                           {d.toLocaleDateString("en-US", { weekday: "short" })}
                         </span>
-                        <span className="st-date-chip-num">{d.getDate()}</span>
+                        <span className="text-sm font-semibold">{d.getDate()}</span>
                         <span
-                          className={`st-date-chip-dot${dot ? " " + dot : ""}`}
+                          className={cn(
+                            "h-1 w-1 rounded-full",
+                            dot === "all-done" && "bg-emerald-500",
+                            dot === "has-tasks" && "bg-amber-400",
+                            !dot && "bg-transparent",
+                          )}
                         />
                       </div>
                     );
                   })}
                 </div>
                 <button
-                  className="st-date-nav-btn"
+                  className="flex h-7 w-7 items-center justify-center rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors"
                   title="Next week"
                   onClick={() => {
                     const d = new Date(selectedDate + "T00:00:00");
@@ -319,16 +326,16 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
                   ▶
                 </button>
               </div>
-              <div className="st-date-nav-controls">
+              <div className="flex items-center gap-2">
                 <button
-                  className="st-today-btn"
+                  className="rounded-md bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
                   onClick={() => setSelectedDate(getTodayStr())}
                 >
                   Today
                 </button>
                 <input
                   type="date"
-                  className="st-date-picker-input"
+                  className="rounded-md border border-border bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                 />
@@ -336,18 +343,18 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
             </div>
 
             {/* Task panel */}
-            <div className="st-task-panel">
-              <div className="st-task-panel-header">
-                <span className="st-task-date-label">{dateLabelText()}</span>
-                <span className="st-task-summary-badge">{summaryText}</span>
+            <div className="overflow-hidden rounded-xl border border-border bg-card">
+              <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <span className="text-sm font-semibold">{dateLabelText()}</span>
+                <span className="text-xs text-muted-foreground">{summaryText}</span>
               </div>
-              <div className="st-task-list">
+              <div className="divide-y divide-border">
                 {/* Habits section */}
                 {habitsForSel.length > 0 && (
                   <>
-                    <div className="st-task-section-hdr st-habit-section-hdr">
+                    <div className="flex items-center justify-between bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                       🔄 Recurring Habits
-                      <span className="st-task-section-cnt">
+                      <span className="font-bold text-foreground">
                         {habitDone}/{habitsForSel.length}
                       </span>
                     </div>
@@ -356,25 +363,31 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
                       return (
                         <div
                           key={h.id}
-                          className={`st-task-item st-habit-item${done ? " done" : ""}`}
+                          className={cn(
+                            "flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors",
+                            done && "opacity-60",
+                          )}
                         >
                           <div
-                            className={`st-task-check st-habit-check${done ? " done" : ""}`}
+                            className={cn(
+                              "flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded border transition-colors",
+                              done
+                                ? "border-blue-500 bg-blue-500"
+                                : "border-border hover:border-blue-500",
+                            )}
                             onClick={() => toggleHabit(h.id)}
                           >
                             {done && CHECK_SVG}
                           </div>
-                          <span
-                            className={`st-task-text${done ? " done" : ""}`}
-                          >
+                          <span className={cn("flex-1 text-sm", done && "line-through text-muted-foreground")}>
                             {h.title}
                           </span>
                           {h.timeMin > 0 && (
-                            <span className="st-task-time-badge">
+                            <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                               {formatMinutes(h.timeMin)}
                             </span>
                           )}
-                          <span className="st-habit-recur-badge">
+                          <span className="rounded bg-blue-100 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
                             {formatHabitRecurrence(h)}
                           </span>
                         </div>
@@ -385,15 +398,15 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
                 {/* Daily tasks section */}
                 {(tasksForDate.length > 0 || habitsForSel.length > 0) && (
-                  <div className="st-task-section-hdr">
+                  <div className="flex items-center justify-between bg-muted/50 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     📋 Daily Tasks
-                    <span className="st-task-section-cnt">
+                    <span className="font-bold text-foreground">
                       {taskDone}/{tasksForDate.length}
                     </span>
                   </div>
                 )}
                 {tasksForDate.length === 0 && (
-                  <div className="st-no-tasks" style={{ padding: "12px 16px" }}>
+                  <div className="px-4 py-3 text-center text-sm text-muted-foreground">
                     {habitsForSel.length
                       ? "No one-off tasks. Add one below."
                       : "No tasks or habits for this day."}
@@ -402,24 +415,32 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
                 {tasksForDate.map((task, i) => (
                   <div
                     key={task.id || i}
-                    className={`st-task-item${task.done ? " done" : ""}`}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-2.5 hover:bg-muted/40 transition-colors",
+                      task.done && "opacity-60",
+                    )}
                   >
                     <div
-                      className={`st-task-check${task.done ? " done" : ""}`}
+                      className={cn(
+                        "flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded border transition-colors",
+                        task.done
+                          ? "border-emerald-500 bg-emerald-500"
+                          : "border-border hover:border-emerald-500",
+                      )}
                       onClick={() => toggleTask(i)}
                     >
                       {task.done && CHECK_SVG}
                     </div>
-                    <span className={`st-task-text${task.done ? " done" : ""}`}>
+                    <span className={cn("flex-1 text-sm", task.done && "line-through text-muted-foreground")}>
                       {task.title}
                     </span>
                     {task.timeMin > 0 && (
-                      <span className="st-task-time-badge">
+                      <span className="rounded bg-amber-100 px-1.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
                         {formatMinutes(task.timeMin)}
                       </span>
                     )}
                     <button
-                      className="st-task-del-btn"
+                      className="flex h-6 w-6 items-center justify-center rounded text-base leading-none text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                       onClick={() => deleteTask(i)}
                     >
                       ×
@@ -427,9 +448,9 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
                   </div>
                 ))}
               </div>
-              <div className="st-add-task-form">
+              <div className="flex items-center gap-2 border-t border-border px-4 py-3">
                 <input
-                  className="st-task-title-input"
+                  className="flex-1 rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   placeholder="Add a one-off task..."
                   value={newTaskTitle}
                   onChange={(e) => setNewTaskTitle(e.target.value)}
@@ -437,13 +458,16 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
                 />
                 <input
                   type="number"
-                  className="st-task-time-input"
+                  className="w-16 rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   placeholder="Min"
                   min={1}
                   value={newTaskTime}
                   onChange={(e) => setNewTaskTime(e.target.value)}
                 />
-                <button className="st-add-task-btn" onClick={addTask}>
+                <button
+                  className="rounded-md bg-primary px-4 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                  onClick={addTask}
+                >
                   + Add
                 </button>
               </div>
@@ -482,12 +506,9 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
 
   const days = filterMode === "weekly" ? 7 : 30;
 
-  // Build chart data
   const completionRateData = [];
   const tasksPerDayData = [];
-  let cardDone = 0,
-    cardTotal = 0,
-    cardTime = 0;
+  let cardDone = 0, cardTotal = 0, cardTime = 0;
 
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
@@ -520,11 +541,8 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
   }
   const cardPct = cardTotal ? Math.round((cardDone / cardTotal) * 100) : 0;
 
-  // Time allocation pie data for selected date
   const sTasks = daily[selectedDate] || [];
-  const sHabits = habits.filter((h) =>
-    habitAppliesOnDate(h, selectedDate),
-  );
+  const sHabits = habits.filter((h) => habitAppliesOnDate(h, selectedDate));
   const doneTime =
     sTasks.filter((t) => t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
     sHabits
@@ -543,27 +561,36 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
         ]
       : [{ name: "No data", value: 1 }];
 
-  const completionChartConfig = {
-    completion: { label: "Completion %", color: "#f59e0b" },
-  };
+  const completionChartConfig = { completion: { label: "Completion %", color: "#f59e0b" } };
   const tasksChartConfig = {
     done: { label: "Done", color: "#10b981" },
     remaining: { label: "Remaining", color: "#e5e7eb" },
   };
 
   return (
-    <div className="st-daily-right">
-      <div className="st-analytics-top-row">
-        <h3 className="st-chart-title">Analytics</h3>
-        <div className="st-filter-tabs">
+    <div>
+      {/* Analytics header + filter */}
+      <div className="mb-3 flex items-center justify-between">
+        <h3 className="text-sm font-semibold">Analytics</h3>
+        <div className="flex gap-1 rounded-lg bg-muted p-0.5">
           <button
-            className={`st-filter-tab${filterMode === "weekly" ? " active" : ""}`}
+            className={cn(
+              "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+              filterMode === "weekly"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
             onClick={() => setFilterMode("weekly")}
           >
             Weekly
           </button>
           <button
-            className={`st-filter-tab${filterMode === "monthly" ? " active" : ""}`}
+            className={cn(
+              "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+              filterMode === "monthly"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground",
+            )}
             onClick={() => setFilterMode("monthly")}
           >
             Monthly
@@ -572,30 +599,25 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
       </div>
 
       {/* Stats cards */}
-      <div className="st-analytics-cards">
-        <div className="st-ana-card">
-          <div className="st-ana-val">{cardDone}</div>
-          <div className="st-ana-lbl">Items Done</div>
-        </div>
-        <div className="st-ana-card">
-          <div className="st-ana-val">{cardTotal}</div>
-          <div className="st-ana-lbl">Total Items</div>
-        </div>
-        <div className="st-ana-card">
-          <div className="st-ana-val">{cardPct}%</div>
-          <div className="st-ana-lbl">Completion</div>
-        </div>
-        <div className="st-ana-card">
-          <div className="st-ana-val">{formatMinutes(cardTime)}</div>
-          <div className="st-ana-lbl">Time Done</div>
-        </div>
+      <div className="mb-4 grid grid-cols-4 gap-2">
+        {[
+          { val: cardDone, lbl: "Items Done" },
+          { val: cardTotal, lbl: "Total Items" },
+          { val: `${cardPct}%`, lbl: "Completion" },
+          { val: formatMinutes(cardTime), lbl: "Time Done" },
+        ].map(({ val, lbl }) => (
+          <div key={lbl} className="rounded-lg border border-border bg-card px-3 py-2.5 text-center">
+            <div className="text-xl font-bold">{val}</div>
+            <div className="mt-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">{lbl}</div>
+          </div>
+        ))}
       </div>
 
-      {/* Completion Rate line chart */}
-      <div className="st-chart-card" style={{ marginBottom: 10 }}>
-        <h3 className="st-chart-title">
+      {/* Completion Rate chart */}
+      <div className="mb-3 rounded-xl border border-border bg-card p-3">
+        <h3 className="mb-2 text-sm font-semibold">
           Completion Rate{" "}
-          <span className="st-chart-subtitle">
+          <span className="text-xs font-normal text-muted-foreground">
             ({filterMode === "weekly" ? "last 7 days" : "last 30 days"})
           </span>
         </h3>
@@ -605,61 +627,30 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
             <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
             <YAxis domain={[0, 100]} tickFormatter={(v) => v + "%"} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
             <ChartTooltip content={<ChartTooltipContent formatter={(v) => (v !== null ? v + "%" : "—")} />} />
-            <Line
-              type="monotone"
-              dataKey="completion"
-              stroke="#f59e0b"
-              strokeWidth={2.5}
-              dot={{ r: 4, fill: "#f59e0b" }}
-              connectNulls
-            />
+            <Line type="monotone" dataKey="completion" stroke="#f59e0b" strokeWidth={2.5} dot={{ r: 4, fill: "#f59e0b" }} connectNulls />
           </LineChart>
         </ChartContainer>
       </div>
 
       {/* Time Allocation + Tasks per Day */}
-      <div className="st-charts-row-2">
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Time Allocation</h3>
-          <div className="st-pie-wrap">
-            <ChartContainer config={{ done: { label: "Done", color: "#10b981" }, remaining: { label: "Remaining", color: "#e5e7eb" } }} className="h-[180px] w-full">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={45}
-                  outerRadius={70}
-                  dataKey="value"
-                  paddingAngle={pieData.length > 1 ? 2 : 0}
-                >
-                  {pieData.map((entry) => (
-                    <Cell
-                      key={entry.name}
-                      fill={
-                        entry.name === "Done"
-                          ? "#10b981"
-                          : entry.name === "Remaining"
-                            ? "#e5e7eb"
-                            : "#e5e7eb"
-                      }
-                    />
-                  ))}
-                </Pie>
-                <ChartTooltip content={<ChartTooltipContent formatter={(v, n) => [formatMinutes(v), n]} hideLabel />} />
-                <Legend
-                  iconType="square"
-                  iconSize={10}
-                  formatter={(value) => value}
-                  wrapperStyle={{ fontSize: 12 }}
-                />
-              </PieChart>
-            </ChartContainer>
-          </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-border bg-card p-3">
+          <h3 className="mb-2 text-sm font-semibold">Time Allocation</h3>
+          <ChartContainer config={{ done: { label: "Done", color: "#10b981" }, remaining: { label: "Remaining", color: "#e5e7eb" } }} className="h-[180px] w-full">
+            <PieChart>
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value" paddingAngle={pieData.length > 1 ? 2 : 0}>
+                {pieData.map((entry) => (
+                  <Cell key={entry.name} fill={entry.name === "Done" ? "#10b981" : "#e5e7eb"} />
+                ))}
+              </Pie>
+              <ChartTooltip content={<ChartTooltipContent formatter={(v, n) => [formatMinutes(v), n]} hideLabel />} />
+              <Legend iconType="square" iconSize={10} wrapperStyle={{ fontSize: 12 }} />
+            </PieChart>
+          </ChartContainer>
         </div>
 
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Tasks per Day</h3>
+        <div className="rounded-xl border border-border bg-card p-3">
+          <h3 className="mb-2 text-sm font-semibold">Tasks per Day</h3>
           <ChartContainer config={tasksChartConfig} className="h-[180px] w-full">
             <BarChart data={tasksPerDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="#f3f4f6" />
@@ -678,18 +669,11 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
 }
 
 // ── Habits view ──────────────────────────────────────────────────────────────
-function HabitsView({
-  state,
-  habitForm,
-  setHabitForm,
-  onAddHabit,
-  onDeleteHabit,
-}) {
+function HabitsView({ state, habitForm, setHabitForm, onAddHabit, onDeleteHabit }) {
   const today = getTodayStr();
   const habits = state.habits || [];
   const habitLog = state.habitLog || {};
 
-  // Habit completion rates bar data
   const palette = ["#2563eb", "#7c3aed", "#059669", "#dc2626", "#f59e0b", "#0891b2", "#db2777"];
   const completionRatesData = habits.map((h, i) => {
     const s = countHabitScheduled(h, today);
@@ -701,7 +685,6 @@ function HabitsView({
     };
   });
 
-  // Habits this week bar data
   const weekData = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date();
@@ -718,9 +701,7 @@ function HabitsView({
     done: { label: "Done", color: "#10b981" },
     remaining: { label: "Scheduled", color: "#e5e7eb" },
   };
-  const ratesChartConfig = {
-    completion: { label: "Completion %", color: "#2563eb" },
-  };
+  const ratesChartConfig = { completion: { label: "Completion %", color: "#2563eb" } };
 
   const computedEnd =
     habitForm.duration === "indefinite"
@@ -731,66 +712,67 @@ function HabitsView({
 
   return (
     <div>
-      <div className="st-habits-layout">
+      <div className="mb-5 grid grid-cols-1 gap-5 md:grid-cols-2">
         {/* New habit form */}
-        <div className="st-habit-form-card">
-          <h3 className="st-chart-title" style={{ marginBottom: 14 }}>
-            ➕ New Recurring Habit
-          </h3>
-          <div className="st-hf-row">
-            <div className="st-hf-group" style={{ flex: 2 }}>
-              <label className="st-hf-label">Habit Name</label>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <h3 className="mb-3.5 text-sm font-semibold">➕ New Recurring Habit</h3>
+
+          <div className="mb-3 flex gap-3">
+            <div className="flex flex-col gap-1" style={{ flex: 2 }}>
+              <label className="text-xs font-semibold text-muted-foreground">Habit Name</label>
               <input
-                className="st-hf-input"
+                className="rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 placeholder="e.g. Morning Review"
                 value={habitForm.title}
-                onChange={(e) =>
-                  setHabitForm((f) => ({ ...f, title: e.target.value }))
-                }
+                onChange={(e) => setHabitForm((f) => ({ ...f, title: e.target.value }))}
               />
             </div>
-            <div className="st-hf-group">
-              <label className="st-hf-label">Time (min)</label>
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">Time (min)</label>
               <input
                 type="number"
-                className="st-hf-input"
+                className="rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 placeholder="30"
                 min={1}
                 value={habitForm.time}
-                onChange={(e) =>
-                  setHabitForm((f) => ({ ...f, time: e.target.value }))
-                }
+                onChange={(e) => setHabitForm((f) => ({ ...f, time: e.target.value }))}
               />
             </div>
           </div>
-          <div className="st-hf-group">
-            <label className="st-hf-label">Repeat Pattern</label>
-            <div className="st-hf-pills">
+
+          <div className="mb-3 flex flex-col gap-1">
+            <label className="text-xs font-semibold text-muted-foreground">Repeat Pattern</label>
+            <div className="flex flex-wrap gap-1.5">
               {["daily", "weekdays", "weekends", "custom"].map((r) => (
                 <button
                   key={r}
-                  className={`st-pill${habitForm.recurrence === r ? " active" : ""}`}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                    habitForm.recurrence === r
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-muted-foreground hover:border-primary hover:text-primary",
+                  )}
                   onClick={() => setHabitForm((f) => ({ ...f, recurrence: r }))}
                 >
-                  {r === "daily"
-                    ? "Daily"
-                    : r === "weekdays"
-                      ? "Weekdays"
-                      : r === "weekends"
-                        ? "Weekends"
-                        : "Custom Days"}
+                  {r === "daily" ? "Daily" : r === "weekdays" ? "Weekdays" : r === "weekends" ? "Weekends" : "Custom Days"}
                 </button>
               ))}
             </div>
           </div>
+
           {habitForm.recurrence === "custom" && (
-            <div className="st-hf-group">
-              <label className="st-hf-label">Select Days</label>
-              <div className="st-day-toggles">
+            <div className="mb-3 flex flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">Select Days</label>
+              <div className="flex gap-1.5">
                 {DAYS.map((d, i) => (
                   <button
                     key={i}
-                    className={`st-day-toggle${habitForm.customDays.includes(i) ? " active" : ""}`}
+                    className={cn(
+                      "flex h-8 w-8 items-center justify-center rounded-full border text-xs font-semibold transition-colors",
+                      habitForm.customDays.includes(i)
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border text-muted-foreground hover:border-primary hover:text-primary",
+                    )}
                     onClick={() =>
                       setHabitForm((f) => ({
                         ...f,
@@ -806,21 +788,22 @@ function HabitsView({
               </div>
             </div>
           )}
-          <div className="st-hf-group">
-            <label className="st-hf-label">Duration</label>
-            <div className="st-hf-pills">
+
+          <div className="mb-3 flex flex-col gap-1">
+            <label className="text-xs font-semibold text-muted-foreground">Duration</label>
+            <div className="flex flex-wrap gap-1.5">
               {[
-                ["1week", "1 Week"],
-                ["2weeks", "2 Weeks"],
-                ["3weeks", "3 Weeks"],
-                ["1month", "1 Month"],
-                ["2months", "2 Months"],
-                ["indefinite", "Indefinite"],
-                ["custom", "Custom"],
+                ["1week", "1 Week"], ["2weeks", "2 Weeks"], ["3weeks", "3 Weeks"],
+                ["1month", "1 Month"], ["2months", "2 Months"], ["indefinite", "Indefinite"], ["custom", "Custom"],
               ].map(([v, l]) => (
                 <button
                   key={v}
-                  className={`st-pill${habitForm.duration === v ? " active" : ""}`}
+                  className={cn(
+                    "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                    habitForm.duration === v
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-muted-foreground hover:border-primary hover:text-primary",
+                  )}
                   onClick={() => setHabitForm((f) => ({ ...f, duration: v }))}
                 >
                   {l}
@@ -828,51 +811,47 @@ function HabitsView({
               ))}
             </div>
           </div>
-          <div className="st-hf-row">
-            <div className="st-hf-group">
-              <label className="st-hf-label">Start Date</label>
+
+          <div className="mb-3 flex gap-3">
+            <div className="flex flex-1 flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">Start Date</label>
               <input
                 type="date"
-                className="st-hf-input"
+                className="rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                 value={habitForm.startDate}
-                onChange={(e) =>
-                  setHabitForm((f) => ({ ...f, startDate: e.target.value }))
-                }
+                onChange={(e) => setHabitForm((f) => ({ ...f, startDate: e.target.value }))}
               />
             </div>
-            <div className="st-hf-group">
-              <label className="st-hf-label">
+            <div className="flex flex-1 flex-col gap-1">
+              <label className="text-xs font-semibold text-muted-foreground">
                 End Date{" "}
                 {computedEnd && (
-                  <span className="st-hf-computed">(→ {computedEnd})</span>
+                  <span className="text-xs text-muted-foreground">(→ {computedEnd})</span>
                 )}
               </label>
               <input
                 type="date"
-                className="st-hf-input"
+                className="rounded-md border border-border bg-background px-3 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
                 value={computedEnd || habitForm.endDate || ""}
-                disabled={
-                  habitForm.duration !== "indefinite" &&
-                  habitForm.duration !== "custom"
-                }
-                onChange={(e) =>
-                  setHabitForm((f) => ({ ...f, endDate: e.target.value }))
-                }
+                disabled={habitForm.duration !== "indefinite" && habitForm.duration !== "custom"}
+                onChange={(e) => setHabitForm((f) => ({ ...f, endDate: e.target.value }))}
               />
             </div>
           </div>
-          <button className="st-add-habit-btn" onClick={onAddHabit}>
+
+          <button
+            className="mt-1 w-full rounded-md bg-primary py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+            onClick={onAddHabit}
+          >
             Create Habit
           </button>
         </div>
 
         {/* Habits list */}
-        <div className="st-habits-list-card">
-          <h3 className="st-chart-title" style={{ marginBottom: 12 }}>
-            Your Habits
-          </h3>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <h3 className="mb-3 text-sm font-semibold">Your Habits</h3>
           {habits.length === 0 ? (
-            <div className="st-no-tasks" style={{ padding: 18 }}>
+            <div className="py-4 text-center text-sm text-muted-foreground">
               No habits yet. Create one using the form!
             </div>
           ) : (
@@ -881,11 +860,11 @@ function HabitsView({
               const done = countHabitDone(h, habitLog);
               const rate = sched ? Math.round((done / sched) * 100) : 0;
               return (
-                <div key={h.id} className="st-habit-list-item">
-                  <div className="st-habit-list-icon">🔄</div>
-                  <div className="st-habit-list-body">
-                    <div className="st-habit-list-title">{h.title}</div>
-                    <div className="st-habit-list-meta">
+                <div key={h.id} className="flex items-start gap-3 border-b border-border py-2.5 last:border-0">
+                  <div className="mt-0.5 text-xl">🔄</div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm font-semibold">{h.title}</div>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
                       {formatHabitRecurrence(h)}{" "}
                       {h.timeMin ? "· " + formatMinutes(h.timeMin) : ""} ·{" "}
                       {h.startDate} {h.endDate ? "→ " + h.endDate : "∞"} ·{" "}
@@ -893,16 +872,15 @@ function HabitsView({
                         {done}/{sched} ({rate}%)
                       </span>
                     </div>
-                    <div className="st-habit-rate-bar">
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-muted">
                       <div
-                        className="st-habit-rate-fill"
+                        className="h-full rounded-full bg-emerald-500 transition-all duration-500"
                         style={{ width: rate + "%" }}
                       />
                     </div>
                   </div>
                   <button
-                    className="st-task-del-btn"
-                    style={{ fontSize: "1rem" }}
+                    className="flex h-6 w-6 items-center justify-center rounded text-lg leading-none text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                     onClick={() => onDeleteHabit(i)}
                   >
                     ×
@@ -915,37 +893,17 @@ function HabitsView({
       </div>
 
       {/* Habit charts */}
-      <div className="st-habit-analytics-row">
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Habit Completion Rates</h3>
+      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="rounded-xl border border-border bg-card p-3">
+          <h3 className="mb-2 text-sm font-semibold">Habit Completion Rates</h3>
           {habits.length === 0 ? (
-            <div className="st-no-tasks" style={{ padding: 18, textAlign: "center" }}>
-              No habits to display.
-            </div>
+            <div className="py-4 text-center text-sm text-muted-foreground">No habits to display.</div>
           ) : (
             <ChartContainer config={ratesChartConfig} className="h-[160px] w-full">
-              <BarChart
-                layout="vertical"
-                data={completionRatesData}
-                margin={{ top: 4, right: 16, left: 8, bottom: 0 }}
-              >
+              <BarChart layout="vertical" data={completionRatesData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
                 <CartesianGrid horizontal={false} stroke="#f3f4f6" />
-                <XAxis
-                  type="number"
-                  domain={[0, 100]}
-                  tickFormatter={(v) => v + "%"}
-                  tick={{ fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  tick={{ fontSize: 11 }}
-                  tickLine={false}
-                  axisLine={false}
-                  width={80}
-                />
+                <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => v + "%"} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} width={80} />
                 <ChartTooltip content={<ChartTooltipContent formatter={(v) => v + "%"} />} />
                 <Bar dataKey="completion" radius={5}>
                   {completionRatesData.map((entry) => (
@@ -957,8 +915,8 @@ function HabitsView({
           )}
         </div>
 
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Habits This Week</h3>
+        <div className="rounded-xl border border-border bg-card p-3">
+          <h3 className="mb-2 text-sm font-semibold">Habits This Week</h3>
           <ChartContainer config={weekChartConfig} className="h-[160px] w-full">
             <BarChart data={weekData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="#f3f4f6" />

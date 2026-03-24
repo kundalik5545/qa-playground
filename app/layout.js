@@ -110,10 +110,7 @@ export default function RootLayout({ children }) {
           <Header />
 
           {/* Main Content */}
-          <main
-            className="container mx-auto py-3 max-w-7xl min-h-screen"
-            role="main"
-          >
+          <main className="container mx-auto py-3  min-h-screen" role="main">
             {children}
           </main>
 

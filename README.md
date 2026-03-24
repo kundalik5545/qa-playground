@@ -29,19 +29,19 @@ It provides:
 
 ### Practice Elements (22 total)
 
-| # | Element | # | Element |
-|---|---|---|---|
-| 1 | POM (Page Object Model) | 12 | Drop Zone |
-| 2 | Inputs | 13 | Sort |
-| 3 | Buttons | 14 | Multi-Select |
-| 4 | Select / Dropdowns | 15 | Slider |
-| 5 | Links | 16 | Waits (explicit/implicit) |
-| 6 | Alerts (alert, confirm, prompt) | 17 | Simple Table |
-| 7 | iFrames | 18 | Advanced Table |
-| 8 | Radio Buttons & Checkboxes | 19 | Calendar / Date Picker |
-| 9 | Window / Tab Switching | 20 | Forms |
-| 10 | Element Visibility & State | 21 | File Upload / Download |
-| 11 | Drag & Drop | 22 | Shadow DOM |
+| #   | Element                         | #   | Element                   |
+| --- | ------------------------------- | --- | ------------------------- |
+| 1   | POM (Page Object Model)         | 12  | Drop Zone                 |
+| 2   | Inputs                          | 13  | Sort                      |
+| 3   | Buttons                         | 14  | Multi-Select              |
+| 4   | Select / Dropdowns              | 15  | Slider                    |
+| 5   | Links                           | 16  | Waits (explicit/implicit) |
+| 6   | Alerts (alert, confirm, prompt) | 17  | Simple Table              |
+| 7   | iFrames                         | 18  | Advanced Table            |
+| 8   | Radio Buttons & Checkboxes      | 19  | Calendar / Date Picker    |
+| 9   | Window / Tab Switching          | 20  | Forms                     |
+| 10  | Element Visibility & State      | 21  | File Upload / Download    |
+| 11  | Drag & Drop                     | 22  | Shadow DOM                |
 
 ### Bank Demo App (`/bank`)
 
@@ -64,17 +64,17 @@ A simulated banking application for practicing end-to-end test flows:
 
 ## Tech Stack
 
-| Category | Technology |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| Runtime | React 19 |
-| Language | JavaScript / JSX (no TypeScript) |
-| Styling | Tailwind CSS 3 + shadcn/ui (new-york) |
-| UI Primitives | Radix UI |
-| Markdown | unified + remark + rehype pipeline |
-| Syntax Highlighting | shiki + rehype-pretty-code |
-| Deployment | Vercel |
-| Analytics | Vercel Analytics + Google Analytics |
+| Category            | Technology                            |
+| ------------------- | ------------------------------------- |
+| Framework           | Next.js 15 (App Router)               |
+| Runtime             | React 19                              |
+| Language            | JavaScript / JSX (no TypeScript)      |
+| Styling             | Tailwind CSS 3 + shadcn/ui (new-york) |
+| UI Primitives       | Radix UI                              |
+| Markdown            | unified + remark + rehype pipeline    |
+| Syntax Highlighting | shiki + rehype-pretty-code            |
+| Deployment          | Vercel                                |
+| Analytics           | Vercel Analytics + Google Analytics   |
 
 ---
 
@@ -139,6 +139,7 @@ Full architecture details: see [`CLAUDE.md`](./CLAUDE.md) and [`AI_CODING_GUIDEL
 The Bank Demo App is designed for practicing full end-to-end automation flows.
 
 **Login credentials:**
+
 ```
 Username: admin
 Password: admin123
@@ -179,3 +180,7 @@ This project is currently private. License TBD upon public release.
 - **Live app:** [qaplayground.com](https://www.qaplayground.com)
 - **Issues:** [GitHub Issues](https://github.com/kundalik5545/qatesting/issues)
 - **Support the project:** [Buy Me a Coffee](https://www.buymeacoffee.com)
+
+```txt
+create new prisma models, database, and page route on study-tracker to track new resources which user add. User can add edit, delete new resources like yt video link, websites url etc. create tags for each resorce, title, description (optional), url etc. Migrate this new schema to supabase. User needs to login feature to use this feature. for that create public login routes with betterauth and supabase.
+```
