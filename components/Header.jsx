@@ -12,6 +12,7 @@ const Header = () => {
   const mainNavLinks = [
     { to: "/", text: "Home" },
     { to: "/study-tracker", text: "Study Tracker", badge: "New" },
+    { to: "/admin/dashboard", text: "Admin Dashboard", badge: "New" },
     { to: "/bank", text: "Bank" },
     { to: "/practice", text: "Practice" },
     { to: "/blog", text: "Blog" },

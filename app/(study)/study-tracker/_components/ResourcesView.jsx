@@ -1,0 +1,865 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import { authClient } from "@/lib/auth-client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  LayoutGrid,
+  List,
+  Plus,
+  Pencil,
+  Trash2,
+  ExternalLink,
+  Search,
+  X,
+  Loader2,
+  LogIn,
+  Copy,
+  Check,
+  KeyRound,
+} from "lucide-react";
+
+const RESOURCE_TYPES = [
+  "ARTICLE",
+  "VIDEO",
+  "COURSE",
+  "BOOK",
+  "TOOL",
+  "DOCUMENTATION",
+  "OTHER",
+];
+
+const TYPE_LABELS = {
+  ARTICLE: "Article",
+  VIDEO: "Video",
+  COURSE: "Course",
+  BOOK: "Book",
+  TOOL: "Tool",
+  DOCUMENTATION: "Docs",
+  OTHER: "Other",
+};
+
+const TYPE_COLORS = {
+  ARTICLE:       { bg: "#eff6ff", color: "#2563eb" },
+  VIDEO:         { bg: "#fef2f2", color: "#dc2626" },
+  COURSE:        { bg: "#f0fdf4", color: "#16a34a" },
+  BOOK:          { bg: "#fffbeb", color: "#d97706" },
+  TOOL:          { bg: "#faf5ff", color: "#9333ea" },
+  DOCUMENTATION: { bg: "#f0f9ff", color: "#0284c7" },
+  OTHER:         { bg: "#f9fafb", color: "#6b7280" },
+};
+
+const EMPTY_FORM = {
+  resourceType: "",
+  title: "",
+  url: "",
+  description: "",
+  tags: [],
+  image: "",
+};
+
+export default function ResourcesView({ showToast }) {
+  const { data: session, isPending } = authClient.useSession();
+
+  const [resources, setResources]   = useState([]);
+  const [loading, setLoading]       = useState(false);
+  const [viewMode, setViewMode]     = useState("table"); // "table" | "card"
+
+  // Filters
+  const [search, setSearch]         = useState("");
+  const [filterType, setFilterType] = useState("ALL");
+  const [filterTag, setFilterTag]   = useState("");
+
+  // Dialog
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingId, setEditingId]   = useState(null);
+  const [form, setForm]             = useState(EMPTY_FORM);
+  const [saving, setSaving]         = useState(false);
+  const [tagInput, setTagInput]     = useState("");
+
+  // API Keys panel
+  const [keysOpen, setKeysOpen]     = useState(false);
+  const [apiKeys, setApiKeys]       = useState([]);
+  const [keysLoading, setKeysLoading] = useState(false);
+  const [newKeyName, setNewKeyName] = useState("");
+  const [copiedKey, setCopiedKey]   = useState(null);
+
+  const isLoggedIn = !!session?.user;
+
+  const fetchResources = useCallback(async () => {
+    if (!isLoggedIn) return;
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (filterType !== "ALL") params.set("type", filterType);
+      if (filterTag) params.set("tag", filterTag);
+      const res = await fetch(`/api/resources?${params}`);
+      if (res.ok) setResources(await res.json());
+    } catch (_) {
+      showToast("Failed to load resources", true);
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn, search, filterType, filterTag, showToast]);
+
+  useEffect(() => {
+    fetchResources();
+  }, [fetchResources]);
+
+  const fetchApiKeys = async () => {
+    setKeysLoading(true);
+    try {
+      const res = await fetch("/api/api-keys");
+      if (res.ok) setApiKeys(await res.json());
+    } finally {
+      setKeysLoading(false);
+    }
+  };
+
+  const openAdd = () => {
+    setEditingId(null);
+    setForm(EMPTY_FORM);
+    setTagInput("");
+    setDialogOpen(true);
+  };
+
+  const openEdit = (r) => {
+    setEditingId(r.id);
+    setForm({
+      resourceType: r.resourceType,
+      title:        r.title,
+      url:          r.url,
+      description:  r.description || "",
+      tags:         r.tags.map((t) => t.toLowerCase()),
+      image:        r.image || "",
+    });
+    setTagInput("");
+    setDialogOpen(true);
+  };
+
+  const addTag = (raw) => {
+    const tag = raw.trim().toLowerCase();
+    if (!tag) return;
+    setForm((f) => ({
+      ...f,
+      tags: f.tags.includes(tag) ? f.tags : [...f.tags, tag],
+    }));
+    setTagInput("");
+  };
+
+  const removeTag = (tag) => {
+    setForm((f) => ({ ...f, tags: f.tags.filter((t) => t !== tag) }));
+  };
+
+  const handleTagKeyDown = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      addTag(tagInput);
+    }
+  };
+
+  const handleSave = async () => {
+    if (!form.resourceType || !form.title || !form.url) {
+      showToast("Type, title and URL are required", true);
+      return;
+    }
+    setSaving(true);
+    try {
+      const payload = {
+        resourceType: form.resourceType,
+        title:        form.title.trim(),
+        url:          form.url.trim(),
+        description:  form.description.trim() || null,
+        tags:         form.tags.map((t) => t.toLowerCase()),
+        image:        form.image.trim() || null,
+      };
+      const res = editingId
+        ? await fetch(`/api/resources/${editingId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          })
+        : await fetch("/api/resources", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+      if (!res.ok) throw new Error();
+      showToast(editingId ? "Resource updated!" : "Resource added!");
+      setDialogOpen(false);
+      fetchResources();
+    } catch (_) {
+      showToast("Failed to save resource", true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const res = await fetch(`/api/resources/${id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error();
+      showToast("Resource deleted");
+      setResources((prev) => prev.filter((r) => r.id !== id));
+    } catch (_) {
+      showToast("Failed to delete resource", true);
+    }
+  };
+
+  const handleGenerateKey = async () => {
+    try {
+      const res = await fetch("/api/api-keys", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newKeyName || "Chrome Extension" }),
+      });
+      if (!res.ok) throw new Error();
+      setNewKeyName("");
+      fetchApiKeys();
+      showToast("API key generated!");
+    } catch (_) {
+      showToast("Failed to generate key", true);
+    }
+  };
+
+  const handleDeleteKey = async (id) => {
+    try {
+      const res = await fetch("/api/api-keys", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error();
+      setApiKeys((prev) => prev.filter((k) => k.id !== id));
+      showToast("Key revoked");
+    } catch (_) {
+      showToast("Failed to revoke key", true);
+    }
+  };
+
+  const copyKey = (key) => {
+    navigator.clipboard.writeText(key);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  // Collect all unique tags (case-insensitive) for filter suggestions
+  const allTags = [...new Set(resources.flatMap((r) => r.tags.map((t) => t.toLowerCase())))].sort();
+
+  // ── Not logged in ──────────────────────────────────────────────────────────
+  if (!isPending && !isLoggedIn) {
+    return (
+      <div className="res-login-gate">
+        <div className="res-login-card">
+          <div className="res-login-icon">🔒</div>
+          <h2 className="res-login-title">Sign in to access Resources</h2>
+          <p className="res-login-sub">
+            Save articles, videos, courses and tools you&apos;re learning from. Log
+            in to get started.
+          </p>
+          <a href="/login" className="res-login-btn">
+            <LogIn size={16} />
+            Sign In
+          </a>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Loading session ────────────────────────────────────────────────────────
+  if (isPending) {
+    return (
+      <div className="res-loading">
+        <Loader2 className="res-spinner" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="res-root">
+      {/* ── TOP BAR ── */}
+      <div className="res-topbar">
+        <div className="res-topbar-left">
+          <h1 className="res-page-title">Resources</h1>
+          <span className="res-count">{resources.length} saved</span>
+        </div>
+        <div className="res-topbar-right">
+          <Button
+            size="sm"
+            variant="outline"
+            className="res-keys-btn"
+            onClick={() => { setKeysOpen(true); fetchApiKeys(); }}
+            id="manage-api-keys-btn"
+            data-testid="manage-api-keys-btn"
+          >
+            <KeyRound size={14} />
+            API Keys
+          </Button>
+          <Button
+            size="sm"
+            className="res-add-btn"
+            onClick={openAdd}
+            id="add-resource-btn"
+            data-testid="add-resource-btn"
+          >
+            <Plus size={14} />
+            Add Resource
+          </Button>
+        </div>
+      </div>
+
+      {/* ── FILTERS ── */}
+      <div className="res-filters">
+        <div className="res-search-wrap">
+          <Search size={14} className="res-search-icon" />
+          <input
+            className="res-search"
+            placeholder="Search title or description…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            id="resource-search"
+            data-testid="resource-search"
+          />
+          {search && (
+            <button className="res-search-clear" onClick={() => setSearch("")}>
+              <X size={12} />
+            </button>
+          )}
+        </div>
+
+        <select
+          className="res-filter-select"
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value)}
+          id="resource-type-filter"
+          data-testid="resource-type-filter"
+        >
+          <option value="ALL">All Types</option>
+          {RESOURCE_TYPES.map((t) => (
+            <option key={t} value={t}>{TYPE_LABELS[t]}</option>
+          ))}
+        </select>
+
+        {allTags.length > 0 && (
+          <select
+            className="res-filter-select"
+            value={filterTag}
+            onChange={(e) => setFilterTag(e.target.value)}
+            id="resource-tag-filter"
+            data-testid="resource-tag-filter"
+          >
+            <option value="">All Tags</option>
+            {allTags.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        )}
+
+        <div className="res-view-toggle">
+          <button
+            className={`res-toggle-btn${viewMode === "table" ? " active" : ""}`}
+            onClick={() => setViewMode("table")}
+            title="Table view"
+            id="view-table-btn"
+            data-testid="view-table-btn"
+          >
+            <List size={15} />
+          </button>
+          <button
+            className={`res-toggle-btn${viewMode === "card" ? " active" : ""}`}
+            onClick={() => setViewMode("card")}
+            title="Card view"
+            id="view-card-btn"
+            data-testid="view-card-btn"
+          >
+            <LayoutGrid size={15} />
+          </button>
+        </div>
+      </div>
+
+      {/* ── CONTENT ── */}
+      {loading ? (
+        <div className="res-loading">
+          <Loader2 className="res-spinner" />
+        </div>
+      ) : resources.length === 0 ? (
+        <div className="res-empty">
+          <div className="res-empty-icon">📚</div>
+          <p className="res-empty-title">No resources yet</p>
+          <p className="res-empty-sub">Add your first resource to get started.</p>
+        </div>
+      ) : viewMode === "table" ? (
+        <div className="res-table-wrap">
+          <table className="res-table" id="resources-table" data-testid="resources-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Title</th>
+                <th>Tags</th>
+                <th>Added</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {resources.map((r) => (
+                <tr key={r.id} data-testid={`resource-row-${r.id}`}>
+                  <td>
+                    <span
+                      className="res-type-badge"
+                      style={TYPE_COLORS[r.resourceType]}
+                    >
+                      {TYPE_LABELS[r.resourceType]}
+                    </span>
+                  </td>
+                  <td>
+                    <a
+                      href={r.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="res-title-link"
+                      data-testid={`resource-title-${r.id}`}
+                    >
+                      {r.title}
+                      <ExternalLink size={11} className="res-ext-icon" />
+                    </a>
+                    {r.description && (
+                      <p className="res-row-desc">{r.description}</p>
+                    )}
+                  </td>
+                  <td>
+                    <div className="res-tags">
+                      {r.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="res-tag"
+                          onClick={() => setFilterTag(tag)}
+                          title={`Filter by "${tag}"`}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="res-date">
+                    {new Date(r.createdAt).toLocaleDateString()}
+                  </td>
+                  <td>
+                    <div className="res-actions">
+                      <button
+                        className="res-action-btn"
+                        onClick={() => openEdit(r)}
+                        title="Edit"
+                        data-testid={`edit-resource-${r.id}`}
+                      >
+                        <Pencil size={13} />
+                      </button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            className="res-action-btn danger"
+                            title="Delete"
+                            data-testid={`delete-resource-${r.id}`}
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete resource?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              &ldquo;{r.title}&rdquo; will be permanently deleted.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDelete(r.id)}>
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <div className="res-card-grid" id="resources-card-grid" data-testid="resources-card-grid">
+          {resources.map((r) => (
+            <div key={r.id} className="res-card" data-testid={`resource-card-${r.id}`}>
+              {r.image && (
+                <div className="res-card-img-wrap">
+                  <img src={r.image} alt={r.title} className="res-card-img" />
+                </div>
+              )}
+              <div className="res-card-body">
+                <div className="res-card-top">
+                  <span
+                    className="res-type-badge"
+                    style={TYPE_COLORS[r.resourceType]}
+                  >
+                    {TYPE_LABELS[r.resourceType]}
+                  </span>
+                  <div className="res-actions">
+                    <button
+                      className="res-action-btn"
+                      onClick={() => openEdit(r)}
+                      title="Edit"
+                      data-testid={`edit-card-${r.id}`}
+                    >
+                      <Pencil size={13} />
+                    </button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <button
+                          className="res-action-btn danger"
+                          title="Delete"
+                          data-testid={`delete-card-${r.id}`}
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete resource?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            &ldquo;{r.title}&rdquo; will be permanently deleted.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleDelete(r.id)}>
+                            Delete
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </div>
+                </div>
+                <a
+                  href={r.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="res-card-title"
+                  data-testid={`card-title-${r.id}`}
+                >
+                  {r.title}
+                  <ExternalLink size={12} />
+                </a>
+                {r.description && (
+                  <p className="res-card-desc">{r.description}</p>
+                )}
+                {r.tags.length > 0 && (
+                  <div className="res-tags">
+                    {r.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="res-tag"
+                        onClick={() => setFilterTag(tag)}
+                        title={`Filter by "${tag}"`}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="res-card-date">
+                  {new Date(r.createdAt).toLocaleDateString()}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── ADD / EDIT DIALOG ── */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-lg" id="resource-dialog" data-testid="resource-dialog">
+          <DialogHeader>
+            <DialogTitle>{editingId ? "Edit Resource" : "Add Resource"}</DialogTitle>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1">
+              <Label htmlFor="res-type">Type *</Label>
+              <Select
+                value={form.resourceType}
+                onValueChange={(v) => setForm((f) => ({ ...f, resourceType: v }))}
+              >
+                <SelectTrigger id="res-type" data-testid="res-type-select">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  {RESOURCE_TYPES.map((t) => (
+                    <SelectItem key={t} value={t}>{TYPE_LABELS[t]}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="res-title">Title *</Label>
+              <Input
+                id="res-title"
+                data-testid="res-title-input"
+                placeholder="Resource title"
+                value={form.title}
+                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="res-url">URL *</Label>
+              <Input
+                id="res-url"
+                data-testid="res-url-input"
+                type="url"
+                placeholder="https://..."
+                value={form.url}
+                onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="res-desc">Description</Label>
+              <Textarea
+                id="res-desc"
+                data-testid="res-desc-input"
+                placeholder="Brief description…"
+                rows={3}
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="res-tags">Tags</Label>
+              {/* Current tags as chips */}
+              {form.tags.length > 0 && (
+                <div className="res-tags mb-2">
+                  {form.tags.map((tag) => (
+                    <span key={tag} className="res-tag-chip">
+                      {tag}
+                      <button
+                        type="button"
+                        className="res-tag-chip-remove"
+                        onClick={() => removeTag(tag)}
+                        data-testid={`remove-tag-${tag}`}
+                      >
+                        <X size={10} />
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              )}
+              {/* Tag input row */}
+              <div className="res-tag-input-row">
+                <Input
+                  id="res-tags"
+                  data-testid="res-tags-input"
+                  placeholder="Type a tag and press Enter…"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagKeyDown}
+                  autoComplete="off"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => addTag(tagInput)}
+                  data-testid="add-tag-btn"
+                  disabled={!tagInput.trim()}
+                >
+                  Add
+                </Button>
+              </div>
+              {/* Existing tag suggestions */}
+              {allTags.filter((t) => !form.tags.includes(t) && t.includes(tagInput.toLowerCase())).length > 0 && (
+                <div className="res-tag-suggestions">
+                  <span className="res-tag-suggest-label">Suggestions:</span>
+                  {allTags
+                    .filter((t) => !form.tags.includes(t) && (!tagInput || t.includes(tagInput.toLowerCase())))
+                    .slice(0, 8)
+                    .map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        className="res-tag-suggest"
+                        onClick={() => addTag(t)}
+                        data-testid={`suggest-tag-${t}`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                </div>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <Label htmlFor="res-image">Image URL (optional)</Label>
+              <Input
+                id="res-image"
+                data-testid="res-image-input"
+                type="url"
+                placeholder="https://..."
+                value={form.image}
+                onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSave}
+              disabled={saving}
+              id="save-resource-btn"
+              data-testid="save-resource-btn"
+            >
+              {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              {editingId ? "Update" : "Add Resource"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* ── API KEYS DIALOG ── */}
+      <Dialog open={keysOpen} onOpenChange={setKeysOpen}>
+        <DialogContent className="sm:max-w-lg" id="api-keys-dialog" data-testid="api-keys-dialog">
+          <DialogHeader>
+            <DialogTitle>API Keys — Chrome Extension</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Use these keys in your Chrome extension:{" "}
+            <code className="text-xs bg-muted px-1 rounded">
+              Authorization: Bearer &lt;key&gt;
+            </code>
+          </p>
+
+          <div className="flex gap-2">
+            <Input
+              placeholder="Key name (e.g. My Extension)"
+              value={newKeyName}
+              onChange={(e) => setNewKeyName(e.target.value)}
+              id="new-key-name"
+              data-testid="new-key-name-input"
+            />
+            <Button
+              onClick={handleGenerateKey}
+              id="generate-key-btn"
+              data-testid="generate-key-btn"
+            >
+              Generate
+            </Button>
+          </div>
+
+          {keysLoading ? (
+            <div className="flex justify-center py-4">
+              <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            </div>
+          ) : apiKeys.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              No API keys yet.
+            </p>
+          ) : (
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {apiKeys.map((k) => (
+                <div
+                  key={k.id}
+                  className="flex items-center gap-2 p-2 rounded border bg-muted/30"
+                  data-testid={`api-key-row-${k.id}`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium">{k.name}</p>
+                    <p className="text-xs text-muted-foreground font-mono truncate">
+                      {k.key}
+                    </p>
+                  </div>
+                  <button
+                    className="shrink-0 p-1 rounded hover:bg-muted"
+                    onClick={() => copyKey(k.key)}
+                    title="Copy key"
+                    data-testid={`copy-key-${k.id}`}
+                  >
+                    {copiedKey === k.key ? (
+                      <Check size={13} className="text-green-600" />
+                    ) : (
+                      <Copy size={13} />
+                    )}
+                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        className="shrink-0 p-1 rounded hover:bg-muted text-destructive"
+                        title="Revoke"
+                        data-testid={`revoke-key-${k.id}`}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Revoke key?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Any extension using &ldquo;{k.name}&rdquo; will stop working.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleDeleteKey(k.id)}>
+                          Revoke
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setKeysOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}

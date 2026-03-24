@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   loadAllState,
   saveKey,
@@ -16,11 +16,37 @@ import DashboardView from "./DashboardView";
 import SyllabusView from "./SyllabusView";
 import DailyTrackerView from "./DailyTrackerView";
 import SyllabusManagerView from "./SyllabusManagerView";
+import ResourcesView from "./ResourcesView";
+import { authClient } from "@/lib/auth-client";
+import { LogIn, LogOut, ChevronDown, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function StudyTrackerApp() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [state, setState] = useState(null);
   const [toast, setToast] = useState({ msg: "", show: false, error: false });
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  // Close profile dropdown on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (profileRef.current && !profileRef.current.contains(e.target)) {
+        setProfileOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleLogout = async () => {
+    await authClient.signOut();
+    setProfileOpen(false);
+    router.push("/login");
+  };
 
   // Load state on mount
   useEffect(() => {
@@ -143,6 +169,13 @@ export default function StudyTrackerApp() {
             active={activeTab}
             onClick={setActiveTab}
           />
+          <NavBtn
+            id="resources"
+            label="Resources"
+            icon="🔖"
+            active={activeTab}
+            onClick={setActiveTab}
+          />
 
           {/* Syllabi section */}
           <li>
@@ -168,6 +201,83 @@ export default function StudyTrackerApp() {
             );
           })}
         </ul>
+
+        {/* ── SIDEBAR FOOTER: login / user profile ── */}
+        <div className="st-sidebar-footer">
+          {user ? (
+            <div ref={profileRef} style={{ position: "relative" }}>
+              <button
+                className="st-user-btn"
+                onClick={() => setProfileOpen((o) => !o)}
+                id="user-profile-btn"
+                data-testid="user-profile-btn"
+              >
+                <div className="st-user-avatar">
+                  {user.name?.[0]?.toUpperCase() ?? "U"}
+                </div>
+                <div className="st-user-info">
+                  <div className="st-user-name">{user.name}</div>
+                  <div className="st-user-email">{user.email}</div>
+                </div>
+                <ChevronDown size={14} style={{ color: "#9ca3af", flexShrink: 0, transform: profileOpen ? "rotate(180deg)" : "none", transition: "transform 0.15s" }} />
+              </button>
+
+              {profileOpen && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: "calc(100% + 6px)",
+                    left: 0,
+                    right: 0,
+                    background: "#fff",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "10px",
+                    boxShadow: "0 8px 24px rgba(0,0,0,0.10)",
+                    padding: "8px",
+                    zIndex: 50,
+                  }}
+                  id="user-profile-dropdown"
+                  data-testid="user-profile-dropdown"
+                >
+                  <div style={{ padding: "8px 10px 10px", borderBottom: "1px solid #f3f4f6", marginBottom: "6px" }}>
+                    <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#111827" }}>{user.name}</p>
+                    <p style={{ fontSize: "0.72rem", color: "#6b7280" }}>{user.email}</p>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 700, padding: "2px 7px", borderRadius: "20px", background: "#eff2ff", color: "#2563eb", display: "inline-block", marginTop: "4px" }}>
+                      {user.role ?? "USER"}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    style={{
+                      display: "flex", alignItems: "center", gap: "8px",
+                      width: "100%", padding: "8px 10px", border: "none",
+                      background: "none", borderRadius: "7px", cursor: "pointer",
+                      fontSize: "0.85rem", fontWeight: 500, color: "#dc2626",
+                      fontFamily: "'DM Sans', sans-serif", transition: "background 0.15s",
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = "#fee2e2"}
+                    onMouseLeave={(e) => e.currentTarget.style.background = "none"}
+                    id="logout-btn"
+                    data-testid="logout-btn"
+                  >
+                    <LogOut size={14} />
+                    Log Out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <a
+              href="/login"
+              className="st-login-btn"
+              id="sidebar-login-btn"
+              data-testid="sidebar-login-btn"
+            >
+              <LogIn size={15} />
+              Sign In
+            </a>
+          )}
+        </div>
       </nav>
 
       {/* ── MAIN ── */}
@@ -205,6 +315,10 @@ export default function StudyTrackerApp() {
               updateState={updateState}
               showToast={showToast}
             />
+          )}
+
+          {activeTab === "resources" && (
+            <ResourcesView showToast={showToast} />
           )}
 
           {state.syllabi[activeTab] && (

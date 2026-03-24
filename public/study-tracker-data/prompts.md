@@ -29,3 +29,28 @@ Please perform the following initialization and implementation:
      - `USER` -> `/study-tracker`
 
 Please search the codebase first to ensure you follow the existing project structure and naming conventions. Use claude.md file for information
+
+## New Prompt - resources tab
+
+I want to create resources route in study-tracker where user needs to login to add new resources. Once log in i want form to add resources
+
+- resource type
+- title
+- url
+- description
+- tags
+- image (optional)
+- created at
+
+create prism model for this and apply migration. crete api action url to post data into database as in future i will create a chrome extension which will extract details from web and post that into this model.
+
+Page should be responsive nice looking following current dashboard, daily tracker UI requirements.
+
+## Tech features
+
+- Show resources in table and card format with toggle button.
+- add filter at top to search for resources with tags, title match etc as required.
+- user can edit, delete resoruces
+- add login button at bottom of left navbar of study-tracker with user profile dropdown menu card use shadcn and tailwindcss.
+
+Ask questions if need more info
