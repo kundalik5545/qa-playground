@@ -16,10 +16,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
-import { Loader2, LogIn } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 
-export default function LoginPage() {
+export default function SignUpPage() {
   const router = useRouter();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -30,61 +31,74 @@ export default function LoginPage() {
     setError("");
     setLoading(true);
 
-    const { data, error: authError } = await authClient.signIn.email({
+    const { data, error: authError } = await authClient.signUp.email({
+      name,
       email,
       password,
     });
 
     if (authError) {
-      setError(authError.message || "Invalid email or password.");
+      setError(authError.message || "Sign-up failed. Please try again.");
       setLoading(false);
       return;
     }
 
-    // Redirect based on role from the session user object
-    if (data?.user?.role === "ADMIN") {
-      router.push("/admin/dashboard");
-    } else {
-      router.push("/study-tracker");
-    }
-
+    // New users are always USER role — redirect to study tracker
+    router.push("/study-tracker");
     setLoading(false);
   };
 
   return (
     <div
       className="min-h-screen flex items-center justify-center p-4"
-      id="login-page-container"
+      id="signup-page-container"
     >
-      <div className="w-full max-w-md" id="login-wrapper">
+      <div className="w-full max-w-md" id="signup-wrapper">
         <Card
           className="backdrop-blur-sm bg-card/95 shadow-2xl"
-          id="login-card"
+          id="signup-card"
         >
-          <CardHeader className="text-center space-y-2" id="login-header">
+          <CardHeader className="text-center space-y-2" id="signup-header">
             <div className="flex justify-center mb-2">
               <div className="p-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full">
-                <LogIn className="h-10 w-10 text-white" />
+                <UserPlus className="h-10 w-10 text-white" />
               </div>
             </div>
             <CardTitle
               className="text-3xl font-bold gradient-title"
-              id="login-title"
+              id="signup-title"
             >
-              Sign In
+              Create Account
             </CardTitle>
-            <CardDescription id="login-subtitle">
-              QA PlayGround — access your dashboard
+            <CardDescription id="signup-subtitle">
+              QA PlayGround — join to track your progress
             </CardDescription>
           </CardHeader>
 
-          <CardContent id="login-content">
+          <CardContent id="signup-content">
             <form
               onSubmit={handleSubmit}
-              id="login-form"
-              data-testid="login-form"
+              id="signup-form"
+              data-testid="signup-form"
             >
               <div className="space-y-4">
+                <div className="space-y-2" id="name-field-container">
+                  <Label htmlFor="name" id="name-label">
+                    Full Name
+                  </Label>
+                  <Input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="John Doe"
+                    data-testid="name-input"
+                    autoComplete="name"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+
                 <div className="space-y-2" id="email-field-container">
                   <Label htmlFor="email" id="email-label">
                     Email
@@ -112,15 +126,16 @@ export default function LoginPage() {
                     name="password"
                     placeholder="••••••••"
                     data-testid="password-input"
-                    autoComplete="current-password"
+                    autoComplete="new-password"
                     required
+                    minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
 
                 {error && (
-                  <Alert variant="destructive" id="login-error" data-testid="login-error">
+                  <Alert variant="destructive" id="signup-error" data-testid="signup-error">
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
@@ -128,33 +143,33 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                  id="login-btn"
-                  data-testid="login-button"
-                  data-action="login"
+                  id="signup-btn"
+                  data-testid="signup-button"
+                  data-action="signup"
                   disabled={loading}
                 >
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
+                      Creating account...
                     </>
                   ) : (
-                    "Sign In"
+                    "Create Account"
                   )}
                 </Button>
               </div>
             </form>
           </CardContent>
 
-          <CardFooter className="justify-center" id="login-footer">
+          <CardFooter className="justify-center" id="signup-footer">
             <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{" "}
+              Already have an account?{" "}
               <Link
-                href="/signup"
+                href="/login"
                 className="text-primary hover:underline font-medium"
-                id="signup-link"
+                id="login-link"
               >
-                Sign up
+                Sign in
               </Link>
             </p>
           </CardFooter>

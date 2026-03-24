@@ -19,7 +19,12 @@
       "Bash(ls d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/*.yaml)",
       "Bash(ls d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/*.lock)",
       "Bash(npm install:*)",
-      "Bash(npx prisma:*)"
+      "Bash(npx prisma:*)",
+      "Bash(node -e \"const ba = require\\(''./node_modules/better-auth/package.json''\\); console.log\\(ba.version\\)\")",
+      "WebSearch",
+      "WebFetch(domain:www.prisma.io)",
+      "WebFetch(domain:better-auth.com)",
+      "WebFetch(domain:github.com)"
     ]
   }
 }
