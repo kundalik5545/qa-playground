@@ -265,77 +265,80 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
       {/* ── TASKS VIEW ── */}
       {view === "tasks" && (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 items-start">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-[3fr_2fr] items-start">
           {/* Left: date strip + task list */}
           <div>
             {/* Date nav bar */}
-            <div className="mb-3 flex items-center justify-between gap-2 rounded-xl border border-border bg-card px-3 py-2.5">
-              <div className="flex items-center gap-1.5">
-                <button
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors"
-                  title="Previous week"
-                  onClick={() => {
-                    const d = new Date(selectedDate + "T00:00:00");
-                    d.setDate(d.getDate() - 7);
-                    setSelectedDate(d.toISOString().slice(0, 10));
-                  }}
-                >
-                  ◀
-                </button>
-                <div className="flex gap-0.5">
-                  {stripDates.map((date) => {
-                    const d = new Date(date + "T00:00:00");
-                    const dot = dotClass(date);
-                    const isSelected = date === selectedDate;
-                    const isToday = date === getTodayStr();
-                    return (
-                      <div
-                        key={date}
+            <div className="mb-4 flex items-center gap-2 rounded-xl border border-border bg-card px-3 py-3">
+              <button
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                title="Previous week"
+                onClick={() => {
+                  const d = new Date(selectedDate + "T00:00:00");
+                  d.setDate(d.getDate() - 7);
+                  setSelectedDate(d.toISOString().slice(0, 10));
+                }}
+              >
+                ◀
+              </button>
+              <div className="flex flex-1 justify-between gap-0.5">
+                {stripDates.map((date) => {
+                  const d = new Date(date + "T00:00:00");
+                  const dot = dotClass(date);
+                  const isSelected = date === selectedDate;
+                  const isToday = date === getTodayStr();
+                  return (
+                    <div
+                      key={date}
+                      className={cn(
+                        "flex flex-1 cursor-pointer flex-col items-center gap-1 rounded-xl py-2 transition-colors hover:bg-muted",
+                        isSelected && "bg-primary text-primary-foreground hover:bg-primary",
+                        !isSelected && isToday && "ring-2 ring-primary ring-offset-1",
+                      )}
+                      onClick={() => setSelectedDate(date)}
+                    >
+                      <span className={cn(
+                        "text-[10px] font-semibold uppercase tracking-wide",
+                        isSelected ? "text-primary-foreground/80" : "text-muted-foreground",
+                      )}>
+                        {d.toLocaleDateString("en-US", { weekday: "short" })}
+                      </span>
+                      <span className="text-base font-bold leading-none">{d.getDate()}</span>
+                      <span
                         className={cn(
-                          "flex w-9 cursor-pointer flex-col items-center gap-0.5 rounded-lg py-1 text-xs hover:bg-muted transition-colors",
-                          isSelected && "bg-primary/10",
-                          isToday && "ring-1 ring-primary ring-offset-1",
+                          "h-1.5 w-1.5 rounded-full",
+                          isSelected && dot === "all-done" && "bg-white",
+                          isSelected && dot === "has-tasks" && "bg-white/60",
+                          !isSelected && dot === "all-done" && "bg-emerald-500",
+                          !isSelected && dot === "has-tasks" && "bg-amber-400",
+                          !dot && "bg-transparent",
                         )}
-                        onClick={() => setSelectedDate(date)}
-                      >
-                        <span className="text-[10px] font-medium uppercase text-muted-foreground">
-                          {d.toLocaleDateString("en-US", { weekday: "short" })}
-                        </span>
-                        <span className="text-sm font-semibold">{d.getDate()}</span>
-                        <span
-                          className={cn(
-                            "h-1 w-1 rounded-full",
-                            dot === "all-done" && "bg-emerald-500",
-                            dot === "has-tasks" && "bg-amber-400",
-                            !dot && "bg-transparent",
-                          )}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-                <button
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-xs text-muted-foreground hover:bg-muted transition-colors"
-                  title="Next week"
-                  onClick={() => {
-                    const d = new Date(selectedDate + "T00:00:00");
-                    d.setDate(d.getDate() + 7);
-                    setSelectedDate(d.toISOString().slice(0, 10));
-                  }}
-                >
-                  ▶
-                </button>
+                      />
+                    </div>
+                  );
+                })}
               </div>
-              <div className="flex items-center gap-2">
+              <button
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                title="Next week"
+                onClick={() => {
+                  const d = new Date(selectedDate + "T00:00:00");
+                  d.setDate(d.getDate() + 7);
+                  setSelectedDate(d.toISOString().slice(0, 10));
+                }}
+              >
+                ▶
+              </button>
+              <div className="flex shrink-0 items-center gap-2 border-l border-border pl-2">
                 <button
-                  className="rounded-md bg-primary px-3 py-1 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
+                  className="rounded-md bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
                   onClick={() => setSelectedDate(getTodayStr())}
                 >
                   Today
                 </button>
                 <input
                   type="date"
-                  className="rounded-md border border-border bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  className="rounded-md border border-border bg-background px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                 />
@@ -621,7 +624,7 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
             ({filterMode === "weekly" ? "last 7 days" : "last 30 days"})
           </span>
         </h3>
-        <ChartContainer config={completionChartConfig} className="h-[140px] w-full">
+        <ChartContainer config={completionChartConfig} className="h-[220px] w-full">
           <LineChart data={completionRateData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke="#f3f4f6" />
             <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
@@ -636,9 +639,9 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl border border-border bg-card p-3">
           <h3 className="mb-2 text-sm font-semibold">Time Allocation</h3>
-          <ChartContainer config={{ done: { label: "Done", color: "#10b981" }, remaining: { label: "Remaining", color: "#e5e7eb" } }} className="h-[180px] w-full">
+          <ChartContainer config={{ done: { label: "Done", color: "#10b981" }, remaining: { label: "Remaining", color: "#e5e7eb" } }} className="h-[240px] w-full">
             <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%" innerRadius={45} outerRadius={70} dataKey="value" paddingAngle={pieData.length > 1 ? 2 : 0}>
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90} dataKey="value" paddingAngle={pieData.length > 1 ? 2 : 0}>
                 {pieData.map((entry) => (
                   <Cell key={entry.name} fill={entry.name === "Done" ? "#10b981" : "#e5e7eb"} />
                 ))}
@@ -651,7 +654,7 @@ function DailyAnalytics({ state, selectedDate, filterMode, setFilterMode }) {
 
         <div className="rounded-xl border border-border bg-card p-3">
           <h3 className="mb-2 text-sm font-semibold">Tasks per Day</h3>
-          <ChartContainer config={tasksChartConfig} className="h-[180px] w-full">
+          <ChartContainer config={tasksChartConfig} className="h-[240px] w-full">
             <BarChart data={tasksPerDayData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="#f3f4f6" />
               <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
@@ -899,7 +902,7 @@ function HabitsView({ state, habitForm, setHabitForm, onAddHabit, onDeleteHabit 
           {habits.length === 0 ? (
             <div className="py-4 text-center text-sm text-muted-foreground">No habits to display.</div>
           ) : (
-            <ChartContainer config={ratesChartConfig} className="h-[160px] w-full">
+            <ChartContainer config={ratesChartConfig} className="h-[220px] w-full">
               <BarChart layout="vertical" data={completionRatesData} margin={{ top: 4, right: 16, left: 8, bottom: 0 }}>
                 <CartesianGrid horizontal={false} stroke="#f3f4f6" />
                 <XAxis type="number" domain={[0, 100]} tickFormatter={(v) => v + "%"} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
@@ -917,7 +920,7 @@ function HabitsView({ state, habitForm, setHabitForm, onAddHabit, onDeleteHabit 
 
         <div className="rounded-xl border border-border bg-card p-3">
           <h3 className="mb-2 text-sm font-semibold">Habits This Week</h3>
-          <ChartContainer config={weekChartConfig} className="h-[160px] w-full">
+          <ChartContainer config={weekChartConfig} className="h-[220px] w-full">
             <BarChart data={weekData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke="#f3f4f6" />
               <XAxis dataKey="date" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />

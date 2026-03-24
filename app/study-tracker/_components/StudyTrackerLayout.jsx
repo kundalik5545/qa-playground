@@ -16,7 +16,7 @@ export default function StudyTrackerLayout({ children }) {
       <main
         className={cn(
           "flex-1 min-w-0 transition-all duration-300 man-class",
-          collapsed ? "ml-0" : "ml-24",
+          collapsed ? "ml-14" : "ml-14 sm:ml-20 md:ml-24 lg:ml-24",
         )}
       >
         {children}

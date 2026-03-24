@@ -11,7 +11,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { LayoutDashboard, CalendarDays, BookOpen, GraduationCap, PanelLeft } from "lucide-react";
+import {
+  LayoutDashboard,
+  CalendarDays,
+  BookOpen,
+  GraduationCap,
+  PanelLeft,
+} from "lucide-react";
 import {
   loadSyllabiFromIdb,
   saveSyllabiToIdb,
@@ -48,9 +54,7 @@ export default function StudySidebar({ collapsed, onToggle }) {
     setProgressMap(studyState?.progress || {});
     if (syllabi && Object.keys(syllabi).length > 0) {
       const orderedIds =
-        Array.isArray(order) && order.length > 0
-          ? order
-          : Object.keys(syllabi);
+        Array.isArray(order) && order.length > 0 ? order : Object.keys(syllabi);
       setSyllabiList(
         orderedIds.filter((id) => syllabi[id]).map((id) => syllabi[id]),
       );
@@ -73,7 +77,7 @@ export default function StudySidebar({ collapsed, onToggle }) {
       <aside
         className={cn(
           "fixed top-16 left-0 h-[calc(100vh-4rem)] border-r border-border bg-background flex flex-col z-40 transition-all duration-300 overflow-hidden",
-          collapsed ? "w-14" : "w-64",
+          collapsed ? "w-14" : "w-14 sm:w-20 md:w-48 lg:w-64",
         )}
       >
         {/* Sidebar header */}
@@ -103,7 +107,9 @@ export default function StudySidebar({ collapsed, onToggle }) {
               <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
                 <GraduationCap className="h-4 w-4" />
               </div>
-              <span className="flex-1 text-sm font-semibold truncate">Study Tracker</span>
+              <span className="hidden flex-1 text-sm font-semibold truncate md:inline">
+                Study Tracker
+              </span>
               <button
                 onClick={onToggle}
                 className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
@@ -181,7 +187,7 @@ export default function StudySidebar({ collapsed, onToggle }) {
                   N
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm text-muted-foreground truncate">
+              <span className="hidden md:inline text-sm text-muted-foreground truncate">
                 My Profile
               </span>
             </div>
@@ -207,7 +213,7 @@ function NavItem({ label, href, icon: Icon, isActive, collapsed }) {
       <Icon
         className={cn("h-4 w-4 shrink-0", isActive ? "text-primary" : "")}
       />
-      {!collapsed && <span>{label}</span>}
+      {!collapsed && <span className="hidden md:inline">{label}</span>}
     </Link>
   );
 
@@ -222,31 +228,38 @@ function NavItem({ label, href, icon: Icon, isActive, collapsed }) {
   return link;
 }
 
-function SyllabusItem({ label, href, emoji, color, progressPct, isActive, collapsed }) {
+function SyllabusItem({
+  label,
+  href,
+  emoji,
+  color,
+  progressPct,
+  isActive,
+  collapsed,
+}) {
   const link = (
     <Link
       href={href}
       className={cn(
         "flex items-center rounded-md py-2 text-sm font-medium transition-colors",
         collapsed ? "justify-center px-2" : "gap-3 px-3",
-        isActive
-          ? "bg-primary/10"
-          : "hover:bg-muted",
+        isActive ? "bg-primary/10" : "hover:bg-muted",
       )}
     >
-      <span
-        className="h-4 w-4 shrink-0 flex items-center justify-center text-sm leading-none"
-      >
+      <span className="h-4 w-4 shrink-0 flex items-center justify-center text-sm leading-none">
         {emoji}
       </span>
       {!collapsed && (
-        <span className="flex-1 truncate font-medium" style={{ color }}>
+        <span
+          className="hidden flex-1 truncate font-medium md:inline"
+          style={{ color }}
+        >
           {label}
         </span>
       )}
       {!collapsed && (
         <span
-          className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0"
+          className="hidden text-[10px] font-semibold px-1.5 py-0.5 rounded-full shrink-0 md:inline-block"
           style={{ color, backgroundColor: `${color}18` }}
         >
           {progressPct ?? 0}%
