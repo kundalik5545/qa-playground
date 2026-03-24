@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import StudySidebar from "./StudySidebar";
 
 export default function StudyTrackerLayout({ children }) {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="flex w-full py-10">
+    <div className="flex w-full py-16">
       <StudySidebar
         collapsed={collapsed}
         onToggle={() => setCollapsed((v) => !v)}

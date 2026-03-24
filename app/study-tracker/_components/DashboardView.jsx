@@ -2,21 +2,6 @@
 
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  Tooltip,
-  Legend,
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,14 +17,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Download, Upload, Trash2 } from "lucide-react";
 import { getSyllabusStats, getLast14Days, getTodayStr } from "@/lib/studyTrackerStorage";
-
-const TS = {
-  fontSize: 12,
-  borderRadius: 8,
-  border: "1px solid hsl(var(--border))",
-  background: "hsl(var(--card))",
-  color: "hsl(var(--foreground))",
-};
+import TodaysTasksChart from "./charts/TodaysTasksChart";
+import DailyTaskCompletionChart from "./charts/DailyTaskCompletionChart";
+import OverallProgressChart from "./charts/OverallProgressChart";
+import TopicsCompletedChart from "./charts/TopicsCompletedChart";
+import ProgressBySyllabusChart from "./charts/ProgressBySyllabusChart";
+import CompletionBreakdownChart from "./charts/CompletionBreakdownChart";
 
 export default function DashboardView({ state, allStats, onExport, onImport, onClearAll }) {
   const router = useRouter();
@@ -100,7 +83,7 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
               state.progress[topic.id]?.date === day
             )
               count++;
-        entry[syl.label] = count > 0 ? count : null;
+        entry[syl.label] = count;
       }
       return entry;
     });
@@ -228,261 +211,32 @@ export default function DashboardView({ state, allStats, onExport, onImport, onC
 
       {/* ── Row 1: Today's Tasks | Daily Task Completion % ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <h2 className="font-semibold text-base">Today's Tasks</h2>
-            <p className="text-xs text-muted-foreground">
-              {hasTasksToday
-                ? `${todayDone} / ${todayTasks.length} completed`
-                : "No tasks today"}
-            </p>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={taskPieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={62}
-                  outerRadius={88}
-                  dataKey="value"
-                  nameKey="name"
-                  strokeWidth={0}
-                >
-                  <Cell fill="#10b981" />
-                  <Cell fill="#e5e7eb" />
-                </Pie>
-                <Tooltip contentStyle={TS} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <h2 className="font-semibold text-base">
-              Daily Task Completion %{" "}
-              <span className="text-xs font-normal text-muted-foreground">
-                (last 14 days)
-              </span>
-            </h2>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart
-                data={taskCompData}
-                margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                  domain={[0, 100]}
-                  tickFormatter={(v) => `${v}%`}
-                />
-                <Tooltip
-                  contentStyle={TS}
-                  formatter={(v) => (v != null ? [`${v}%`, "Completion"] : ["No tasks", ""])}
-                />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-                <Line
-                  type="monotone"
-                  dataKey="pct"
-                  name="Completion %"
-                  stroke="#f59e0b"
-                  strokeWidth={2.5}
-                  dot={{ r: 4, fill: "#f59e0b", strokeWidth: 0 }}
-                  activeDot={{ r: 6 }}
-                  connectNulls={false}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <TodaysTasksChart
+          taskPieData={taskPieData}
+          hasTasksToday={hasTasksToday}
+          todayDone={todayDone}
+          todayTasksLength={todayTasks.length}
+        />
+        <DailyTaskCompletionChart taskCompData={taskCompData} />
       </div>
 
       {/* ── Row 2: Overall Progress | Topics Completed ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <h2 className="font-semibold text-base">Overall Progress</h2>
-            <p className="text-xs text-muted-foreground">
-              {allStats.done} / {allStats.total} topics
-            </p>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={overallPieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={62}
-                  outerRadius={88}
-                  dataKey="value"
-                  nameKey="name"
-                  strokeWidth={0}
-                >
-                  <Cell fill="#2563eb" />
-                  <Cell fill="#e5e7eb" />
-                </Pie>
-                <Tooltip contentStyle={TS} />
-                <Legend wrapperStyle={{ fontSize: 12 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <h2 className="font-semibold text-base">
-              Topics Completed{" "}
-              <span className="text-xs font-normal text-muted-foreground">
-                (last 14 days)
-              </span>
-            </h2>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart
-                data={topicsLineData}
-                margin={{ top: 4, right: 8, left: -16, bottom: 0 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <YAxis
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip contentStyle={TS} />
-                <Legend wrapperStyle={{ fontSize: 11 }} />
-                {syllabusIds.map((id) => {
-                  const syl = state.syllabi[id];
-                  return (
-                    <Line
-                      key={id}
-                      type="monotone"
-                      dataKey={syl.label}
-                      stroke={syl.color}
-                      strokeWidth={2.5}
-                      dot={{ r: 4, strokeWidth: 0 }}
-                      activeDot={{ r: 6 }}
-                      connectNulls={false}
-                    />
-                  );
-                })}
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+        <OverallProgressChart overallPieData={overallPieData} allStats={allStats} />
+        <TopicsCompletedChart
+          topicsLineData={topicsLineData}
+          syllabi={state.syllabi}
+          syllabusIds={syllabusIds}
+        />
       </div>
 
       {/* ── Row 3: Progress by Syllabus | Completion Breakdown ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] gap-6">
-        <Card>
-          <CardHeader className="pb-2">
-            <h2 className="font-semibold text-base">Progress by Syllabus</h2>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={260}>
-              <BarChart
-                data={barData}
-                margin={{ top: 4, right: 8, left: -16, bottom: 56 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-                <XAxis
-                  dataKey="name"
-                  tick={{ fontSize: 11 }}
-                  angle={-35}
-                  textAnchor="end"
-                  tickLine={false}
-                  axisLine={false}
-                  interval={0}
-                />
-                <YAxis
-                  tick={{ fontSize: 10 }}
-                  tickLine={false}
-                  axisLine={false}
-                  allowDecimals={false}
-                />
-                <Tooltip
-                  contentStyle={TS}
-                  formatter={(value, name, props) => {
-                    const d = props?.payload;
-                    if (name === "Completed" && d) {
-                      const total = (d.Completed ?? 0) + (d.Remaining ?? 0);
-                      const pct = total ? Math.round(((d.Completed ?? 0) / total) * 100) : 0;
-                      return [`${value} (${pct}%)`, name];
-                    }
-                    return [value, name];
-                  }}
-                />
-                <Legend wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-                <Bar dataKey="Completed" stackId="a">
-                  {barData.map((d, i) => (
-                    <Cell key={i} fill={d.color} />
-                  ))}
-                </Bar>
-                <Bar dataKey="Remaining" stackId="a" radius={[4, 4, 0, 0]}>
-                  {barData.map((d, i) => (
-                    <Cell key={i} fill={d.color + "33"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <h2 className="font-semibold text-base">Completion Breakdown</h2>
-          </CardHeader>
-          <CardContent>
-            {!hasCompletionData ? (
-              <div className="flex items-center justify-center h-[260px] text-sm text-muted-foreground">
-                No completed topics yet
-              </div>
-            ) : (
-              <ResponsiveContainer width="100%" height={260}>
-                <PieChart>
-                  <Pie
-                    data={completionPieData}
-                    cx="50%"
-                    cy="45%"
-                    innerRadius={52}
-                    outerRadius={82}
-                    dataKey="value"
-                    nameKey="name"
-                    strokeWidth={2}
-                    stroke="hsl(var(--card))"
-                  >
-                    {completionPieData.map((d, i) => (
-                      <Cell key={i} fill={d.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip contentStyle={TS} />
-                  <Legend wrapperStyle={{ fontSize: 12 }} />
-                </PieChart>
-              </ResponsiveContainer>
-            )}
-          </CardContent>
-        </Card>
+        <ProgressBySyllabusChart barData={barData} />
+        <CompletionBreakdownChart
+          completionPieData={completionPieData}
+          hasCompletionData={hasCompletionData}
+        />
       </div>
 
       {/* ── Recent Activity ── */}
