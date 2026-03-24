@@ -10,8 +10,11 @@
 
 - 22 interactive UI elements (inputs, buttons, tables, calendars, drag-drop, alerts, etc.) for Selenium/Playwright/Cypress practice
 - A simulated Bank Demo App (login, accounts, dashboard, transactions) for end-to-end automation scenarios
+- A Study Tracker for tracking QA learning progress across syllabi, daily logs, and saved resources
+- Free QA Tools (JSON to file converter, more coming soon)
 - Markdown-based blog and tutorials focused on QA automation
 - JavaScript learning content
+- Admin dashboard with role-based access control
 
 **Problem it solves:** QA engineers lack realistic, purpose-built playgrounds to practice automation. Most real apps aren't designed with testability in mind. This one is.
 
@@ -27,21 +30,24 @@
 
 | Category | Technology | Version |
 |---|---|---|
-| Framework | Next.js (App Router) | ^15.1.2 |
-| Runtime | React | ^19.2.1 |
+| Framework | Next.js (App Router) | ^16.1.7 |
+| Runtime | React | ^19.2.4 |
 | Language | JavaScript/JSX | (no TypeScript) |
-| Styling | Tailwind CSS | ^3.4.1 |
+| Styling | Tailwind CSS | ^3.4.19 |
 | UI Components | shadcn/ui (new-york style) | — |
 | UI Primitives | Radix UI | various |
-| Icons | lucide-react, react-icons | ^0.468.0, ^5.5.0 |
-| Themes | next-themes | ^0.4.4 |
-| Toast | sonner | ^1.7.1 |
-| Date picker | react-day-picker | ^9.4.4 |
+| Icons | lucide-react, react-icons | ^0.577.0, ^5.6.0 |
+| Themes | next-themes | ^0.4.6 |
+| Toast | sonner | ^2.0.7 |
+| Date picker | react-day-picker | ^9.14.0 |
 | Drawer | vaul | ^1.1.2 |
 | Markdown parsing | unified, remark, rehype pipeline | various |
-| Syntax highlighting | shiki, rehype-pretty-code | ^1.29.2, ^0.14.0 |
+| Syntax highlighting | shiki, rehype-pretty-code | ^4.0.2, ^0.14.3 |
 | SEO | next-sitemap | ^4.2.3 |
-| Analytics | @vercel/analytics | ^1.6.1 |
+| Analytics | @vercel/analytics | ^2.0.1 |
+| Authentication | better-auth | ^1.5.6 |
+| ORM | Prisma (prisma-client-js) | ^7.5.0 |
+| DB Driver | pg (PostgreSQL) | ^8.20.0 |
 | Bundler | Turbopack (dev) | built-in Next.js |
 | Package manager | npm | — |
 | Class merging | clsx + tailwind-merge (via `cn()`) | — |
@@ -68,15 +74,18 @@
 ├── data/                         Static config and data arrays
 ├── lib/                          Utility functions and helpers
 ├── Blog/                         Markdown content files (blog + element docs)
+├── prisma/                       Prisma schema
+│   └── schema.prisma             PostgreSQL schema (User, Session, Account, Resource, ApiKey, Verification)
 ├── public/                       Static assets (SVGs, images, docs)
 ├── CLAUDE.md                     This file
+├── middleware.js                 Next.js middleware — protects /admin routes (role check via Better-Auth)
+├── prisma.config.ts              Prisma configuration (required by Prisma tooling — do not convert)
 ├── package.json                  Dependencies and scripts
 ├── jsconfig.json                 Path alias config (@/*)
 ├── components.json               shadcn/ui config (new-york, slate base)
 ├── next.config.mjs               Image domains, server action size limit
 ├── vercel.json                   Vercel deployment config
 ├── next-sitemap.config.js        Sitemap generation (qaplayground.com)
-├── next-sitemap.config.js        Sitemap: https://www.qaplayground.com
 ├── .ai-project-config.json       Machine-readable project metadata (do not delete)
 └── docs/                         Project documentation
     ├── AI_CODING_GUIDELINES.md   Rules and guidelines for AI agents
@@ -104,12 +113,19 @@ app/
 │       ├── accounts/page.jsx     Accounts CRUD (/bank/accounts)
 │       └── transactions/page.jsx Transaction management (/bank/transactions)
 
-├── (admin)/                      Route group: Static/admin pages
+├── (contact)/                    Route group: Static/contact pages
 │   ├── layout.js
 │   ├── about-me/page.jsx         /about-me
 │   ├── about-us/page.jsx         /about-us
 │   ├── contact-us/page.jsx       /contact-us
-│   └── privacy-policy/page.jsx   /privacy-policy
+│   ├── privacy-policy/page.jsx   /privacy-policy
+│   └── site-alerts/page.jsx      /site-alerts — admin-managed site-wide alerts
+
+├── (admin)/                      Route group: Authentication & Admin dashboard
+│   ├── login/page.jsx            /login — Better-Auth email/password login
+│   ├── signup/page.jsx           /signup — Better-Auth user registration
+│   └── admin/
+│       └── dashboard/page.jsx    /admin/dashboard — role-gated admin panel (ADMIN only)
 
 ├── (Practice)/                   Route group: Practice + Learn content
 │   ├── layout.js
@@ -133,6 +149,8 @@ app/
 │   │       ├── TablePage.jsx
 │   │       ├── AdvanceTablePage.jsx
 │   │       ├── ElementsPage.jsx
+│   │       ├── FormsPage.jsx
+│   │       ├── MultiSelectPage.jsx
 │   │       └── TextsBoxPage.jsx
 │   ├── learn/
 │   │   ├── [slug]/page.jsx       Learning content pages (/learn/[slug])
@@ -141,6 +159,49 @@ app/
 │   │       └── LogicalPrograms.jsx
 │   └── javascript/
 │       └── [slug]/page.jsx       JS course pages (/javascript/[slug])
+
+├── (study)/                      Route group: Study Tracker
+│   ├── layout.js
+│   └── study-tracker/
+│       ├── page.jsx              Study Tracker app (/study-tracker)
+│       ├── layout.js
+│       ├── study-tracker.css     Study Tracker custom styles
+│       ├── dashboard/page.jsx    Study Tracker dashboard sub-page
+│       ├── ai-syllabus-prompt/
+│       │   ├── page.jsx          AI syllabus prompt helper (/study-tracker/ai-syllabus-prompt)
+│       │   └── PromptPageContent.jsx
+│       └── _components/
+│           ├── StudyTrackerApp.jsx   Root shell (tabs, auth session, nav)
+│           ├── DashboardView.jsx     Stats + progress summary
+│           ├── DailyTrackerView.jsx  Log daily study sessions
+│           ├── SyllabusView.jsx      View/browse syllabus topics
+│           ├── SyllabusManagerView.jsx  Import/export/manage syllabi
+│           └── ResourcesView.jsx     Save and manage learning resources
+
+├── (tools)/                      Route group: QA Tools
+│   ├── layout.js
+│   └── qa-tools/
+│       ├── page.jsx              QA Tools hub (/qa-tools) — tool cards grid
+│       ├── ToolCard.jsx          Tool card component
+│       └── json-to-file/         JSON → Downloadable File tool (/qa-tools/json-to-file)
+│           ├── page.jsx
+│           ├── JsonToFileContent.jsx
+│           └── _components/
+│               ├── FilenameDownload.jsx
+│               ├── HowItWorksSection.jsx
+│               ├── JsonStatusBar.jsx
+│               ├── PageBreadcrumb.jsx
+│               ├── PasteEditor.jsx
+│               ├── RelatedToolsBar.jsx
+│               └── SuccessBanner.jsx
+
+├── api/
+│   ├── auth/[...all]/route.js    Better-Auth catch-all handler (login, signup, session, etc.)
+│   ├── admin/verify/route.js     Admin role verification endpoint
+│   ├── resources/
+│   │   ├── route.js              GET all resources, POST new resource (authenticated)
+│   │   └── [id]/route.js         GET, PUT, DELETE single resource by ID
+│   └── api-keys/route.js         API key management (create, list)
 
 └── (blog)/
     └── blog/page.jsx             Blog index (/blog)
@@ -152,6 +213,7 @@ app/
 components/
 ├── Header.jsx                    Main site nav with dark mode toggle
 ├── NavbarSheet.jsx               Mobile slide-out nav (Sheet component)
+├── SiteAlertPopup.jsx            Site-wide alert popup (driven by alertStorage)
 ├── hero.jsx                      Hero section on landing page
 ├── bank/
 │   └── BankNavbar.jsx            Bank app nav — logout clears sessionStorage
@@ -174,11 +236,12 @@ components/
 ```
 data/
 ├── BasicSetting.js               basicDetails, allUrls, socialHandles
-├── blogs.js                      Array of 6 blog metadata objects
+├── blogs.js                      Array of blog metadata objects
 ├── elementsTestCases.js          Test case arrays for each UI element
 ├── formsTestCases.js             Test case arrays for form elements
 ├── landingPage.js                statsData, featuresData, howItWorksData, testimonialsData
-└── sitemap-links.js              siteMapUrls array for sitemap generation
+├── sitemap-links.js              siteMapUrls array for sitemap generation
+└── studyTrackerSyllabi.js        Default syllabus data for the Study Tracker
 ```
 
 ### lib/
@@ -186,15 +249,20 @@ data/
 ```
 lib/
 ├── utils.js                      cn() — clsx + tailwind-merge helper
-└── bankStorage.js                localStorage abstraction for Bank Demo
+├── bankStorage.js                localStorage abstraction for Bank Demo
+├── studyTrackerStorage.js        localStorage abstraction for Study Tracker (syllabus, daily logs, stats)
+├── alertStorage.js               localStorage abstraction for site-wide alerts
+├── auth.js                       Better-Auth server config (Prisma adapter, email/password, roles, session)
+├── auth-client.js                Better-Auth client (useSession hook, signIn, signOut)
+└── prisma.js                     Prisma client singleton
 ```
 
 ### Blog/
 
 ```
 Blog/
-├── AutomationBlog/               Blog markdown posts (7 posts)
-├── ElementBlogs/                 Element docs markdown (15 files, one per practice element)
+├── AutomationBlog/               Blog markdown posts
+├── ElementBlogs/                 Element docs markdown (one per practice element)
 └── JavascriptBlog/               JS syllabus content
 ```
 
@@ -204,29 +272,55 @@ Blog/
 
 ### App Router Structure
 
-Next.js App Router with route groups — `(bank)`, `(admin)`, `(Practice)`, `(blog)` — used purely for layout isolation. Route groups don't affect URL structure.
+Next.js App Router with route groups — `(bank)`, `(contact)`, `(admin)`, `(Practice)`, `(blog)`, `(study)`, `(tools)` — used purely for layout isolation. Route groups don't affect URL structure.
 
 ### Data Flow
 
 ```
 User → Page Component
-  → data/*.js files (static arrays)           — landing page content, blog metadata
+  → data/*.js files (static arrays)           — landing page content, blog metadata, syllabi
   → Blog/*.md files (markdown)                — dynamic page content via unified pipeline
   → lib/bankStorage.js (localStorage)         — bank app state persistence
+  → lib/studyTrackerStorage.js (localStorage) — study tracker state (syllabus, logs)
+  → lib/alertStorage.js (localStorage)        — site-wide alerts
   → sessionStorage                            — bank login session auth
+  → PostgreSQL (via Prisma + Better-Auth)     — user accounts, sessions, resources, API keys
 ```
 
-**No database.** The `DATABASE_URL` in `vercel.json` is an empty placeholder. All Bank Demo data lives in the browser's `localStorage`.
+### Authentication & Authorization
+
+| Layer | What it does |
+|---|---|
+| `lib/auth.js` | Better-Auth server config — email/password, Prisma adapter, role field, 7-day sessions |
+| `lib/auth-client.js` | Better-Auth client — `useSession()`, `signIn.email()`, `signOut()` |
+| `app/api/auth/[...all]/route.js` | Better-Auth catch-all API handler |
+| `middleware.js` | Protects `/admin/*` — checks session via `/api/auth/get-session`, redirects non-ADMINs |
+| Prisma `Role` enum | `USER` (default) or `ADMIN` — stored in `User` model |
 
 ### State Management
 
 | What | Where |
 |---|---|
+| Auth session (site-wide) | Better-Auth — server sessions in PostgreSQL, client cookie |
 | Bank login session | `sessionStorage` — key: `bankUser` |
 | Bank accounts + transactions | `localStorage` — managed via `lib/bankStorage.js` |
+| Study Tracker state | `localStorage` — managed via `lib/studyTrackerStorage.js` |
+| Site alerts | `localStorage` — managed via `lib/alertStorage.js` |
 | Theme (dark/light) | `next-themes` — class-based on `<html>` |
 | Toast notifications | `sonner` via `<Toaster>` in root layout |
 | All other state | Local `useState` in components — no global store |
+
+### Prisma Schema (PostgreSQL)
+
+```
+User          — id, name, email, emailVerified, image, role (USER|ADMIN), createdAt, updatedAt
+Session       — id, token, expiresAt, userId (FK), ipAddress, userAgent
+Account       — id, accountId, providerId, userId (FK), accessToken, refreshToken, password, ...
+Verification  — id, identifier, value, expiresAt
+Resource      — id, userId (FK), resourceType (ARTICLE|VIDEO|COURSE|BOOK|TOOL|DOCUMENTATION|OTHER),
+                title, url, description, tags[], image, createdAt, updatedAt
+ApiKey        — id, userId (FK), name, key (unique), createdAt
+```
 
 ### Markdown Pipeline (for Blog + Practice pages)
 
@@ -298,10 +392,36 @@ Uses **CSS variables** defined in `app/globals.css` for light + dark mode, follo
 - CSS variables for theming (not hardcoded colors)
 - Mobile-first responsive: `sm:`, `md:`, `lg:` breakpoint prefixes
 - Custom bank-page hiding: `.bank-page header, .bank-page footer { display: none }` in globals.css
+- Exception: `app/(study)/study-tracker/study-tracker.css` for Study Tracker-specific styles
 
 ---
 
 ## Key Features Already Built
+
+### Authentication (`/login`, `/signup`)
+- Email/password auth via Better-Auth
+- Role-based: `USER` (default) and `ADMIN`
+- Session lasts 7 days, cookie refreshes daily
+- Admin routes protected by `middleware.js`
+
+### Admin Dashboard (`/admin/dashboard`)
+- Role-gated (ADMIN only) via Next.js middleware
+- Non-admin users redirected to `/`
+- Unauthenticated users redirected to `/login`
+
+### Study Tracker (`/study-tracker`)
+- Track QA learning progress across multiple syllabi (Manual Testing, Automation, API, Playwright, etc.)
+- Views: Dashboard, Syllabus, Daily Tracker, Syllabus Manager, Resources
+- Import/export syllabi as JSON (AI-generated format supported)
+- AI Syllabus Prompt helper at `/study-tracker/ai-syllabus-prompt`
+- Resources management — save articles, videos, courses, books, tools by type
+- Resources backed by PostgreSQL (authenticated users) via `/api/resources`
+- Non-auth state stored in `localStorage` via `lib/studyTrackerStorage.js`
+
+### QA Tools (`/qa-tools`)
+- Tool hub with card-based layout
+- **JSON → Downloadable File** (live): paste AI-generated JSON with FILENAME prefix, download as `.json`
+- Coming soon: JSON Formatter, Base64 Encoder/Decoder, JWT Token Decoder, Regex Tester
 
 ### Bank Demo Application (`/bank`)
 - Login with hardcoded credentials (`admin` / `admin123`)
@@ -345,20 +465,17 @@ Uses **CSS variables** defined in `app/globals.css` for light + dark mode, follo
 - Syntax-highlighted code blocks (shiki)
 - Prose-styled HTML output
 
+### Site Alerts (`/site-alerts`)
+- Admin-managed site-wide alerts displayed as popups
+- Stored in localStorage via `lib/alertStorage.js`
+- Rendered via `components/SiteAlertPopup.jsx`
+
 ### SEO
 - `app/sitemap.js` — dynamic sitemap generation
 - `app/robots.js` — robots.txt generation
 - `next-sitemap` — post-build sitemap (configured for qaplayground.com)
 - Per-page `generateMetadata()` for dynamic OG/Twitter tags
 - Google Analytics (`G-Z4H9RTYGS4`)
-
-### Landing Page (`/`)
-- Hero section
-- Stats cards
-- Feature cards (from `data/landingPage.js`)
-- How it works steps
-- Testimonials
-- Links to practice, tutorials, logic, and external products
 
 ---
 
@@ -382,6 +499,8 @@ Always use the `@/` alias — no relative paths:
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { basicDetails } from "@/data/BasicSetting"
+import { authClient } from "@/lib/auth-client"
+import { prisma } from "@/lib/prisma"
 ```
 
 ### Styling Rules
@@ -390,6 +509,7 @@ import { basicDetails } from "@/data/BasicSetting"
 - Use `cn()` from `@/lib/utils` for conditional classes
 - Dark mode variants via `dark:` prefix — do not break dark mode on any component
 - Responsive via `sm:`, `md:`, `lg:` — never hardcode widths
+- Exception: Study Tracker uses `study-tracker.css` for scoped styles
 
 ### Practice Component Structure
 
@@ -405,6 +525,18 @@ Both sections must be present in every practice component.
 - Auth check must happen at the top of every bank page (check `sessionStorage`, redirect if not found)
 - Preserve all `id`, `data-testid`, and `data-action` attributes — these are the automation testing hooks
 
+### Authentication Rules
+
+- All auth operations use `lib/auth-client.js` on the client and `lib/auth.js` on the server
+- Never read/write the `User`, `Session`, or `Account` tables directly — go through Better-Auth APIs
+- Admin route protection is handled by `middleware.js` — do not replicate in page components
+- The `role` field cannot be set by clients (enforced in `lib/auth.js` via `input: false`)
+
+### API Routes Rules
+
+- Resource CRUD lives in `app/api/resources/` — always verify the user session before mutating
+- Use `lib/prisma.js` singleton for all database access — do not create new PrismaClient instances
+
 ### Do NOT Touch
 
 - `components/ui/` — these are shadcn/ui generated files. Use the shadcn CLI to update them, not manual edits
@@ -412,19 +544,31 @@ Both sections must be present in every practice component.
 - `.ai-project-config.json` — machine-readable metadata, update only when project structure changes significantly
 - Google Analytics ID `G-Z4H9RTYGS4` in `app/layout.js` — do not change
 - `next-sitemap.config.js` site URL — must remain `https://www.qaplayground.com/`
+- `prisma.config.ts` — required by Prisma tooling, do not convert to `.js`
 
 ### No TypeScript
 
 This project uses plain JavaScript/JSX. Do not add `.ts` or `.tsx` files. Do not add type annotations.
+Exception: `prisma.config.ts` is required by Prisma tooling — do not convert it.
+
+---
+
+## Environment Variables
+
+| Variable | Purpose |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string for Prisma |
+| `BETTER_AUTH_URL` | Base URL for Better-Auth (defaults to `http://localhost:3000`) |
+| `BETTER_AUTH_SECRET` | Secret key for Better-Auth session signing |
 
 ---
 
 ## Known Issues / TODOs
 
-- **No TODO/FIXME comments** found in any source file at time of analysis.
-- `DATABASE_URL` in `vercel.json` is empty — the bank app is fully client-side (localStorage). If a real database is ever added, this needs proper env setup.
-- Several practice elements listed on the hub page (`/practice`) may not have corresponding `_components/` files yet (Drag, Drop, Sort, Multi-Select, Slider, Shadow DOM, Frame were listed in the hub but not all confirmed in `_components/`).
+- Several practice elements listed on the hub page (`/practice`) may not have corresponding `_components/` files yet (Drag, Drop, Sort, Slider, Shadow DOM, Frame were listed in the hub but not all confirmed in `_components/`).
 - `Blog/ElementBlogs/test.md` appears to be a test/scratch file — review whether it should be kept.
+- Study Tracker resources sync to PostgreSQL only when the user is authenticated; unauthenticated users get a localStorage-only experience or the Resources tab is hidden.
+- QA Tools beyond JSON-to-file (JSON Formatter, Base64, JWT Decoder, Regex Tester) are stubbed as "coming soon".
 
 ---
 

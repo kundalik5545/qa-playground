@@ -10,6 +10,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 enum ResourceType {
   ARTICLE
   VIDEO
@@ -30,7 +35,7 @@ model User {
   image         String?
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
-  role          String     @default("USER")
+  role          Role       @default(USER)
   sessions      Session[]
   accounts      Account[]
   resources     Resource[]

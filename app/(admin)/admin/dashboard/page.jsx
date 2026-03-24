@@ -20,6 +20,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     if (isPending) return;
+
     if (!session) {
       router.replace("/login");
       return;
@@ -54,7 +55,10 @@ export default function AdminDashboardPage() {
           className="backdrop-blur-sm bg-card/95 shadow-2xl"
           id="admin-dashboard-card"
         >
-          <CardHeader className="text-center space-y-2" id="admin-dashboard-header">
+          <CardHeader
+            className="text-center space-y-2"
+            id="admin-dashboard-header"
+          >
             <div className="flex justify-center mb-2">
               <div className="p-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full">
                 <ShieldCheck className="h-10 w-10 text-white" />
