@@ -231,6 +231,7 @@ export default function SyllabusDetailContent({ slug }) {
 
   const handleCheck = useCallback((topicId, checked, topic) => {
     setStudyState((prev) => {
+      const wasAlreadyDone = !!prev.progress[topicId]?.done;
       const newProgress = {
         ...prev.progress,
         [topicId]: { done: checked, date: checked ? getTodayStr() : null },
@@ -240,11 +241,28 @@ export default function SyllabusDetailContent({ slug }) {
         newSubtopics[topicId] = {};
         topic.subtopics.forEach((_, i) => { newSubtopics[topicId][i] = checked; });
       }
-      const next = { ...prev, progress: newProgress, subtopics: newSubtopics };
-      persistStudyState({ progress: newProgress, subtopics: newSubtopics });
+
+      // Update activity log (+1 on check, -1 on uncheck)
+      const delta = checked && !wasAlreadyDone ? 1 : !checked && wasAlreadyDone ? -1 : 0;
+      let newLog = [...(prev.log || [])];
+      if (delta !== 0) {
+        const today = getTodayStr();
+        const idx = newLog.findIndex((e) => e.date === today && e.tabId === slug);
+        if (idx >= 0) {
+          const updated = { ...newLog[idx], count: newLog[idx].count + delta };
+          newLog = updated.count > 0
+            ? newLog.map((e, i) => (i === idx ? updated : e))
+            : newLog.filter((_, i) => i !== idx);
+        } else if (delta > 0) {
+          newLog = [...newLog, { date: today, tabId: slug, count: 1 }];
+        }
+      }
+
+      const next = { ...prev, progress: newProgress, subtopics: newSubtopics, log: newLog };
+      persistStudyState({ progress: newProgress, subtopics: newSubtopics, log: newLog });
       return next;
     });
-  }, []);
+  }, [slug]);
 
   const handleSubtopicCheck = useCallback((topicId, idx, totalSubs, topic, checked) => {
     setStudyState((prev) => {
