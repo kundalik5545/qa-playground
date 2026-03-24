@@ -12,7 +12,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, LogOut, ShieldCheck, Mail, User } from "lucide-react";
+import { Loader2, LogOut, ShieldCheck, Mail, User, Bell } from "lucide-react";
+import Link from "next/link";
 
 export default function AdminDashboardPage() {
   const router = useRouter();
@@ -123,6 +124,19 @@ export default function AdminDashboardPage() {
                 </div>
               </div>
             </div>
+
+            <Link href="/admin/site-alerts" id="site-alerts-link" data-testid="site-alerts-link">
+              <Button
+                variant="outline"
+                className="w-full"
+                id="site-alerts-btn"
+                data-testid="site-alerts-btn"
+                data-action="navigate-site-alerts"
+              >
+                <Bell className="mr-2 h-4 w-4" />
+                Manage Site Alerts
+              </Button>
+            </Link>
 
             <Button
               onClick={handleLogout}

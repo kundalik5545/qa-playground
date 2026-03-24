@@ -102,3 +102,42 @@ model Verification {
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
 }
+
+// ─── Site Alert Feature ───────────────────────────────────────────────────────
+
+enum SiteAlertQuestionType {
+  YESNO
+  THUMBS
+}
+
+// Singleton — only ever one row. Controls global on/off + frequency.
+model SiteAlertConfig {
+  id           String   @id @default(cuid())
+  enabled      Boolean  @default(true)
+  durationDays Int      @default(7)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// One row per question the admin creates.
+model SiteAlertQuestion {
+  id        String                @id @default(cuid())
+  text      String
+  type      SiteAlertQuestionType @default(YESNO)
+  order     Int                   @default(0)
+  isActive  Boolean               @default(true)
+  createdAt DateTime              @default(now())
+  updatedAt DateTime              @updatedAt
+  responses SiteAlertResponse[]
+}
+
+// One row per answer a visitor submits.
+model SiteAlertResponse {
+  id         String            @id @default(cuid())
+  questionId String
+  question   SiteAlertQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answer     String
+  visitorId  String
+  userAgent  String?
+  createdAt  DateTime          @default(now())
+}
