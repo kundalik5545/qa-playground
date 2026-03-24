@@ -28,18 +28,25 @@ enum ResourceType {
 // Better-Auth required models
 
 model User {
-  id            String     @id @default(cuid())
-  name          String
-  email         String     @unique
-  emailVerified Boolean    @default(false)
-  image         String?
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  role          Role       @default(USER)
-  sessions      Session[]
-  accounts      Account[]
-  resources     Resource[]
-  apiKeys       ApiKey[]
+  id               String             @id @default(cuid())
+  name             String
+  email            String             @unique
+  emailVerified    Boolean            @default(false)
+  image            String?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  role             Role               @default(USER)
+  sessions         Session[]
+  accounts         Account[]
+  resources        Resource[]
+  apiKeys          ApiKey[]
+  syllabi          UserSyllabus[]
+  topicProgress    TopicProgress[]
+  subtopicProgress SubtopicProgress[]
+  dailyTasks       DailyTask[]
+  habits           Habit[]
+  habitLogs        HabitLog[]
+  activityLogs     ActivityLog[]
 }
 
 model Resource {
@@ -101,6 +108,114 @@ model Verification {
   expiresAt  DateTime
   createdAt  DateTime? @default(now())
   updatedAt  DateTime? @updatedAt
+}
+
+// ─── Study Tracker Feature ────────────────────────────────────────────────────
+
+// Stores each user's custom syllabus overrides (or the default if unchanged).
+// syllabusId matches the client-side key e.g. "manual", "automation", "playwright".
+model UserSyllabus {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  syllabusId String
+  data       Json
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, syllabusId])
+}
+
+// Per-topic completion state. topicId matches client strings e.g. "m-t1".
+model TopicProgress {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId   String
+  done      Boolean   @default(false)
+  notes     String?
+  doneAt    DateTime?
+  updatedAt DateTime  @updatedAt
+
+  @@unique([userId, topicId])
+}
+
+// Per-subtopic checked state. One row per (user, topic, subtopicTitle) triple.
+model SubtopicProgress {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topicId       String
+  subtopicTitle String
+  checked       Boolean  @default(false)
+  updatedAt     DateTime @updatedAt
+
+  @@unique([userId, topicId, subtopicTitle])
+}
+
+// Daily task list entries. taskId is the client-generated uuid.
+model DailyTask {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date      String
+  taskId    String
+  title     String
+  done      Boolean  @default(false)
+  timeMin   Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, taskId])
+  @@index([userId, date])
+}
+
+// Habit definitions. habitId is the client-generated uuid.
+model Habit {
+  id         String     @id @default(cuid())
+  userId     String
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habitId    String
+  title      String
+  timeMin    Int        @default(0)
+  recurrence String
+  customDays Int[]
+  startDate  String
+  endDate    String?
+  active     Boolean    @default(true)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  logs       HabitLog[]
+
+  @@unique([userId, habitId])
+}
+
+// Habit completion log — one row per (user, habit, date).
+model HabitLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  habitId   String
+  habit     Habit    @relation(fields: [habitId], references: [id], onDelete: Cascade)
+  date      String
+  done      Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, habitId, date])
+  @@index([userId, date])
+}
+
+// Append-only activity log. Tracks topic completions, notes, etc.
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  date       String
+  topicId    String?
+  syllabusId String?
+  action     String
+  createdAt  DateTime @default(now())
+
+  @@index([userId, date])
 }
 
 // ─── Site Alert Feature ───────────────────────────────────────────────────────

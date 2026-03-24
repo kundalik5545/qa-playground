@@ -90,7 +90,10 @@
 └── docs/                         Project documentation
     ├── AI_CODING_GUIDELINES.md   Rules and guidelines for AI agents
     ├── BANK_MIGRATION_NOTES.md   Bank feature migration notes
-    └── DEV_QUICK_REFERENCE.md    Quick dev reference
+    ├── DEV_QUICK_REFERENCE.md    Quick dev reference
+    ├── STUDY_TRACKER_DB_MIGRATION_ANALYSIS.md  Full analysis: localStorage → DB migration
+    └── tasks/                    Active task tracking files
+        └── STUDY_TRACKER_DB_MIGRATION_TASKS.md  Phase-by-phase tasks for DB migration
 ```
 
 ### app/ — Routes & Layouts
@@ -304,7 +307,7 @@ User → Page Component
 | Auth session (site-wide) | Better-Auth — server sessions in PostgreSQL, client cookie |
 | Bank login session | `sessionStorage` — key: `bankUser` |
 | Bank accounts + transactions | `localStorage` — managed via `lib/bankStorage.js` |
-| Study Tracker state | `localStorage` — managed via `lib/studyTrackerStorage.js` |
+| Study Tracker state | `localStorage` via `lib/studyTrackerStorage.js` (anonymous users); **PostgreSQL via Prisma for logged-in users** (migration in progress — see `docs/tasks/STUDY_TRACKER_DB_MIGRATION_TASKS.md`) |
 | Site alerts | `localStorage` — managed via `lib/alertStorage.js` |
 | Theme (dark/light) | `next-themes` — class-based on `<html>` |
 | Toast notifications | `sonner` via `<Toaster>` in root layout |
@@ -321,6 +324,18 @@ Resource      — id, userId (FK), resourceType (ARTICLE|VIDEO|COURSE|BOOK|TOOL|
                 title, url, description, tags[], image, createdAt, updatedAt
 ApiKey        — id, userId (FK), name, key (unique), createdAt
 ```
+
+**Planned models (Study Tracker DB migration — not yet in schema):**
+```
+UserSyllabus     — id, userId (FK), syllabusId, data (Json), updatedAt
+TopicProgress    — id, userId (FK), topicId, done, notes?, doneAt?, updatedAt
+SubtopicProgress — id, userId (FK), topicId, subtopicTitle, checked, updatedAt
+DailyTask        — id, userId (FK), date, taskId, title, done, timeMin, createdAt, updatedAt
+Habit            — id, userId (FK), habitId, title, timeMin, recurrence, customDays[], startDate, endDate?, active, createdAt, updatedAt
+HabitLog         — id, userId (FK), habitId (FK → Habit), date, done, updatedAt
+ActivityLog      — id, userId (FK), date, topicId?, syllabusId?, action, createdAt
+```
+See `docs/STUDY_TRACKER_DB_MIGRATION_ANALYSIS.md` for full schema and migration rationale.
 
 ### Markdown Pipeline (for Blog + Practice pages)
 
@@ -567,7 +582,7 @@ Exception: `prisma.config.ts` is required by Prisma tooling — do not convert i
 
 - Several practice elements listed on the hub page (`/practice`) may not have corresponding `_components/` files yet (Drag, Drop, Sort, Slider, Shadow DOM, Frame were listed in the hub but not all confirmed in `_components/`).
 - `Blog/ElementBlogs/test.md` appears to be a test/scratch file — review whether it should be kept.
-- Study Tracker resources sync to PostgreSQL only when the user is authenticated; unauthenticated users get a localStorage-only experience or the Resources tab is hidden.
+- **[IN PROGRESS]** Study Tracker full DB migration underway — moving all 8 localStorage keys (`qa_tracker_*`) to PostgreSQL per-user. Plan + tasks tracked in `docs/tasks/STUDY_TRACKER_DB_MIGRATION_TASKS.md`. Analysis in `docs/STUDY_TRACKER_DB_MIGRATION_ANALYSIS.md`. Anonymous users remain unaffected (localStorage-only). Phases 1–6 must ship before Phase 7 (localStorage removal).
 - QA Tools beyond JSON-to-file (JSON Formatter, Base64, JWT Decoder, Regex Tester) are stubbed as "coming soon".
 
 ---
