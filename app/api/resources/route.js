@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+};
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS_HEADERS });
+}
+
 async function resolveUserId(request) {
   // 1. API key auth (for Chrome extension)
   const authHeader = request.headers.get("authorization") || "";
@@ -48,13 +58,13 @@ export async function GET(request) {
     orderBy: { createdAt: "desc" },
   });
 
-  return NextResponse.json(resources);
+  return NextResponse.json(resources, { headers: CORS_HEADERS });
 }
 
 export async function POST(request) {
   const userId = await resolveUserId(request);
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401, headers: CORS_HEADERS });
   }
 
   const body = await request.json();
@@ -63,7 +73,7 @@ export async function POST(request) {
   if (!resourceType || !title || !url) {
     return NextResponse.json(
       { error: "resourceType, title, and url are required" },
-      { status: 400 }
+      { status: 400, headers: CORS_HEADERS }
     );
   }
 
@@ -79,5 +89,5 @@ export async function POST(request) {
     },
   });
 
-  return NextResponse.json(resource, { status: 201 });
+  return NextResponse.json(resource, { status: 201, headers: CORS_HEADERS });
 }
