@@ -113,6 +113,8 @@ function QuestionsTab() {
       const q = await res.json();
       setQuestions((prev) => [...prev, q]);
       toast.success("Question added");
+    } else {
+      toast.error("Failed to add question");
     }
   }
 
@@ -314,11 +316,7 @@ function QuestionsTab() {
                       )
                     );
                   }}
-                  onBlur={(e) => {
-                    if (e.target.value.trim() !== q.text) {
-                      updateQuestion(q.id, "text", e.target.value.trim());
-                    }
-                  }}
+                  onBlur={(e) => updateQuestion(q.id, "text", e.target.value.trim())}
                 />
               </div>
 

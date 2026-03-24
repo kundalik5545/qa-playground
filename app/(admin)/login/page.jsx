@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -20,10 +20,21 @@ import { Loader2, LogIn } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { data: session } = authClient.useSession();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (session?.user) {
+      if (session.user.role === "ADMIN") {
+        router.replace("/admin/dashboard");
+      } else {
+        router.replace("/study-tracker");
+      }
+    }
+  }, [session, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
