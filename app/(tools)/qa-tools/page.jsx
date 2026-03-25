@@ -184,6 +184,7 @@ export default function QaToolsPage() {
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Link
               href="/study-tracker/dashboard"
+              prefetch={false}
               style={{
                 padding: "9px 18px",
                 borderRadius: 8,
@@ -199,6 +200,7 @@ export default function QaToolsPage() {
             </Link>
             <Link
               href="/practice"
+              prefetch={false}
               style={{
                 padding: "9px 18px",
                 borderRadius: 8,

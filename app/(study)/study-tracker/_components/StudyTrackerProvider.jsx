@@ -20,7 +20,7 @@ export const useTracker = () => useContext(StudyTrackerContext);
 
 export default function StudyTrackerProvider({ children }) {
   const [state, setState] = useState(null);
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: sessionPending } = authClient.useSession();
   const user = session?.user;
   const syncTimers = useRef({});
 
@@ -194,6 +194,7 @@ export default function StudyTrackerProvider({ children }) {
         handleClearAll,
         allStats,
         user,
+        sessionPending,
       }}
     >
       {children}

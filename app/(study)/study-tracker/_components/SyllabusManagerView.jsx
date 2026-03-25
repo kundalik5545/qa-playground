@@ -96,7 +96,7 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
             <Button size="sm" variant="outline" onClick={importSyllabus} title="Import a syllabus from a .json file">⬆ Import</Button>
             <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={exportAll} title="Export all syllabi to a single .json file">⬇ Export All</Button>
             <Button size="sm" asChild className="bg-[#eff2ff] text-blue-600 border border-[#c7d2fe] hover:bg-[#e0e7ff]" title="Generate a syllabus using AI">
-              <Link href="/study-tracker/ai-syllabus-prompt">✦ AI Prompt</Link>
+              <Link href="/study-tracker/ai-syllabus-prompt" prefetch={false}>✦ AI Prompt</Link>
             </Button>
             <Button size="sm" asChild className="bg-[#f0fdf4] text-green-600 border border-[#bbf7d0] hover:bg-[#dcfce7]" title="Paste AI-generated JSON and download it as a .json file">
               <Link href="/qa-tools/json-to-file" prefetch={false}>⬇ JSON → File</Link>

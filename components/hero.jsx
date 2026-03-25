@@ -24,7 +24,7 @@ const HeroSection = () => {
         </p>
 
         <div className="flex flex-wrap justify-center gap-4">
-          <Link href="/practice" passHref>
+          <Link href="/practice" passHref prefetch={false}>
             <Button
               size="lg"
               className="px-8 bg-primary text-primary-foreground hover:bg-primary/90"
@@ -54,12 +54,9 @@ const HeroSection = () => {
             href="https://www.buymeacoffee.com/randomcoders"
             target="_blank"
             rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFDD00] text-black font-semibold text-sm hover:bg-[#f0cc00] transition-colors"
           >
-            <img
-              src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png"
-              alt="Buy Me A Coffee"
-              style={{ height: "55px", width: "217px" }}
-            />
+            ☕ Buy me a coffee
           </a>
         </div>
       </div>

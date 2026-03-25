@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { authClient } from "@/lib/auth-client";
+import { useTracker } from "./StudyTrackerProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -88,7 +88,7 @@ const EMPTY_FORM = {
 };
 
 export default function ResourcesView({ showToast }) {
-  const { data: session, isPending } = authClient.useSession();
+  const { user, sessionPending: isPending } = useTracker();
 
   const [resources, setResources]   = useState([]);
   const [loading, setLoading]       = useState(false);
@@ -113,7 +113,7 @@ export default function ResourcesView({ showToast }) {
   const [newKeyName, setNewKeyName] = useState("");
   const [copiedKey, setCopiedKey]   = useState(null);
 
-  const isLoggedIn = !!session?.user;
+  const isLoggedIn = !!user;
 
   const fetchResources = useCallback(async () => {
     if (!isLoggedIn) return;

@@ -189,6 +189,7 @@ const LandingPage = () => {
               </p>
               <Link
                 href="/practice"
+                prefetch={false}
                 aria-label="Start practicing automation testing elements"
               >
                 <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
@@ -213,7 +214,7 @@ const LandingPage = () => {
                 transaction management. Perfect for building and testing
                 end-to-end automation frameworks.
               </p>
-              <Link href="/bank" aria-label="Open the Bank Demo application">
+              <Link href="/bank" prefetch={false} aria-label="Open the Bank Demo application">
                 <Button className="w-full bg-teal-700 hover:bg-teal-800 text-white">
                   Open Bank App
                 </Button>
@@ -243,6 +244,7 @@ const LandingPage = () => {
               </p>
               <Link
                 href="/study-tracker/dashboard"
+                prefetch={false}
                 aria-label="Open the QA Study Tracker"
               >
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">

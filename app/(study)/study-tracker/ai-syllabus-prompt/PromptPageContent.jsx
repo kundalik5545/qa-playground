@@ -318,6 +318,7 @@ export default function PromptPageContent() {
         {/* Back link */}
         <Link
           href="/study-tracker/dashboard"
+          prefetch={false}
           className="inline-flex items-center gap-1.5 text-[0.82rem] font-semibold text-gray-500 no-underline mb-7 hover:text-blue-600 transition-colors"
         >
           <ArrowLeft size={14} />
@@ -453,6 +454,7 @@ export default function PromptPageContent() {
             </Link>
             <Link
               href="/study-tracker/dashboard"
+              prefetch={false}
               className="inline-flex items-center gap-1.5 px-[18px] py-[9px] rounded-lg bg-blue-600 text-white text-[0.84rem] font-semibold no-underline hover:bg-blue-700 transition-colors"
             >
               Go to Syllabus Manager →

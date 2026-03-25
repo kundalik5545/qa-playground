@@ -59,51 +59,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        {/* Buy Me Coffee */}
-        <script
-          type="text/javascript"
-          src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js"
-          data-name="bmc-button"
-          data-slug="randomcoders"
-          data-color="#FFDD00"
-          data-emoji=""
-          data-font="Cookie"
-          data-text="Buy me a coffee"
-          data-outline-color="#000000"
-          data-font-color="#000000"
-          data-coffee-color="#ffffff"
-        ></script>
-
-        {/* Google tag (gtag.js) */}
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-Z4H9RTYGS4"
-        ></Script>
-        <Script id="google-analytics">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-Z4H9RTYGS4');
-          `}
-        </Script>
-
-        <script
-          id="usercentrics-cmp"
-          src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
-          data-settings-id="RCGf52YH07pmK7"
-          async
-        ></script>
-
-        {/* Umami Script */}
-        <script
-          defer
-          src="https://cloud.umami.is/script.js"
-          data-website-id="b5f3d51f-b071-48a6-a70b-2346af1f7625"
-        ></script>
-      </head>
+      <head></head>
 
       <body className={inter.className}>
         <ThemeProvider
@@ -139,6 +95,32 @@ export default function RootLayout({ children }) {
             <Footer />
           </footer>
         </ThemeProvider>
+
+        {/* Umami Analytics */}
+        <Script
+          id="umami-analytics"
+          src="https://cloud.umami.is/script.js"
+          data-website-id="b5f3d51f-b071-48a6-a70b-2346af1f7625"
+          strategy="afterInteractive"
+        />
+
+        {/* Google Analytics — disabled (503 on collect endpoint; re-enable if GA4 is reconfigured) */}
+        {/* <Script
+          id="google-analytics-src"
+          src="https://www.googletagmanager.com/gtag/js?id=G-Z4H9RTYGS4"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics-init" strategy="afterInteractive">
+          {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Z4H9RTYGS4');`}
+        </Script> */}
+
+        {/* Usercentrics CMP — disabled (loads 10 requests; re-enable with lazyOnload when consent UX is needed) */}
+        {/* <Script
+          id="usercentrics-cmp"
+          src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
+          data-settings-id="RCGf52YH07pmK7"
+          strategy="lazyOnload"
+        /> */}
       </body>
     </html>
   );

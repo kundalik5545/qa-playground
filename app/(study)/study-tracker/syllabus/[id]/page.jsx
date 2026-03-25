@@ -6,25 +6,35 @@ import SyllabusView from "../../_components/SyllabusView";
 
 export default function SyllabusDetailPage() {
   const { id } = useParams();
-  const { state, updateState, showToast } = useTracker();
+  const context = useTracker();
 
-  if (!state) return null;
+  try {
+    const { state, updateState, showToast } = context ?? {};
 
-  const syllabus = state.syllabi[id];
-  if (!syllabus) {
+    if (!state) return null;
+
+    const syllabus = state.syllabi?.[id];
+    if (!syllabus) {
+      return (
+        <div style={{ padding: "40px", color: "#6b7280", textAlign: "center" }}>
+          Syllabus not found.
+        </div>
+      );
+    }
+
+    return (
+      <SyllabusView
+        syllabus={syllabus}
+        state={state}
+        updateState={updateState}
+        showToast={showToast}
+      />
+    );
+  } catch {
     return (
       <div style={{ padding: "40px", color: "#6b7280", textAlign: "center" }}>
-        Syllabus not found.
+        Unable to load syllabus. Please try refreshing the page.
       </div>
     );
   }
-
-  return (
-    <SyllabusView
-      syllabus={syllabus}
-      state={state}
-      updateState={updateState}
-      showToast={showToast}
-    />
-  );
 }

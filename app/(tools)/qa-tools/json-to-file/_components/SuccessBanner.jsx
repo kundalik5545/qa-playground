@@ -18,6 +18,7 @@ export default function SuccessBanner() {
       </div>
       <Link
         href="/study-tracker/syllabus"
+        prefetch={false}
         className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-bold transition-colors no-underline"
       >
         Go to Syllabus Manager

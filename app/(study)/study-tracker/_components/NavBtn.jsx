@@ -9,6 +9,7 @@ export default function NavBtn({ href, label, icon, pathname, badge, badgeStyle 
     <li className="mb-[1px]">
       <Link
         href={href}
+        prefetch={false}
         className={cn(
           "flex items-center gap-[9px] px-[10px] py-[9px] rounded-lg text-sm font-medium transition-all w-full no-underline",
           active
