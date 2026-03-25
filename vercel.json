@@ -7,8 +7,5 @@
     }
   ],
   "routes": [],
-  "env": {
-    "DATABASE_URL": ""
-  },
   "buildCommand": "npm run build"
 }
