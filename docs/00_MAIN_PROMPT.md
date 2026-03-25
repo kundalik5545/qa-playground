@@ -1,0 +1,1 @@
+Go through `10_BLOG_PAGE_UI_IMPROVMENT.md` file under `docs` folder and understand all requirment or changes. Then create a Tasks under `docs/tasks` folder. Ask questions if more information needed. Then execute the plan.
