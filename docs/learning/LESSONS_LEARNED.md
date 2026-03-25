@@ -19,6 +19,10 @@ Add new lessons at the top of the relevant section (newest first).
 
 | # | Title | Section | Date |
 |---|---|---|---|
+| 008 | Tailwind Dynamic Classes Require a Lookup Map | UI / Styling | 2026-03-26 |
+| 007 | JSX Comment Nesting Trap Silently Swallows Content | UI / Styling | 2026-03-26 |
+| 006 | Auth Session Dedup — One `useSession()` Per Provider | Authentication | 2026-03-26 |
+| 005 | `next/script` `id` Prop Prevents Duplicate Script Injection | Next.js / Vercel | 2026-03-26 |
 | 004 | RSC Prefetch Inside Tab Panels | Next.js / Vercel | 2026-03-25 |
 | 003 | Empty DATABASE_URL in vercel.json Overrides Real Env Var | Next.js / Vercel | 2026-03-25 |
 | 002 | Prisma 7 + pnpm — `@prisma/client-runtime-utils` Not Found on Vercel | Database / Prisma | 2026-03-25 |
@@ -28,6 +32,54 @@ Add new lessons at the top of the relevant section (newest first).
 ---
 
 ## Next.js / Vercel
+
+---
+
+### Lesson 005 — `next/script` `id` Prop Prevents Duplicate Script Injection
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Google Analytics (`gtag.js`) and Umami (`cloud.umami.is/script.js`) were both loading **twice** on every page — confirmed in the Network tab. Two identical requests fired on initial load and again on client-side navigation.
+
+#### Root Cause
+
+The scripts were injected as raw `<script>` tags inside the `<head>` element of the Next.js root layout:
+
+```jsx
+<head>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-..."></script>
+</head>
+```
+
+Next.js App Router layouts re-evaluate on every client-side navigation. A raw `<script>` tag has no identity — Next.js does not know it already injected this script, so it injects it again on every route change.
+
+#### Fix
+
+Replace raw `<script>` tags with Next.js's `<Script>` component from `next/script`, with a unique `id` prop:
+
+```jsx
+import Script from "next/script";
+
+// In RootLayout body — NOT in <head>
+<Script
+  id="umami-analytics"
+  src="https://cloud.umami.is/script.js"
+  data-website-id="YOUR_ID"
+  strategy="afterInteractive"
+/>
+```
+
+The `id` prop is what Next.js uses to deduplicate — it guarantees the script is injected exactly once per session regardless of how many route changes happen.
+
+#### Key Takeaways
+
+- Never use raw `<script>` tags in Next.js App Router layouts for third-party scripts — they re-inject on every navigation.
+- `<Script id="...">` from `next/script` is the correct primitive; `id` is mandatory for deduplication.
+- Strategy guide: `"afterInteractive"` for analytics (loads after hydration), `"lazyOnload"` for low-priority widgets (loads during idle time).
+- Place `<Script>` components in `<body>`, not `<head>` — Next.js manages placement automatically based on strategy.
+- To disable a script temporarily: comment out the `<Script>` JSX block. Keep it as a template so re-enabling is one uncomment away.
 
 ---
 
@@ -191,6 +243,51 @@ This stopped the client component from being included in every RSC prefetch payl
 
 ---
 
+### Lesson 006 — Auth Session Dedup — One `useSession()` Per Provider
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+`/api/auth/get-session` was being called **twice** on every Study Tracker page load. The Network tab showed two back-to-back GET requests to the session endpoint on mount.
+
+#### Root Cause
+
+`ResourcesView` — a child of `StudyTrackerProvider` — was calling `authClient.useSession()` independently:
+
+```jsx
+// StudyTrackerProvider.jsx — fetches session #1
+const { data: session } = authClient.useSession();
+
+// ResourcesView.jsx — fetches session #2 (unnecessary)
+const { data: session, isPending } = authClient.useSession();
+```
+
+Even with `cookieCache` enabled, two components calling `useSession()` simultaneously on first mount (before the cache is populated) both fire before either result is cached — resulting in two real network requests.
+
+#### Fix
+
+`StudyTrackerProvider` already owns the session. Expose `user` and `sessionPending` via context, and have child components read from context instead of calling `useSession()` directly:
+
+```jsx
+// StudyTrackerProvider.jsx
+const { data: session, isPending: sessionPending } = authClient.useSession();
+const user = session?.user;
+// expose in context value: { user, sessionPending, ... }
+
+// ResourcesView.jsx — now reads from context
+const { user, sessionPending: isPending } = useTracker(); // ✓ no extra network call
+```
+
+#### Key Takeaways
+
+- `useSession()` should be called exactly **once** per component tree — in the nearest shared context provider.
+- All child components should consume session state via context (`useTracker()`, `useAuth()`, etc.), never by calling `useSession()` independently.
+- This applies even when `cookieCache` is enabled — the cache is populated after the first response, so simultaneous cold-mount calls still both fire.
+- When auditing duplicate `/get-session` calls: grep for `useSession` across the codebase and count the call sites.
+
+---
+
 ### Lesson 001 — better-auth `useSession` Hitting `/get-session` Continuously
 
 **Date:** 2026-03-25
@@ -304,7 +401,91 @@ Both fixes are required together.
 
 ## UI / Styling
 
-<!-- Add lessons about Tailwind, shadcn/ui, dark mode, responsive layout here -->
+---
+
+### Lesson 007 — JSX Comment Nesting Trap Silently Swallows Content
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Several commented-out script blocks in `app/layout.js` appeared correctly commented in the editor, but the Google Analytics label `{/* Google tag (gtag.js) */}` was silently consumed by the Buy Me Coffee comment block above it. The stray `*/` text was also rendering as literal text in the HTML `<head>`.
+
+#### Root Cause
+
+JSX comments (`{/* ... */}`) do not nest. The `{/*` on line 64 opened a comment but had no `*/}` to close it before line 78. Line 78 contained `{/* Google tag (gtag.js) */}` — the `*/` inside this expression closed the **outer** comment from line 64, not a new inner one. Everything between lines 64 and 78 became one giant single comment block, swallowing both the BMC script and the GA label:
+
+```jsx
+{/* <script src="buy-me-coffee.js">    ← opens comment, never closed
+
+{/* Google tag (gtag.js) */}           ← the */ here closes the OUTER comment
+                                        ← all content between is silently consumed
+```
+
+The remaining `}` after the `*/` then orphaned a stray `*/` on the next line which rendered as text in `<head>`.
+
+#### Fix
+
+Rewrote all commented-out script blocks as **single-line** `{/* ... */}` entries — each self-contained, impossible to accidentally merge:
+
+```jsx
+{/* Buy Me Coffee — replaced with inline button in hero.jsx */}
+{/* <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/..."></script> */}
+
+{/* Google Analytics — disabled */}
+{/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-..."></script> */}
+```
+
+#### Key Takeaways
+
+- JSX `{/* */}` block comments do not nest — the first `*/` found anywhere closes the outermost open comment.
+- Multi-line commented-out JSX blocks are a trap: always verify `*/}` is present before starting another `{/*`.
+- Safest practice: keep each disabled code block on a single line inside its own `{/* ... */}`.
+- Symptom to watch for: commented-out code disappearing in the rendered HTML, or stray `*/` appearing as text content.
+
+---
+
+### Lesson 008 — Tailwind Dynamic Classes Require a Lookup Map
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+A `SECONDARY_GRID_POSTS` constant was added to control how many posts appear in the blog secondary grid. Setting it to `3` had no visible effect on the layout — the grid stayed at 2 columns.
+
+#### Root Cause
+
+The grid column class was constructed dynamically:
+
+```jsx
+// This does NOT work
+className={`grid grid-cols-${SECONDARY_GRID_POSTS}`}
+```
+
+Tailwind's build step statically scans source files for complete class name strings. A template literal like `` `grid-cols-${n}` `` is never seen as `grid-cols-3` by the compiler — only the raw string `grid-cols-3` qualifies. The dynamically constructed class is purged from the CSS bundle and has no effect at runtime.
+
+#### Fix
+
+Use a lookup object where every value is a complete, literal class string — Tailwind sees all of them at build time:
+
+```jsx
+const SECONDARY_GRID_COLS = {
+  1: "grid-cols-1",
+  2: "grid-cols-1 sm:grid-cols-2",
+  3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
+  4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
+};
+
+<ul className={`grid ${SECONDARY_GRID_COLS[SECONDARY_GRID_POSTS] ?? SECONDARY_GRID_COLS[2]} gap-6`} />
+```
+
+#### Key Takeaways
+
+- Tailwind is a **static** CSS generator — it cannot respond to runtime values.
+- Any class built with string interpolation, concatenation, or template literals will be purged.
+- The fix is always the same: a lookup map with full literal strings as values.
+- This applies to any dynamic Tailwind value: colors (`text-${color}-500`), spacing (`p-${size}`), columns (`grid-cols-${n}`), etc.
+- If a Tailwind class has no visible effect, check whether it is being constructed dynamically.
 
 ---
 
