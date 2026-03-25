@@ -54,3 +54,7 @@ Page should be responsive nice looking following current dashboard, daily tracke
 - add login button at bottom of left navbar of study-tracker with user profile dropdown menu card use shadcn and tailwindcss.
 
 Ask questions if need more info
+
+## 25 MARCH
+
+new prompt
