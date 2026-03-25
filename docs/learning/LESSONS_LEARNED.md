@@ -17,17 +17,17 @@ Add new lessons at the top of the relevant section (newest first).
 
 ## Lesson Index
 
-| # | Title | Section | Date |
-|---|---|---|---|
-| 008 | Tailwind Dynamic Classes Require a Lookup Map | UI / Styling | 2026-03-26 |
-| 007 | JSX Comment Nesting Trap Silently Swallows Content | UI / Styling | 2026-03-26 |
-| 006 | Auth Session Dedup — One `useSession()` Per Provider | Authentication | 2026-03-26 |
-| 005 | `next/script` `id` Prop Prevents Duplicate Script Injection | Next.js / Vercel | 2026-03-26 |
-| 004 | RSC Prefetch Inside Tab Panels | Next.js / Vercel | 2026-03-25 |
-| 003 | Empty DATABASE_URL in vercel.json Overrides Real Env Var | Next.js / Vercel | 2026-03-25 |
+| #   | Title                                                                | Section           | Date       |
+| --- | -------------------------------------------------------------------- | ----------------- | ---------- |
+| 008 | Tailwind Dynamic Classes Require a Lookup Map                        | UI / Styling      | 2026-03-26 |
+| 007 | JSX Comment Nesting Trap Silently Swallows Content                   | UI / Styling      | 2026-03-26 |
+| 006 | Auth Session Dedup — One `useSession()` Per Provider                 | Authentication    | 2026-03-26 |
+| 005 | `next/script` `id` Prop Prevents Duplicate Script Injection          | Next.js / Vercel  | 2026-03-26 |
+| 004 | RSC Prefetch Inside Tab Panels                                       | Next.js / Vercel  | 2026-03-25 |
+| 003 | Empty DATABASE_URL in vercel.json Overrides Real Env Var             | Next.js / Vercel  | 2026-03-25 |
 | 002 | Prisma 7 + pnpm — `@prisma/client-runtime-utils` Not Found on Vercel | Database / Prisma | 2026-03-25 |
-| 001 | better-auth `useSession` Hitting `/get-session` Continuously | Authentication | 2026-03-25 |
-| 000 | RSC Prefetch Requests Flooding Edge Functions | Next.js / Vercel | 2026-03-25 |
+| 001 | better-auth `useSession` Hitting `/get-session` Continuously         | Authentication    | 2026-03-25 |
+| 000 | RSC Prefetch Requests Flooding Edge Functions                        | Next.js / Vercel  | 2026-03-25 |
 
 ---
 
@@ -49,7 +49,10 @@ The scripts were injected as raw `<script>` tags inside the `<head>` element of 
 
 ```jsx
 <head>
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-..."></script>
+  <script
+    async
+    src="https://www.googletagmanager.com/gtag/js?id=G-..."
+  ></script>
 </head>
 ```
 
@@ -68,7 +71,7 @@ import Script from "next/script";
   src="https://cloud.umami.is/script.js"
   data-website-id="YOUR_ID"
   strategy="afterInteractive"
-/>
+/>;
 ```
 
 The `id` prop is what Next.js uses to deduplicate — it guarantees the script is injected exactly once per session regardless of how many route changes happen.
@@ -206,6 +209,7 @@ Added `prefetch={false}` to every `<Link>` across the app:
 ```
 
 Files touched:
+
 - `components/lib/Footer.jsx` — 3 links
 - `components/Header.jsx`
 - `components/NavbarSheet.jsx`
@@ -220,7 +224,7 @@ Files touched:
 // Removed from app/page.js
 import SiteAlertPopup from "@/components/SiteAlertPopup";
 // ...
-<SiteAlertPopup />
+<SiteAlertPopup />;
 ```
 
 This stopped the client component from being included in every RSC prefetch payload for the home page.
@@ -379,7 +383,11 @@ This tells pnpm to hoist all `@prisma/*` packages to root `node_modules/`, makin
 
 ```js
 const nextConfig = {
-  serverExternalPackages: ["@prisma/client", ".prisma/client", "@prisma/adapter-pg"],
+  serverExternalPackages: [
+    "@prisma/client",
+    ".prisma/client",
+    "@prisma/adapter-pg",
+  ],
   // ...
 };
 ```
@@ -429,11 +437,19 @@ The remaining `}` after the `*/` then orphaned a stray `*/` on the next line whi
 Rewrote all commented-out script blocks as **single-line** `{/* ... */}` entries — each self-contained, impossible to accidentally merge:
 
 ```jsx
-{/* Buy Me Coffee — replaced with inline button in hero.jsx */}
-{/* <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/..."></script> */}
+{
+  /* Buy Me Coffee — replaced with inline button in hero.jsx */
+}
+{
+  /* <script type="text/javascript" src="https://cdnjs.buymeacoffee.com/..."></script> */
+}
 
-{/* Google Analytics — disabled */}
-{/* <script async src="https://www.googletagmanager.com/gtag/js?id=G-..."></script> */}
+{
+  /* Google Analytics — disabled */
+}
+{
+  /* <script async src="https://www.googletagmanager.com/gtag/js?id=G-..."></script> */
+}
 ```
 
 #### Key Takeaways
@@ -476,7 +492,9 @@ const SECONDARY_GRID_COLS = {
   4: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
 };
 
-<ul className={`grid ${SECONDARY_GRID_COLS[SECONDARY_GRID_POSTS] ?? SECONDARY_GRID_COLS[2]} gap-6`} />
+<ul
+  className={`grid ${SECONDARY_GRID_COLS[SECONDARY_GRID_POSTS] ?? SECONDARY_GRID_COLS[2]} gap-6`}
+/>;
 ```
 
 #### Key Takeaways
