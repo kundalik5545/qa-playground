@@ -308,7 +308,7 @@ export default function DashboardView({
             pointBackgroundColor: "#f59e0b",
             fill: true,
             tension: 0.35,
-            spanGaps: false,
+            spanGaps: true,
           }],
         },
         options: {
