@@ -1,0 +1,480 @@
+{
+  "info": {
+    "name": "QA Playground — Study Tracker API",
+    "description": "All /api/tracker/* routes for the Study Tracker DB migration.\n\nSetup:\n1. Set the `baseUrl` collection variable to your local or prod URL.\n2. Run the `Login` request first — Postman's cookie jar will store the session cookie automatically.\n3. All tracker routes use that cookie for auth.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Login to get a session cookie. Run this before any tracker request.",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/auth/sign-in/email",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"your@email.com\",\n  \"password\": \"yourpassword\"\n}"
+            },
+            "description": "Better-Auth login. On success, sets the `better-auth.session_token` cookie automatically. All subsequent requests in this collection will use it."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"user\": {\n    \"id\": \"r9kbT6DVFnieQsu8JjxBovMvKXFfO7rU\",\n    \"name\": \"John Doe\",\n    \"email\": \"your@email.com\",\n    \"role\": \"USER\"\n  },\n  \"session\": { ... }\n}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tracker State",
+      "description": "GET full state for the session user. DELETE wipes all tracker data.",
+      "item": [
+        {
+          "name": "GET Full State",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/tracker/state",
+            "description": "Returns the full tracker state for the logged-in user, shaped to match the localStorage object.\n\nReturns 401 if not authenticated."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"progress\": {\n    \"m-t1\": { \"done\": true, \"notes\": \"Read ISTQB chapter 1\", \"doneAt\": \"2026-03-20\" },\n    \"m-t2\": { \"done\": false }\n  },\n  \"subtopics\": {\n    \"m-t1\": {\n      \"Definition & Goals\": true,\n      \"Verification vs Validation\": false\n    }\n  },\n  \"daily\": {\n    \"2026-03-25\": [\n      { \"id\": \"1774414905686\", \"title\": \"Practice Selenium\", \"done\": false, \"timeMin\": 30 }\n    ]\n  },\n  \"habits\": [\n    {\n      \"id\": \"habit-uuid-abc123\",\n      \"title\": \"Practice automation daily\",\n      \"timeMin\": 45,\n      \"recurrence\": \"daily\",\n      \"customDays\": [],\n      \"startDate\": \"2026-03-01\",\n      \"active\": true\n    }\n  ],\n  \"habitLog\": {\n    \"2026-03-25\": {\n      \"habit-uuid-abc123\": true\n    }\n  },\n  \"syllabi\": null,\n  \"log\": [\n    { \"date\": \"2026-03-20\", \"topicId\": \"m-t1\", \"syllabusId\": \"manual\", \"action\": \"completed\" }\n  ],\n  \"custom\": {}\n}"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        },
+        {
+          "name": "DELETE All Tracker Data",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/tracker/state",
+            "description": "Wipes ALL tracker data for the session user from DB (TopicProgress, SubtopicProgress, DailyTask, Habit, HabitLog, UserSyllabus, ActivityLog).\n\nUsed by handleClearAll. Returns 204 on success."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Bulk Sync",
+      "description": "POST a partial or full state object. Used for first-login migration, import, and dual-write updates.",
+      "item": [
+        {
+          "name": "POST Bulk Sync (full state)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/sync",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullState\": {\n    \"progress\": {\n      \"m-t1\": { \"done\": true, \"notes\": \"Read ISTQB chapter 1\", \"doneAt\": \"2026-03-20\" },\n      \"m-t2\": { \"done\": false }\n    },\n    \"subtopics\": {\n      \"m-t1\": {\n        \"Definition & Goals\": true,\n        \"Verification vs Validation\": false\n      }\n    },\n    \"daily\": {\n      \"2026-03-25\": [\n        { \"id\": \"1774414905686\", \"title\": \"Practice Selenium\", \"done\": false, \"timeMin\": 30 }\n      ]\n    },\n    \"habits\": [\n      {\n        \"id\": \"habit-uuid-abc123\",\n        \"title\": \"Practice automation daily\",\n        \"timeMin\": 45,\n        \"recurrence\": \"daily\",\n        \"customDays\": [],\n        \"startDate\": \"2026-03-01\",\n        \"active\": true\n      }\n    ],\n    \"habitLog\": {\n      \"2026-03-25\": {\n        \"habit-uuid-abc123\": true\n      }\n    },\n    \"syllabi\": null,\n    \"log\": [\n      { \"date\": \"2026-03-20\", \"topicId\": \"m-t1\", \"syllabusId\": \"manual\", \"action\": \"completed\" }\n    ]\n  }\n}"
+            },
+            "description": "Bulk upserts all supplied keys. Any key omitted from fullState is skipped.\n\n- All keys are optional — send only what changed.\n- habitLog requires habits to be present in same payload (or already in DB) for ID resolution.\n- taskId values can be strings or numbers — coerced to String internally.\n- Activity log entries are appended (no dedup)."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"fullState required\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        },
+        {
+          "name": "POST Bulk Sync (partial — progress only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/sync",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullState\": {\n    \"progress\": {\n      \"m-t1\": { \"done\": true, \"notes\": \"Finished chapter\", \"doneAt\": \"2026-03-25\" }\n    }\n  }\n}"
+            },
+            "description": "Partial sync — only upserts progress. Other keys untouched."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Progress",
+      "description": "Single topic progress update.",
+      "item": [
+        {
+          "name": "PATCH Topic Progress",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/progress",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topicId\": \"m-t1\",\n  \"done\": true,\n  \"notes\": \"Read ISTQB chapter 1\",\n  \"doneAt\": \"2026-03-25\"\n}"
+            },
+            "description": "Upserts a single topic progress row.\n\nRequired: topicId\nOptional: done (bool), notes (string), doneAt (YYYY-MM-DD string)"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"topicId required\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Subtopics",
+      "description": "Single subtopic checked state update.",
+      "item": [
+        {
+          "name": "PATCH Subtopic",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/subtopics",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topicId\": \"m-t1\",\n  \"subtopicTitle\": \"Definition & Goals\",\n  \"checked\": true\n}"
+            },
+            "description": "Upserts a single subtopic row.\n\nRequired: topicId, subtopicTitle\nOptional: checked (bool, default false)"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"topicId and subtopicTitle required\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Daily Tasks",
+      "description": "Add/update or delete daily tasks.",
+      "item": [
+        {
+          "name": "POST Daily Task (add/update)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/daily",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"date\": \"2026-03-25\",\n  \"task\": {\n    \"id\": \"1774414905686\",\n    \"title\": \"Practice Selenium locators\",\n    \"done\": false,\n    \"timeMin\": 45\n  }\n}"
+            },
+            "description": "Upserts a daily task. task.id can be a string or number — coerced to string internally.\n\nRequired: date, task.id\nOptional: task.title, task.done, task.timeMin"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"date and task.id required\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        },
+        {
+          "name": "DELETE Daily Task",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/tracker/daily/1774414905686",
+            "description": "Deletes a daily task by its client taskId (path param).\n\nReturns 204 even if the task does not exist (deleteMany — no error on missing)."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Habits",
+      "description": "Create/update or delete habit definitions.",
+      "item": [
+        {
+          "name": "POST Habit (create/update)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/habits",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habit\": {\n    \"id\": \"habit-uuid-abc123\",\n    \"title\": \"Practice automation daily\",\n    \"timeMin\": 45,\n    \"recurrence\": \"daily\",\n    \"customDays\": [],\n    \"startDate\": \"2026-03-01\",\n    \"endDate\": null,\n    \"active\": true\n  }\n}"
+            },
+            "description": "Upserts a habit definition.\n\nRequired: habit.id\nrecurrence values: 'daily' | 'weekdays' | 'weekends' | 'custom'\ncustomDays: array of ints [0=Sun, 1=Mon ... 6=Sat] — only used when recurrence='custom'"
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"habit.id required\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        },
+        {
+          "name": "DELETE Habit",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/api/tracker/habits/habit-uuid-abc123",
+            "description": "Deletes a habit by its client habitId (path param).\n\nAll related HabitLog rows are deleted automatically via DB cascade (onDelete: Cascade).\nReturns 204 even if the habit does not exist."
+          },
+          "response": [
+            {
+              "name": "204 No Content",
+              "status": "No Content",
+              "code": 204,
+              "body": ""
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Habit Log",
+      "description": "Toggle habit completion for a specific date.",
+      "item": [
+        {
+          "name": "PATCH Habit Log",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/habit-log",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"habitId\": \"habit-uuid-abc123\",\n  \"date\": \"2026-03-25\",\n  \"done\": true\n}"
+            },
+            "description": "Upserts a habit log entry (done/undone for a date).\n\nhabitId is the CLIENT uuid (not the DB CUID). The route resolves it to Habit.id internally.\n\nRequired: habitId, date\nOptional: done (bool, default false)\n\nReturns 404 if the habit doesn't exist in DB yet (create the habit first)."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"habitId and date required\" }"
+            },
+            {
+              "name": "404 Not Found",
+              "status": "Not Found",
+              "code": 404,
+              "body": "{ \"error\": \"Habit not found\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Syllabus",
+      "description": "Save a custom syllabus tree for a user.",
+      "item": [
+        {
+          "name": "PUT Syllabus",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/syllabus/manual",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"data\": {\n    \"id\": \"manual\",\n    \"label\": \"Manual Testing\",\n    \"icon\": \"🧪\",\n    \"color\": \"#2563eb\",\n    \"sections\": [\n      {\n        \"id\": \"manual-s1\",\n        \"title\": \"Fundamentals of Software Testing\",\n        \"topics\": [\n          {\n            \"id\": \"m-t1\",\n            \"title\": \"What is Software Testing?\",\n            \"subtopics\": [\"Definition & Goals\", \"Verification vs Validation\"],\n            \"resources\": []\n          }\n        ]\n      }\n    ]\n  }\n}"
+            },
+            "description": "Upserts a syllabus for the session user.\n\nPath param: syllabusId (e.g. 'manual', 'automation', 'playwright', 'api')\nBody: { data: <full syllabus object> }\n\nThe data field is stored as JSON — no field-level validation on the syllabus shape."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"data required\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Activity Log",
+      "description": "Append-only activity log entries.",
+      "item": [
+        {
+          "name": "POST Activity Log Entry",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/api/tracker/log",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"entry\": {\n    \"date\": \"2026-03-25\",\n    \"topicId\": \"m-t1\",\n    \"syllabusId\": \"manual\",\n    \"action\": \"completed\"\n  }\n}"
+            },
+            "description": "Appends a single activity log entry.\n\nRequired: entry.date, entry.action\nOptional: entry.topicId, entry.syllabusId\n\naction values: 'completed' | 'uncompleted' | 'note_added' (or any string)\n\nNote: append-only, no dedup. Do not call repeatedly for the same event."
+          },
+          "response": [
+            {
+              "name": "200 OK",
+              "status": "OK",
+              "code": 200,
+              "body": "{ \"ok\": true }"
+            },
+            {
+              "name": "400 Bad Request",
+              "status": "Bad Request",
+              "code": 400,
+              "body": "{ \"error\": \"entry.date and entry.action required\" }"
+            },
+            {
+              "name": "401 Unauthorized",
+              "status": "Unauthorized",
+              "code": 401,
+              "body": "{ \"error\": \"Unauthorized\" }"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
