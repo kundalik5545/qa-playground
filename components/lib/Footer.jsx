@@ -21,7 +21,7 @@ const platformLinks = [
       "bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400",
   },
   {
-    href: "/study-tracker",
+    href: "/study-tracker/dashboard",
     label: "Study Tracker",
     icon: <BookOpen className="h-3.5 w-3.5" />,
     badge: "New",

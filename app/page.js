@@ -243,7 +243,7 @@ const LandingPage = () => {
                 progress charts and daily activity logs.
               </p>
               <Link
-                href="/study-tracker"
+                href="/study-tracker/dashboard"
                 aria-label="Open the QA Study Tracker"
               >
                 <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
@@ -297,7 +297,7 @@ const LandingPage = () => {
               </ul>
 
               <Link
-                href="/study-tracker"
+                href="/study-tracker/dashboard"
                 aria-label="Open the QA Study Tracker dashboard"
               >
                 <Button

@@ -31,7 +31,7 @@ export default function LoginPage() {
       if (session.user.role === "ADMIN") {
         router.replace("/admin/dashboard");
       } else {
-        router.replace("/study-tracker");
+        router.replace("/study-tracker/dashboard");
       }
     }
   }, [session, router]);
@@ -56,7 +56,7 @@ export default function LoginPage() {
     if (data?.user?.role === "ADMIN") {
       router.push("/admin/dashboard");
     } else {
-      router.push("/study-tracker");
+      router.push("/study-tracker/dashboard");
     }
 
     setLoading(false);

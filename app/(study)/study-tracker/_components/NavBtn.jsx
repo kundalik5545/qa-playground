@@ -1,24 +1,20 @@
-import React from "react";
+"use client";
 
-const NavBtn = ({ id, label, icon, active, onClick, badge, badgeStyle }) => {
+import Link from "next/link";
+
+export default function NavBtn({ href, label, icon, pathname, badge, badgeStyle }) {
+  const active = pathname === href || pathname.startsWith(href + "/");
   return (
-    <div>
-      <li>
-        <button
-          className={`st-nav-btn${active === id ? " active" : ""}`}
-          onClick={() => onClick(id)}
-        >
-          <span className="st-nav-icon">{icon}</span>
-          <span className="st-nav-label">{label}</span>
-          {badge && (
-            <span className="st-nav-badge" style={badgeStyle}>
-              {badge}
-            </span>
-          )}
-        </button>
-      </li>
-    </div>
+    <li>
+      <Link href={href} className={`st-nav-btn${active ? " active" : ""}`}>
+        <span className="st-nav-icon">{icon}</span>
+        <span className="st-nav-label">{label}</span>
+        {badge && (
+          <span className="st-nav-badge" style={badgeStyle}>
+            {badge}
+          </span>
+        )}
+      </Link>
+    </li>
   );
-};
-
-export default NavBtn;
+}

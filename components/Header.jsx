@@ -11,7 +11,7 @@ import Image from "next/image";
 const Header = () => {
   const mainNavLinks = [
     { to: "/", text: "Home" },
-    { to: "/study-tracker", text: "Study Tracker", badge: "New" },
+    { to: "/study-tracker/dashboard", text: "Study Tracker", badge: "New" },
     { to: "/bank", text: "Bank" },
     { to: "/practice", text: "Practice" },
     { to: "/blog", text: "Blog" },

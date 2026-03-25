@@ -669,7 +669,7 @@ export default function SiteAlertsAdminPage() {
       return;
     }
     if (session.user?.role !== "ADMIN") {
-      router.replace("/study-tracker");
+      router.replace("/study-tracker/dashboard");
     }
   }, [session, isPending, router]);
 

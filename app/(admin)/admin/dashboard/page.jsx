@@ -27,7 +27,7 @@ export default function AdminDashboardPage() {
       return;
     }
     if (session.user?.role !== "ADMIN") {
-      router.replace("/study-tracker");
+      router.replace("/study-tracker/dashboard");
     }
   }, [session, isPending, router]);
 

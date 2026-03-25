@@ -183,7 +183,7 @@ export default function QaToolsPage() {
           </div>
           <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
             <Link
-              href="/study-tracker"
+              href="/study-tracker/dashboard"
               style={{
                 padding: "9px 18px",
                 borderRadius: 8,

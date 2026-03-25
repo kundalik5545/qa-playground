@@ -239,7 +239,7 @@ export default function PromptPageContent() {
       >
         {/* Back link */}
         <Link
-          href="/study-tracker"
+          href="/study-tracker/dashboard"
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -567,7 +567,7 @@ export default function PromptPageContent() {
               ⬇ JSON → File Converter
             </Link>
             <Link
-              href="/study-tracker"
+              href="/study-tracker/dashboard"
               style={{
                 display: "inline-flex",
                 alignItems: "center",

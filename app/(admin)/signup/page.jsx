@@ -32,7 +32,7 @@ export default function SignUpPage() {
       if (session.user.role === "ADMIN") {
         router.replace("/admin/dashboard");
       } else {
-        router.replace("/study-tracker");
+        router.replace("/study-tracker/dashboard");
       }
     }
   }, [session, router]);
@@ -55,7 +55,7 @@ export default function SignUpPage() {
     }
 
     // New users are always USER role — redirect to study tracker
-    router.push("/study-tracker");
+    router.push("/study-tracker/dashboard");
     setLoading(false);
   };
 
