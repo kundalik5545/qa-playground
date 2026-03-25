@@ -81,6 +81,7 @@ const SheetOpen = ({ children }) => {
                   <Link
                     key={link.href}
                     href={link.href}
+                    prefetch={false}
                     aria-label={link.altText}
                     onClick={handleNavigationClick}
                   >

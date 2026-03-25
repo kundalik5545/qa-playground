@@ -1,5 +1,4 @@
 import HeroSection from "@/components/hero";
-import SiteAlertPopup from "@/components/SiteAlertPopup";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -526,7 +525,6 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <SiteAlertPopup />
     </div>
   );
 };

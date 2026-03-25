@@ -45,7 +45,7 @@ const Header = () => {
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-4">
           {mainNavLinks.map(({ to, text, badge }, index) => (
-            <Link key={index} href={to}>
+            <Link key={index} href={to} prefetch={false}>
               <Button
                 variant="ghost"
                 className="hover:bg-gray-200 dark:hover:bg-gray-700 relative"
