@@ -99,7 +99,7 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
               <Link href="/study-tracker/ai-syllabus-prompt">✦ AI Prompt</Link>
             </Button>
             <Button size="sm" asChild className="bg-[#f0fdf4] text-green-600 border border-[#bbf7d0] hover:bg-[#dcfce7]" title="Paste AI-generated JSON and download it as a .json file">
-              <Link href="/qa-tools/json-to-file">⬇ JSON → File</Link>
+              <Link href="/qa-tools/json-to-file" prefetch={false}>⬇ JSON → File</Link>
             </Button>
             <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white" onClick={() => setShowNewForm((v) => !v)}>+ New Syllabus</Button>
           </div>

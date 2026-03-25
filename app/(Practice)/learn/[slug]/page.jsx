@@ -1,11 +1,7 @@
-import { Badge } from "@/components/ui/badge";
 import { basicDetails } from "@/data/BasicSetting";
-import { cn } from "@/lib/utils";
 import { transformerCopyButton } from "@rehype-pretty/transformers";
 import fs from "fs";
 import matter from "gray-matter";
-import { Calendar } from "lucide-react";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 import path from "path";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
@@ -27,9 +23,9 @@ const componentMapping = {
   "logical-programs-list-to-crack-interviews": LogicalProgramsTable,
 };
 
-// Fetch all blog slugs dynamically
+// Fetch all learn slugs dynamically
 export async function generateStaticParams() {
-  const postsDirectory = path.join(process.cwd(), "Blog/AutomationBlog");
+  const postsDirectory = path.join(process.cwd(), "Blog/learn");
   return fs.readdirSync(postsDirectory).map((filename) => ({
     slug: filename.replace(/\.md$/, ""),
   }));
@@ -40,7 +36,7 @@ export async function generateMetadata({ params }) {
   const { slug } = params;
   const filePath = path.join(
     process.cwd(),
-    "Blog/AutomationBlog",
+    "Blog/learn",
     `${slug}.md`
   );
 
@@ -65,14 +61,10 @@ export async function generateMetadata({ params }) {
   };
 }
 
-// Blog Post Component
+// Learn Page Component
 const LearnMainPage = async ({ params }) => {
   const { slug } = params;
-  const filePath = path.join(
-    process.cwd(),
-    "Blog/AutomationBlog",
-    `${slug}.md`
-  );
+  const filePath = path.join(process.cwd(), "Blog/learn", `${slug}.md`);
 
   if (!fs.existsSync(filePath)) return notFound();
 
@@ -105,60 +97,21 @@ const LearnMainPage = async ({ params }) => {
 
     return (
       <div className="container mx-auto px-4 lg:px-8">
-        {data.isBlog === "Yes" ? (
-          <>
-            {/* Blog Header */}
-            <header className="max-w-5xl mx-auto text-start text-foreground bg-background py-6">
-              <h1 className="text-3xl sm:text-4xl font-semibold  pb-2">
-                {data.title}
-              </h1>
-              <div className="flex flex-wrap justify-start items-center gap-3 text-sm mt-2 pb-2">
-                <Badge className="px-2 py-1">By {data.author || "Admin"}</Badge>
-                <p className="flex items-center gap-1">
-                  <Calendar size={18} />
-                  {new Date(data.date).toLocaleDateString("en-GB", {
-                    day: "2-digit",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </p>
-              </div>
-              <hr className="" />
-            </header>
-
-            {/* Blog Image */}
-            {data.image && (
-              <div className="flex justify-center mb-6">
-                <Image
-                  src={data.image}
-                  alt={data.title}
-                  width={800}
-                  height={400}
-                  className="rounded-lg shadow-lg w-full max-w-2xl object-cover"
-                  priority
-                />
-              </div>
-            )}
-          </>
-        ) : (
-          <>
-            {/* Main Playground */}
-            <section
-              className={cn("pb-20", data?.isBlog === "Yes" && "hidden")}
-            >
-              {DynamicComponent && <DynamicComponent />}
-            </section>
-          </>
+        {/* Interactive component (e.g. CoursesPage, LogicalProgramsTable) */}
+        {DynamicComponent && (
+          <section className="pb-20">
+            <DynamicComponent />
+          </section>
         )}
 
-        {/* Blog Content */}
+        {/* Markdown content */}
         <article className="prose dark:prose-invert max-w-5xl mx-auto">
           <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
         </article>
       </div>
     );
   } catch (error) {
-    console.error("Error reading blog post:", error);
+    console.error("Error reading learn page:", error);
     return notFound();
   }
 };

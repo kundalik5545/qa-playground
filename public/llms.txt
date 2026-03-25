@@ -1,0 +1,54 @@
+# QA Playground — llms.txt
+# https://www.qaplayground.com
+
+> QA Playground is a free educational platform for QA automation engineers to learn and practice browser automation testing using Selenium, Playwright, and Cypress.
+
+## What this site is
+
+- 22+ interactive UI elements for automation practice (inputs, tables, modals, drag-drop, file upload, calendar, alerts, iframes, shadow DOM, etc.)
+- A simulated Bank Demo App for end-to-end automation scenarios (login, accounts, transactions)
+- A QA Study Tracker for tracking learning progress across syllabi and daily logs
+- Blog and tutorials focused on QA automation testing
+- Free QA tools (JSON to file converter, more coming soon)
+
+## Primary audience
+
+QA automation engineers, manual testers learning automation, developers writing end-to-end tests.
+
+## Blog posts (most useful for reference)
+
+- https://www.qaplayground.com/blog/how-to-write-effective-test-cases-with-real-world-examples
+- https://www.qaplayground.com/blog/top-10-best-automation-practice-website
+- https://www.qaplayground.com/blog/top-10-best-chrome-extension-for-automation-tester
+- https://www.qaplayground.com/blog/lessons-i-learn-while-creating-qaplayground
+
+## Practice pages (interactive automation testing elements)
+
+- https://www.qaplayground.com/practice/input
+- https://www.qaplayground.com/practice/button
+- https://www.qaplayground.com/practice/select
+- https://www.qaplayground.com/practice/alert
+- https://www.qaplayground.com/practice/radio
+- https://www.qaplayground.com/practice/window
+- https://www.qaplayground.com/practice/waits
+- https://www.qaplayground.com/practice/simple-table
+- https://www.qaplayground.com/practice/advance-table
+- https://www.qaplayground.com/practice/calendar
+- https://www.qaplayground.com/practice/forms
+- https://www.qaplayground.com/practice/upload-download
+- https://www.qaplayground.com/practice/multi-select
+- https://www.qaplayground.com/practice/links
+- https://www.qaplayground.com/practice/frame
+- https://www.qaplayground.com/practice/elements
+
+## Other useful pages
+
+- https://www.qaplayground.com/practice — full list of all practice elements
+- https://www.qaplayground.com/bank — Bank Demo App for end-to-end test practice
+- https://www.qaplayground.com/qa-tools — free tools for QA engineers
+- https://www.qaplayground.com/study-tracker — QA study progress tracker
+
+## Do not index
+
+/admin/*
+/api/*

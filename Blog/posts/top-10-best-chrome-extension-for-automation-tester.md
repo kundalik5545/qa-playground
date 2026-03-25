@@ -1,13 +1,16 @@
 ---
-id: 3
-title: Top 10 best chrome extension for automation tester
-description: "top 10 chrome extension to increase productivity by 10X. These extension are very usefull during your daily testing work."
-author: random coders
-date: 18 march 2025
-keywords: "button, right click using selenium, double click using selenium"
-slug: top-10-best-chrome-extension-for-automation-tester
-image: "/Images/blogs/id-02-people-in-meeting-with-laptop.webp"
-isBlog: Yes
+title: "Top 10 Chrome Extensions for Automation Testers (2025)"
+description: "Top 10 Chrome extensions to increase QA productivity by 10X. These extensions are very useful during daily automation and manual testing work."
+author: "Kundalik Jadhav"
+authorUrl: "https://www.qaplayground.com/about-me"
+date: "2025-03-18"
+lastModified: "2025-03-18"
+category: ["automation", "tools"]
+keywords: "chrome extensions for testers, automation tester tools, selenium chrome extensions, QA productivity tools"
+slug: "top-10-best-chrome-extension-for-automation-tester"
+image: "https://ik.imagekit.io/randomcoder/QAPlayground/id-02-people-in-meeting-with-laptop.webp"
+imageAlt: "Chrome extensions for automation testing"
+draft: false
 ---
 
 ## Introduction

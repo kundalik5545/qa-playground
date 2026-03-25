@@ -446,6 +446,7 @@ export default function PromptPageContent() {
           <div className="mt-4 flex gap-3 justify-end flex-wrap">
             <Link
               href="/qa-tools/json-to-file"
+              prefetch={false}
               className="inline-flex items-center gap-1.5 px-[18px] py-[9px] rounded-lg bg-[#f0fdf4] text-emerald-600 border border-[#bbf7d0] text-[0.84rem] font-semibold no-underline hover:bg-[#dcfce7] transition-colors"
             >
               ⬇ JSON → File Converter

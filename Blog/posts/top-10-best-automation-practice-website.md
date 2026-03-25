@@ -1,13 +1,16 @@
 ---
-id: 1
-title: Top 10 best automation practice website
-description: "Boost your skills with the best automation practice websites! Perfect for all levels, these sites offer real-world challenges. Click now to elevate your expertise!"
-author: random coders
-date: 8 march 2025
-keywords: "button, right click using selenium, double click using selenium"
-slug: top-10-best-automation-practice-website
-image: "/Images/blogs/id_01 Top 10 best automation practice websites.webp"
-isBlog: Yes
+title: "Top 10 Best Automation Practice Websites for QA Engineers"
+description: "Boost your skills with the best automation practice websites! Perfect for all levels, these sites offer real-world challenges for Selenium, Playwright, and Cypress practice."
+author: "Kundalik Jadhav"
+authorUrl: "https://www.qaplayground.com/about-me"
+date: "2025-03-08"
+lastModified: "2025-03-08"
+category: ["automation", "selenium", "playwright"]
+keywords: "automation practice website, selenium practice site, playwright practice, best QA practice websites"
+slug: "top-10-best-automation-practice-website"
+image: "https://ik.imagekit.io/randomcoder/QAPlayground/id-02-people-in-meeting-with-laptop.webp"
+imageAlt: "Top automation practice websites for QA engineers"
+draft: false
 ---
 
 ## Introduction

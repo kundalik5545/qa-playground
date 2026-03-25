@@ -56,7 +56,7 @@ const componentMapping = {
 
 // Fetch all blog slugs dynamically
 export async function generateStaticParams() {
-  const postsDirectory = path.join(process.cwd(), "Blog/ElementBlogs");
+  const postsDirectory = path.join(process.cwd(), "Blog/elements");
   return fs.readdirSync(postsDirectory).map((filename) => ({
     slug: filename.replace(/\.md$/, ""),
   }));
@@ -65,7 +65,7 @@ export async function generateStaticParams() {
 // Generate dynamic metadata for SEO
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const filePath = path.join(process.cwd(), "Blog/ElementBlogs", `${slug}.md`);
+  const filePath = path.join(process.cwd(), "Blog/elements", `${slug}.md`);
 
   if (!fs.existsSync(filePath)) return notFound();
 
@@ -91,7 +91,7 @@ export async function generateMetadata({ params }) {
 // Blog Post Component
 const PracticePage = async ({ params }) => {
   const { slug } = await params;
-  const filePath = path.join(process.cwd(), "Blog/ElementBlogs", `${slug}.md`);
+  const filePath = path.join(process.cwd(), "Blog/elements", `${slug}.md`);
 
   if (!fs.existsSync(filePath)) return notFound();
 
