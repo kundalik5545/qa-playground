@@ -96,6 +96,13 @@ export default function RootLayout({ children }) {
           data-settings-id="RCGf52YH07pmK7"
           async
         ></script>
+
+        {/* Umami Script */}
+        <script
+          defer
+          src="https://cloud.umami.is/script.js"
+          data-website-id="b5f3d51f-b071-48a6-a70b-2346af1f7625"
+        ></script>
       </head>
 
       <body className={inter.className}>

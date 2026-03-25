@@ -6,6 +6,7 @@
 - feat/site-alert
 - feat/localstorage-sync
 - feat/css-migration-to-tailwindcss
+- feat/user-activity-track
 
 ## Fonts used in study-tracker
 
