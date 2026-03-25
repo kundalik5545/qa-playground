@@ -122,7 +122,7 @@ export default function RootLayout({ children }) {
           <SiteAlertPopup />
 
           {/* Toaster Notifications */}
-          <Toaster richColors />
+          <Toaster richColors position="bottom-center" />
 
           {/* Vercel Analytics */}
           <Analytics />

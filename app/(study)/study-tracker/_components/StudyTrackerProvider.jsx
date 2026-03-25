@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from "react";
+import { toast as sonnerToast } from "sonner";
 import {
   loadAllState,
   saveKey,
@@ -19,7 +20,6 @@ export const useTracker = () => useContext(StudyTrackerContext);
 
 export default function StudyTrackerProvider({ children }) {
   const [state, setState] = useState(null);
-  const [toast, setToast] = useState({ msg: "", show: false, error: false });
   const { data: session } = authClient.useSession();
   const user = session?.user;
   const syncTimers = useRef({});
@@ -67,8 +67,8 @@ export default function StudyTrackerProvider({ children }) {
   }, [user?.id]);
 
   const showToast = useCallback((msg, isError = false) => {
-    setToast({ msg, show: true, error: isError });
-    setTimeout(() => setToast((t) => ({ ...t, show: false })), 3000);
+    if (isError) sonnerToast.error(msg);
+    else sonnerToast.success(msg);
   }, []);
 
   // Debounced DB write — progress/subtopics: 1s, syllabi: 2s, others: immediate
@@ -197,11 +197,6 @@ export default function StudyTrackerProvider({ children }) {
       }}
     >
       {children}
-
-      {/* Toast — migrated to sonner in Phase 5 */}
-      <div className={`st-toast${toast.show ? " show" : ""}${toast.error ? " error" : ""}`}>
-        {toast.msg}
-      </div>
     </StudyTrackerContext.Provider>
   );
 }

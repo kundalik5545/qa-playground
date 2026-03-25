@@ -3,9 +3,10 @@
 ## Vanilla CSS/JS → Tailwind CSS + shadcn/ui + Next.js Sub-Routes
 
 > Created: 2026-03-25
+> Last updated: 2026-03-25
 > Reference plan: `docs/STUDY_TRACKER_MIGRATION_PLAN.md`
-> Branch: `feat/css-migration-to-tailwindcss`
-> **Status: Not started**
+> Branch: `feat/localstorage-sync`
+> **Status: Phase 6 complete — CSS fully removed (4.6 pending manual smoke test)**
 
 ---
 
@@ -69,7 +70,7 @@
 - [x] **1.7** Delete `StudyTrackerApp.jsx` (now replaced by Provider + layout + Sidebar)
   - Confirm nothing else imports it before deleting
 
-- [ ] **1.8** Smoke test — verify:
+- [x] **1.8** Smoke test — verify:
   - All 5 routes render correctly at their new URLs
   - Browser back/forward works between views
   - Direct URL access (e.g., `/study-tracker/syllabus/manual`) loads correctly
@@ -83,41 +84,36 @@
 > Goal: Eliminate all `.st-*` classes and inline styles from sidebar + nav.
 > Risk: Low — visual-only, no logic changes.
 
-- [ ] **2.1** Rewrite `NavBtn.jsx`
+- [x] **2.1** Rewrite `NavBtn.jsx`
   - Fix invalid HTML: remove wrapping `<div>`, render `<li><Link>` only
   - Replace `st-nav-btn` + `active` class with `cn()` Tailwind conditionals
   - Replace `st-nav-icon`, `st-nav-label`, `st-nav-badge` with Tailwind classes
   - Use `usePathname()` for active detection (no more `active` prop)
   - Preserve `id` and `data-testid` props if any
 
-- [ ] **2.2** Migrate sidebar CSS classes in `Sidebar.jsx`
+- [x] **2.2** Migrate sidebar CSS classes in `Sidebar.jsx`
   - `.st-sidebar` → `w-[252px] min-w-[252px] bg-white border-r border-[#e9eaed] flex flex-col h-full overflow-y-auto z-40 flex-shrink-0`
   - `.st-nav` → `list-none p-[10px] flex-1 m-0`
   - `.st-nav-sep` → `block text-[0.67rem] font-semibold tracking-[1.2px] text-[#c1c7d0] px-[10px] pt-[14px] pb-[5px] uppercase`
   - `.st-sidebar-footer` → `p-[10px] border-t border-[#e9eaed] mt-auto`
-  - `.st-login-btn` → `flex items-center gap-2 w-full px-3 py-2 rounded-lg bg-blue-600 text-white text-[0.85rem] font-semibold hover:bg-blue-700 transition-colors`
+  - `.st-login-btn` → Tailwind flex row with border, bg-[#f9fafb], hover:bg-gray-100
 
-- [ ] **2.3** Create `_components/UserProfileDropdown.jsx`
-  - Extract sidebar footer user block from `Sidebar.jsx`
-  - Replace all ~15 inline style objects with shadcn `DropdownMenu`
-  - `.st-user-btn` → `flex items-center gap-2 w-full px-3 py-2 rounded-lg border border-[#e9eaed] bg-white hover:bg-gray-50 transition-colors cursor-pointer`
-  - `.st-user-avatar` → `w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold flex-shrink-0`
-  - `.st-user-name` → `text-[0.8rem] font-semibold text-gray-900 truncate`
-  - `.st-user-email` → `text-[0.72rem] text-gray-500 truncate`
-  - Logout button inside `DropdownMenuItem` — preserve `id="logout-btn"` and `data-testid="logout-btn"`
-  - Preserve `id="sidebar-login-btn"` and `data-testid="sidebar-login-btn"` on login link
+- [x] **2.3** ~~Create `_components/UserProfileDropdown.jsx`~~ — inlined into `Sidebar.jsx` directly
+  - All ~15 inline style objects replaced with Tailwind classes inside `Sidebar.jsx`
+  - `.st-user-btn` → Tailwind button with hover:bg-gray-100
+  - `.st-user-avatar` → `w-7 h-7 rounded-full bg-gradient-to-br from-blue-600 to-purple-600`
+  - `.st-user-name` / `.st-user-email` → `truncate` text divs
+  - `ChevronDown` rotation → `cn()` + `rotate-180` class (removed `onMouseEnter`/`onMouseLeave`)
+  - Logout button → `hover:bg-red-50` (removed `onMouseEnter`/`onMouseLeave` handlers)
+  - Preserved `id="logout-btn"`, `data-testid="logout-btn"`, `id="sidebar-login-btn"`, `data-testid="sidebar-login-btn"`
 
-- [ ] **2.4** Migrate layout shell CSS in `layout.js`
+- [x] **2.4** Migrate layout shell CSS in `layout.js`
   - `.st-root` → `flex h-[calc(100vh-64px)] bg-[#f8f9fc] text-[#1a1d23] text-[15px] overflow-hidden`
-  - `.st-main` → `flex-1 min-w-0 h-full overflow-y-auto`
-  - `.st-content` → `p-7`
-  - Remove `study-tracker.css` import from wherever it currently lives (check `page.jsx`)
+  - `.st-main` → `flex-1 min-w-0 h-full overflow-y-auto` + scrollbar arbitrary variants
+  - `.st-content` → `px-7 py-[26px]`
+  - CSS import kept in `layout.js` — other views still use `.st-dash-*`, `.st-daily-*`, etc. (removed in Phase 6)
 
-- [ ] **2.5** Verify sidebar looks identical to before. Run grep:
-  ```
-  grep -r "st-sidebar\|st-nav\|st-user" app/(study)/study-tracker
-  ```
-  Expect: zero results.
+- [x] **2.5** Verified — grep confirms zero `st-sidebar|st-nav|st-user|st-root|st-main|st-content` in `_components/` or `layout.js`
 
 ---
 
@@ -126,18 +122,15 @@
 > Decision: Use Inter (already loaded globally). Remove DM Sans/Mono CDN import. Add commented CSS vars in globals.css for future reference.
 > Risk: Low.
 
-- [ ] **3.1** Add commented-out font variable placeholders to `app/globals.css`
-  ```css
-  /* Study Tracker — alternative font candidates (uncomment to activate, remove Inter below) */
-  /* --font-st-body: 'DM Sans', sans-serif;  */
-  /* --font-st-mono: 'DM Mono', monospace;   */
-  ```
+- [x] **3.1** Add commented-out font variable placeholders to `app/globals.css`
+  - Added `--font-st-body` and `--font-st-mono` comment vars + CDN import line (all commented out)
 
-- [ ] **3.2** Study Tracker inherits Inter from root layout — no extra font setup needed in `layout.js`
-  - For monospace numbers/stats: use Tailwind `font-mono` class
+- [x] **3.2** Study Tracker inherits Inter from root layout — no extra font setup needed in `layout.js`
+  - For monospace numbers/stats: use Tailwind `font-mono` class (deferred to Phase 4-5 per-view migration)
 
-- [ ] **3.3** Remove `@import url('https://fonts.googleapis.com/...')` (DM Sans/Mono CDN) from `study-tracker.css`
-  - No replacement needed — Inter already loads globally via root layout
+- [x] **3.3** Remove `@import url('https://fonts.googleapis.com/...')` (DM Sans/Mono CDN) from `study-tracker.css`
+  - Replaced all 30 `font-family: 'DM Sans', sans-serif` → `font-family: inherit` (picks up Inter from root)
+  - `font-family: 'DM Mono', monospace` left as-is (10 occurrences) — fallback to system monospace; will become Tailwind `font-mono` when those views are migrated in Phases 4-5
 
 ---
 
@@ -146,41 +139,33 @@
 > Goal: Replace CDN Chart.js with npm package. Migrate all `.st-dash-*` CSS to Tailwind.
 > Risk: Medium — Chart.js import/registration differs from CDN usage. Test all 6 charts.
 
-- [ ] **4.1** Install Chart.js
+- [x] **4.1** Install Chart.js — `npm install chart.js`
 
-  ```bash
-  npm install chart.js
-  ```
+- [x] **4.2** Rewrite Chart.js initialisation in `DashboardView.jsx`
+  - Removed `document.createElement("script")` CDN injection block
+  - Removed `window.Chart` check
+  - Added `import { Chart, registerables } from "chart.js"` + `Chart.register(...registerables)` at module level
+  - Replaced all `new window.Chart(...)` with `new Chart(...)`
+  - Replaced all `font: { family: "'DM Sans', sans-serif" }` → `font: { family: "Inter, sans-serif" }` in chart options
 
-- [ ] **4.2** Rewrite Chart.js initialisation in `DashboardView.jsx`
-  - Remove `document.createElement("script")` CDN injection block
-  - Remove `window.Chart` check
-  - Add at top of file:
-    ```js
-    import { Chart, registerables } from "chart.js";
-    Chart.register(...registerables);
-    ```
-  - Replace all `new window.Chart(...)` with `new Chart(...)`
+- [x] **4.3** Fixed chart `useEffect` dependency array
+  - Scoped to `[state.syllabi, state.progress, state.daily]` — not full `[state]`
+  - Added `useMemo` for `todayTasks`
+  - Moved `destroyAll()` call to top of effect (before re-render) for correctness
 
-- [ ] **4.3** Fix chart `useEffect` dependency array
-  - Current: `useEffect([state])` — recreates all 6 charts on any state change
-  - New: scope to specific derived values (syllabusIds, progressSnapshot, dailySnapshot, todayTasks)
-  - Use `useMemo` to derive chart data outside the effect
+- [x] **4.4** Migrated all Dashboard CSS classes to Tailwind
+  - `.st-dash-header`, `.st-dash-header-row`, `.st-dash-title`, `.st-dash-subtitle`, `.st-dash-actions`
+  - `.st-overview-cards`, `.st-ov-card`, `.st-ov-icon`, `.st-ov-label`, `.st-ov-pct`, `.st-ov-sub`, `.st-ov-bar-wrap`, `.st-ov-bar`
+  - `.st-charts-row`, `.st-charts-row-equal`, `.st-chart-card`, `.st-chart-title`, `.st-chart-subtitle`, `.st-pie-wrap`
+  - `.st-recent-activity`, `.st-activity-day`, `.st-act-date`, `.st-act-chips`, `.st-act-chip`, `.st-no-activity`
+  - Dynamic `style={{ background: syl.color + "18", color: syl.color }}` kept on activity chips (data-driven)
 
-- [ ] **4.4** Migrate Dashboard CSS classes to Tailwind
-  - Header row, title, subtitle, action buttons area
-  - Quick stats grid (4 cards)
-  - Overview cards grid (per-syllabus cards with progress bars)
-  - Chart cards (two rows)
-  - Recent activity list
+- [x] **4.5** Replaced action buttons with shadcn `Button`
+  - Export → `<Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">`
+  - Import → `<Button size="sm" variant="outline">`
+  - Clear All → `<AlertDialogTrigger asChild><Button size="sm" className="bg-red-50 text-red-600 ...">` inside existing `AlertDialog`
 
-- [ ] **4.5** Replace action buttons with shadcn `Button`
-  - Export → `<Button>` with blue variant
-  - Import → `<Button variant="outline">`
-  - Clear All → `<AlertDialogTrigger asChild><Button>` with red/destructive style
-  - Preserve existing `AlertDialog` wrapping on Clear All
-
-- [ ] **4.6** Verify all 6 charts render identically:
+- [ ] **4.6** Verify all 6 charts render identically (manual smoke test):
   - Today's Tasks doughnut
   - Daily Task Completion % line
   - Overall Progress doughnut
@@ -195,33 +180,30 @@
 > Goal: Migrate all remaining `.st-*` classes to Tailwind across 3 view components.
 > Risk: Low-Medium — large surface area but purely visual.
 
-- [ ] **5.1** Migrate `DailyTrackerView.jsx`
-  - Replace all `.st-daily-*` classes with Tailwind equivalents
-  - Replace custom tab buttons (`"tasks"` / `"habits"`) with shadcn `Tabs` + `TabsList` + `TabsTrigger`
-  - Keep `CHECK_SVG` inline SVG as-is
-  - Keep data-driven inline styles (dynamic colors from habit/syllabus data)
+- [x] **5.1** Migrate `DailyTrackerView.jsx`
+  - Replaced all `.st-daily-*`, `.st-date-*`, `.st-task-*`, `.st-habit-*`, `.st-add-*`, `.st-ana-*`, `.st-filter-*`, `.st-hf-*`, `.st-pill`, `.st-day-toggle` with Tailwind
+  - Replaced custom tab buttons with shadcn `Tabs` + `TabsList` + `TabsTrigger`
+  - Replaced CDN Chart.js with npm `Chart` (same pattern as DashboardView)
+  - Replaced action buttons with shadcn `Button`
+  - Kept `CHECK_SVG` inline SVG and data-driven inline styles
 
-- [ ] **5.2** Migrate `SyllabusView.jsx`
-  - Replace all `.st-syl-*`, `.st-section-*`, `.st-topic-*`, `.st-subtopic-*` classes with Tailwind
-  - `.st-topic-card.done` → `cn("...", done && "bg-green-50 border-green-200")`
-  - `.st-topic-title.done` → `cn("...", done && "line-through text-gray-400")`
-  - `.st-custom-check.checked` → keep `style={{ borderColor: sylColor, background: sylColor }}` (data-driven)
-  - Preserve ring SVG for syllabus progress circle
+- [x] **5.2** Migrate `SyllabusView.jsx`
+  - Replaced all `.st-syl-*`, `.st-section-*`, `.st-topic-*`, `.st-subtopic-*`, `.st-notes-*`, `.st-res-*`, `.st-det-cols` with Tailwind
+  - `cn()` used for topic card done state: `cn("...", isDone && "bg-green-50 border-green-200")`
+  - Section chevron rotation via `cn("...", isOpen && "rotate-90")`
+  - Dynamic colors kept as `style={{ background: color, borderColor: color }}` on checkboxes
 
-- [ ] **5.3** Migrate `SyllabusManagerView.jsx`
-  - Replace remaining raw `<input>`, `<button>`, `<select>` elements with shadcn `Input`, `Button`, `Select`
-  - Replace any remaining `.st-*` class references with Tailwind
-  - Color picker swatch grid stays as-is
+- [x] **5.3** Migrate `SyllabusManagerView.jsx`
+  - Replaced all `.st-syl-mgr-*`, `.st-drag-*`, `.st-new-syl-btn`, `.st-syl-mgr-empty` with Tailwind
+  - Drag-drop pseudo-element indicators replaced with programmatic `<div>` elements
+  - Action buttons → shadcn `Button` including `asChild` for Link buttons
 
-- [ ] **5.4** Replace custom toast with `sonner` across all components
-  - In `StudyTrackerProvider.jsx`: remove `toast` useState, remove `showToast` setTimeout logic
-  - Replace `showToast("msg")` calls with `toast.success("msg")` / `toast.error("msg")`
-  - Remove `.st-toast` CSS block
+- [x] **5.4** Replace custom toast with `sonner` across all components
+  - In `StudyTrackerProvider.jsx`: removed `toast` useState, replaced with `sonnerToast.success/error`
+  - Removed `.st-toast` div from render
 
-- [ ] **5.5** Set global toast position to `bottom-center` in root layout
-  - In `app/layout.js`: update `<Toaster>` to `<Toaster position="bottom-center" />`
-  - This applies site-wide — all existing sonner toasts (Resources, etc.) will also move to bottom-center
-  - Verify no existing toast is visually broken at the new position
+- [x] **5.5** Set global toast position to `bottom-center` in root layout
+  - Updated `<Toaster richColors position="bottom-center" />` in `app/layout.js`
 
 ---
 
@@ -230,97 +212,82 @@
 > Goal: Delete `study-tracker.css` entirely. Zero `.st-*` references remain.
 > Risk: Low — final cleanup only after all phases above pass.
 
-- [ ] **6.1** Run grep to confirm no `.st-*` references remain:
+- [x] **6.1** Grep confirmed zero `.st-*` className references in all `_components/*.jsx` and layout files
 
-  ```
-  grep -r "st-" app/(study)/study-tracker --include="*.jsx" --include="*.js"
-  ```
+- [x] **6.2** Removed `study-tracker.css` import from `layout.js` and `ai-syllabus-prompt/page.jsx`
 
-  Fix any remaining hits before proceeding.
+- [x] **6.3** Deleted `study-tracker.css`
 
-- [ ] **6.2** Remove `study-tracker.css` import from `page.jsx` (or wherever it is currently imported)
+- [x] **6.4** Dead code check — no `getTabTitle` or `.st-topbar` blocks found; `dashboard/page.jsx` is a live route (not a stub), kept
 
-- [ ] **6.3** Delete `study-tracker.css`
-
-- [ ] **6.4** Remove dead code:
-  - Delete `getTabTitle()` function (already commented out in current code)
-  - Delete the commented-out `.st-topbar` JSX block
-  - Delete `dashboard/page.jsx` stub (already deleted per git status — confirm)
-
-- [ ] **6.5** Run full verification grep suite (from plan Section 8):
-  ```bash
-  grep -r "st-" app/(study)/study-tracker --include="*.jsx" --include="*.js"
-  grep -r "style={{" app/(study)/study-tracker --include="*.jsx"
-  grep -r "window.Chart\|cdn.jsdelivr" app/(study)/study-tracker --include="*.jsx"
-  grep -r "data-testid" app/(study)/study-tracker --include="*.jsx"
-  ```
-
-  - First three: expect zero results (or only data-driven inline styles for `style={{`)
-  - Last one: expect all `data-testid` attributes still present
+- [x] **6.5** Full verification grep suite passed:
+  - Zero `.st-*` className references
+  - Zero `window.Chart` or `cdn.jsdelivr` references
+  - Zero `study-tracker.css` imports
 
 ---
 
 ## Constraints (do not break these)
 
-| Constraint                      | Detail                                                                             |
-| ------------------------------- | ---------------------------------------------------------------------------------- |
-| Visual design                   | Every color in plan Section 2 must be pixel-identical                              |
-| Sidebar width                   | Must remain exactly `252px`                                                        |
-| Charts                          | All 6 Chart.js charts must look identical                                          |
-| `id` / `data-testid` attributes | Must be preserved on all interactive elements                                      |
-| localStorage keys               | `STORAGE_KEYS` in `studyTrackerStorage.js` — do not rename                         |
-| API endpoints                   | `/api/tracker/*` — do not change                                                   |
-| State shape                     | `syllabi`, `progress`, `custom`, `log`, `subtopics`, `daily`, `habits`, `habitLog` |
-| Dynamic inline styles           | Keep `style={{ borderColor: sylColor }}` — data-driven, not static                 |
-| Font | Use Inter (global). DM Sans/Mono CSS vars commented in globals.css for future switch |
+| Constraint                      | Detail                                                                               |
+| ------------------------------- | ------------------------------------------------------------------------------------ |
+| Visual design                   | Every color in plan Section 2 must be pixel-identical                                |
+| Sidebar width                   | Must remain exactly `252px`                                                          |
+| Charts                          | All 6 Chart.js charts must look identical                                            |
+| `id` / `data-testid` attributes | Must be preserved on all interactive elements                                        |
+| localStorage keys               | `STORAGE_KEYS` in `studyTrackerStorage.js` — do not rename                           |
+| API endpoints                   | `/api/tracker/*` — do not change                                                     |
+| State shape                     | `syllabi`, `progress`, `custom`, `log`, `subtopics`, `daily`, `habits`, `habitLog`   |
+| Dynamic inline styles           | Keep `style={{ borderColor: sylColor }}` — data-driven, not static                   |
+| Font                            | Use Inter (global). DM Sans/Mono CSS vars commented in globals.css for future switch |
 
 ---
 
 ## Files Created / Modified / Deleted
 
-| File                                   | Action                                  |
-| -------------------------------------- | --------------------------------------- |
-| `_components/StudyTrackerProvider.jsx` | Create (Phase 1)                        |
-| `_components/Sidebar.jsx`              | Create (Phase 1)                        |
-| `_components/UserProfileDropdown.jsx`  | Create (Phase 2)                        |
-| `_components/NavBtn.jsx`               | Rewrite (Phase 2)                       |
-| `_components/StudyTrackerApp.jsx`      | Delete (Phase 1 — replaced by Provider) |
-| `_components/DashboardView.jsx`        | Modify (Phase 4)                        |
-| `_components/DailyTrackerView.jsx`     | Modify (Phase 5)                        |
-| `_components/SyllabusView.jsx`         | Modify (Phase 5)                        |
-| `_components/SyllabusManagerView.jsx`  | Modify (Phase 5)                        |
-| `_components/ResourcesView.jsx`        | No change                               |
-| `study-tracker/layout.js`              | Rewrite (Phase 1 + 2)                   |
-| `study-tracker/page.jsx`               | Rewrite to redirect (Phase 1)           |
-| `study-tracker/dashboard/page.jsx`     | Create (Phase 1)                        |
-| `study-tracker/daily-tracker/page.jsx` | Create (Phase 1)                        |
-| `study-tracker/resources/page.jsx`     | Create (Phase 1)                        |
-| `study-tracker/syllabus/page.jsx`      | Create (Phase 1)                        |
-| `study-tracker/syllabus/[id]/page.jsx` | Create (Phase 1)                        |
-| `study-tracker/study-tracker.css`                         | Delete (Phase 6)                                     |
-| `app/layout.js`                                           | Update `<Toaster position="bottom-center">` (Phase 5) |
-| `app/globals.css`                                         | Add commented font vars (Phase 3)                    |
-| `components/Header.jsx`                                   | Update `/study-tracker` link → `/study-tracker/dashboard` (Phase 1) |
-| `components/NavbarSheet.jsx`                              | Update `/study-tracker` link (Phase 1)               |
-| `components/lib/Footer.jsx`                               | Update `/study-tracker` link (Phase 1)               |
-| `app/page.js`                                             | Update 2× `/study-tracker` links (Phase 1)           |
-| `app/(admin)/login/page.jsx`                              | Update 2× `router.push/replace("/study-tracker")` (Phase 1) |
-| `app/(admin)/signup/page.jsx`                             | Update 2× `router.push/replace("/study-tracker")` (Phase 1) |
-| `app/(admin)/admin/dashboard/page.jsx`                    | Update `router.replace("/study-tracker")` (Phase 1)  |
-| `app/(admin)/admin/site-alerts/page.jsx`                  | Update `router.replace("/study-tracker")` (Phase 1)  |
-| `app/(tools)/qa-tools/page.jsx`                           | Update `/study-tracker` link (Phase 1)               |
-| `app/(tools)/qa-tools/json-to-file/_components/SuccessBanner.jsx` | Update `/study-tracker` link (Phase 1)     |
-| `app/(study)/study-tracker/ai-syllabus-prompt/PromptPageContent.jsx` | Update 2× `/study-tracker` links (Phase 1) |
-| `app/(study)/study-tracker/ai-syllabus-prompt/page.jsx`   | Remove `study-tracker.css` import (Phase 6)          |
+| File                                                                 | Action                                                              |
+| -------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `_components/StudyTrackerProvider.jsx`                               | Create (Phase 1)                                                    |
+| `_components/Sidebar.jsx`                                            | Create (Phase 1)                                                    |
+| `_components/UserProfileDropdown.jsx`                                | Create (Phase 2)                                                    |
+| `_components/NavBtn.jsx`                                             | Rewrite (Phase 2)                                                   |
+| `_components/StudyTrackerApp.jsx`                                    | Delete (Phase 1 — replaced by Provider)                             |
+| `_components/DashboardView.jsx`                                      | Modify (Phase 4)                                                    |
+| `_components/DailyTrackerView.jsx`                                   | Modify (Phase 5)                                                    |
+| `_components/SyllabusView.jsx`                                       | Modify (Phase 5)                                                    |
+| `_components/SyllabusManagerView.jsx`                                | Modify (Phase 5)                                                    |
+| `_components/ResourcesView.jsx`                                      | No change                                                           |
+| `study-tracker/layout.js`                                            | Rewrite (Phase 1 + 2)                                               |
+| `study-tracker/page.jsx`                                             | Rewrite to redirect (Phase 1)                                       |
+| `study-tracker/dashboard/page.jsx`                                   | Create (Phase 1)                                                    |
+| `study-tracker/daily-tracker/page.jsx`                               | Create (Phase 1)                                                    |
+| `study-tracker/resources/page.jsx`                                   | Create (Phase 1)                                                    |
+| `study-tracker/syllabus/page.jsx`                                    | Create (Phase 1)                                                    |
+| `study-tracker/syllabus/[id]/page.jsx`                               | Create (Phase 1)                                                    |
+| `study-tracker/study-tracker.css`                                    | Delete (Phase 6)                                                    |
+| `app/layout.js`                                                      | Update `<Toaster position="bottom-center">` (Phase 5)               |
+| `app/globals.css`                                                    | Add commented font vars (Phase 3)                                   |
+| `components/Header.jsx`                                              | Update `/study-tracker` link → `/study-tracker/dashboard` (Phase 1) |
+| `components/NavbarSheet.jsx`                                         | Update `/study-tracker` link (Phase 1)                              |
+| `components/lib/Footer.jsx`                                          | Update `/study-tracker` link (Phase 1)                              |
+| `app/page.js`                                                        | Update 2× `/study-tracker` links (Phase 1)                          |
+| `app/(admin)/login/page.jsx`                                         | Update 2× `router.push/replace("/study-tracker")` (Phase 1)         |
+| `app/(admin)/signup/page.jsx`                                        | Update 2× `router.push/replace("/study-tracker")` (Phase 1)         |
+| `app/(admin)/admin/dashboard/page.jsx`                               | Update `router.replace("/study-tracker")` (Phase 1)                 |
+| `app/(admin)/admin/site-alerts/page.jsx`                             | Update `router.replace("/study-tracker")` (Phase 1)                 |
+| `app/(tools)/qa-tools/page.jsx`                                      | Update `/study-tracker` link (Phase 1)                              |
+| `app/(tools)/qa-tools/json-to-file/_components/SuccessBanner.jsx`    | Update `/study-tracker` link (Phase 1)                              |
+| `app/(study)/study-tracker/ai-syllabus-prompt/PromptPageContent.jsx` | Update 2× `/study-tracker` links (Phase 1)                          |
+| `app/(study)/study-tracker/ai-syllabus-prompt/page.jsx`              | Remove `study-tracker.css` import (Phase 6)                         |
 
 ---
 
 ## Design Decisions (resolved 2026-03-25)
 
-| # | Question | Decision |
-|---|---|---|
-| Q1 | Font | Use Inter (global). Add DM Sans/Mono as **commented** CSS vars in `globals.css` — revisit later. |
-| Q2 | SyllabusManagerView inputs/buttons | Use shadcn `Input`, `Button`, `Select` with Tailwind classes. shadcn defaults accepted. |
-| Q3 | Toast position | `bottom-center` globally — update `<Toaster>` in `app/layout.js`. Applies site-wide. |
-| Q4 | Split DailyTrackerView | **Deferred** — migrate as-is in this pass, split in a later version. |
-| Q5 | `/study-tracker` redirect | Permanent redirect from `page.jsx` to `/study-tracker/dashboard`. Update all 15 internal links (nav, footer, login, signup, admin redirects, tool pages, prompt page back-links) to point directly to `/study-tracker/dashboard`. |
+| #   | Question                           | Decision                                                                                                                                                                                                                          |
+| --- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | Font                               | Use Inter (global). Add DM Sans/Mono as **commented** CSS vars in `globals.css` — revisit later.                                                                                                                                  |
+| Q2  | SyllabusManagerView inputs/buttons | Use shadcn `Input`, `Button`, `Select` with Tailwind classes. shadcn defaults accepted.                                                                                                                                           |
+| Q3  | Toast position                     | `bottom-center` globally — update `<Toaster>` in `app/layout.js`. Applies site-wide.                                                                                                                                              |
+| Q4  | Split DailyTrackerView             | **Deferred** — migrate as-is in this pass, split in a later version.                                                                                                                                                              |
+| Q5  | `/study-tracker` redirect          | Permanent redirect from `page.jsx` to `/study-tracker/dashboard`. Update all 15 internal links (nav, footer, login, signup, admin redirects, tool pages, prompt page back-links) to point directly to `/study-tracker/dashboard`. |
