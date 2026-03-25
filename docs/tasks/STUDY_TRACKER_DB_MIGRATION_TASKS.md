@@ -41,16 +41,16 @@
 
 > Risk: Low. New routes only, nothing existing is touched.
 
-- [ ] **2.1** Create `app/api/tracker/state/route.js` — `GET` full tracker state for session user
+- [x] **2.1** Create `app/api/tracker/state/route.js` — `GET` full tracker state for session user + `DELETE` wipe all tracker data
   - Uses `Promise.all` to fetch all 7 models in parallel
   - Returns reshaped state matching the localStorage shape
-- [ ] **2.2** Create `app/api/tracker/sync/route.js` — `POST` bulk upsert (used for first-login migration)
+- [x] **2.2** Create `app/api/tracker/sync/route.js` — `POST` bulk upsert (used for first-login migration + partial key sync)
   - Accepts `{ fullState }` in request body
-  - Upserts all keys atomically (use `prisma.$transaction`)
-- [ ] **2.3** Create `lib/trackerDb.js` — shared utilities:
+  - Upserts all supplied keys in a `prisma.$transaction`
+  - Habit log resolution: looks up existing DB habit IDs so partial syncs work
+- [x] **2.3** Create `lib/trackerDb.js` — shared utilities:
   - `reshapeToState(dbRows)` — converts flat DB rows → state object shape
-  - `reshapeToDb(state)` — converts state object → DB upsert payloads
-  - `mergeStates(local, db)` — DB wins on conflict (by `updatedAt`)
+  - `mergeStates(local, db)` — DB wins for any key that has DB content
 
 **Acceptance criteria:** `GET /api/tracker/state` returns correct shape for a seeded user; `POST /api/tracker/sync` upserts without error.
 
@@ -60,16 +60,16 @@
 
 > Risk: Low. New routes only.
 
-- [ ] **3.1** `PATCH /api/tracker/progress` — single topic progress update
-- [ ] **3.2** `PATCH /api/tracker/subtopics` — single subtopic toggle
-- [ ] **3.3** `POST /api/tracker/daily` — add/update daily task
-- [ ] **3.4** `DELETE /api/tracker/daily/[taskId]/route.js` — delete daily task
-- [ ] **3.5** `POST /api/tracker/habits` — create/update habit
-- [ ] **3.6** `DELETE /api/tracker/habits/[habitId]/route.js` — delete habit
-- [ ] **3.7** `PATCH /api/tracker/habit-log` — toggle habit completion for a date
-- [ ] **3.8** `PUT /api/tracker/syllabus/[syllabusId]/route.js` — save custom syllabus
-- [ ] **3.9** `POST /api/tracker/log` — append activity log entry
-- [ ] **3.10** `DELETE /api/tracker/state/route.js` — wipe all tracker data for user (used by handleClearAll)
+- [x] **3.1** `PATCH /api/tracker/progress` — single topic progress update
+- [x] **3.2** `PATCH /api/tracker/subtopics` — single subtopic toggle
+- [x] **3.3** `POST /api/tracker/daily` — add/update daily task
+- [x] **3.4** `DELETE /api/tracker/daily/[taskId]/route.js` — delete daily task
+- [x] **3.5** `POST /api/tracker/habits` — create/update habit
+- [x] **3.6** `DELETE /api/tracker/habits/[habitId]/route.js` — delete habit
+- [x] **3.7** `PATCH /api/tracker/habit-log` — toggle habit completion for a date
+- [x] **3.8** `PUT /api/tracker/syllabus/[syllabusId]/route.js` — save custom syllabus
+- [x] **3.9** `POST /api/tracker/log` — append activity log entry
+- [x] **3.10** `DELETE /api/tracker/state` — wipe all tracker data for user (handled in state/route.js)
 
 All routes must:
 - Authenticate via `auth.api.getSession()` (same pattern as `/api/resources`)
@@ -82,13 +82,13 @@ All routes must:
 
 > Risk: Medium. Touch `StudyTrackerApp.jsx`. Test merge logic carefully.
 
-- [ ] **4.1** Make `loadAllState()` call in `useEffect` async
+- [x] **4.1** Make `loadAllState()` call in `useEffect` async
   - Load localStorage first (instant render, no flash)
   - If user session exists: call `GET /api/tracker/state`
-- [ ] **4.2** Implement `mergeStates(local, db)` in `lib/trackerDb.js` — DB wins on conflict
-- [ ] **4.3** On first login (DB empty): call `POST /api/tracker/sync` with current localStorage state
-- [ ] **4.4** After merge: mirror final state back to localStorage (offline cache)
-- [ ] **4.5** Add loading indicator during DB fetch (avoid layout shift — show local data immediately, update silently)
+- [x] **4.2** Implement `mergeStates(local, db)` in `lib/trackerDb.js` — DB wins on conflict
+- [x] **4.3** On first login (DB empty): call `POST /api/tracker/sync` with current localStorage state
+- [x] **4.4** After merge: mirror final state back to localStorage (offline cache)
+- [x] **4.5** No extra loading indicator needed — local data renders instantly; DB merge is a silent update
 
 **Acceptance criteria:**
 - Anonymous user: behaves exactly as before (localStorage only)
@@ -101,12 +101,11 @@ All routes must:
 
 > Risk: Medium. Every state mutation now makes an async API call.
 
-- [ ] **5.1** Create `syncPatch(key, value, userId)` helper in `lib/trackerDb.js`
-  - Maps `key` → correct PATCH/POST route
+- [x] **5.1** `syncToDb(key, value, currentState)` inline in `StudyTrackerApp.jsx`
+  - Routes all keys through `POST /api/tracker/sync` with partial `fullState`
   - Debounce: `progress` / `subtopics` = 1s, `syllabi` = 2s, others = immediate
-- [ ] **5.2** Wrap `updateState()` in `StudyTrackerApp.jsx` to call `syncPatch` when user is logged in
-  - Existing `saveKey()` (localStorage) call must remain unchanged
-  - DB write failure must be silent (log to console only, never block the UI)
+  - `habitLog` includes `habits` in payload for ID resolution
+- [x] **5.2** `updateState()` calls `syncToDb` when user is logged in; localStorage write unchanged; DB failures are silent
 
 **Acceptance criteria:** Updating topic progress while logged in reflects in DB within 2s; localStorage still updated synchronously.
 
@@ -116,8 +115,8 @@ All routes must:
 
 > Risk: Low. Isolated functions.
 
-- [ ] **6.1** Update `handleClearAll` to also call `DELETE /api/tracker/state` when user is logged in
-- [ ] **6.2** Update `handleImport` to also call `POST /api/tracker/sync` with imported data when user is logged in
+- [x] **6.1** Updated `handleClearAll` to also call `DELETE /api/tracker/state` when user is logged in
+- [x] **6.2** Updated `handleImport` to also call `POST /api/tracker/sync` with imported data when user is logged in
 
 ---
 
