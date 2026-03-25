@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -92,7 +92,7 @@ export default function ResourcesView({ showToast }) {
 
   const [resources, setResources]   = useState([]);
   const [loading, setLoading]       = useState(false);
-  const [viewMode, setViewMode]     = useState("table"); // "table" | "card"
+  const [viewMode, setViewMode]     = useState("card"); // "table" | "card"
 
   // Filters
   const [search, setSearch]         = useState("");
@@ -274,21 +274,23 @@ export default function ResourcesView({ showToast }) {
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
-  // Collect all unique tags (case-insensitive) for filter suggestions
+  // Collect all unique tags for filter suggestions
   const allTags = [...new Set(resources.flatMap((r) => r.tags.map((t) => t.toLowerCase())))].sort();
 
   // ── Not logged in ──────────────────────────────────────────────────────────
   if (!isPending && !isLoggedIn) {
     return (
-      <div className="res-login-gate">
-        <div className="res-login-card">
-          <div className="res-login-icon">🔒</div>
-          <h2 className="res-login-title">Sign in to access Resources</h2>
-          <p className="res-login-sub">
-            Save articles, videos, courses and tools you&apos;re learning from. Log
-            in to get started.
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center max-w-[360px] bg-white border border-[#e9eaed] rounded-2xl px-10 py-10">
+          <div className="text-[3rem] mb-4">🔒</div>
+          <h2 className="text-lg font-semibold text-[#1f2937] mb-2">Sign in to access Resources</h2>
+          <p className="text-sm text-gray-500 mb-6 leading-relaxed">
+            Save articles, videos, courses and tools you&apos;re learning from. Log in to get started.
           </p>
-          <a href="/login" className="res-login-btn">
+          <a
+            href="/login"
+            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors no-underline"
+          >
             <LogIn size={16} />
             Sign In
           </a>
@@ -300,25 +302,27 @@ export default function ResourcesView({ showToast }) {
   // ── Loading session ────────────────────────────────────────────────────────
   if (isPending) {
     return (
-      <div className="res-loading">
-        <Loader2 className="res-spinner" />
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
       </div>
     );
   }
 
   return (
-    <div className="res-root">
+    <div>
       {/* ── TOP BAR ── */}
-      <div className="res-topbar">
-        <div className="res-topbar-left">
-          <h1 className="res-page-title">Resources</h1>
-          <span className="res-count">{resources.length} saved</span>
+      <div className="flex items-center justify-between mb-5">
+        <div className="flex items-center gap-3">
+          <h1 className="text-xl font-bold text-[#1f2937] m-0">Resources</h1>
+          <span className="text-[0.75rem] font-semibold bg-gray-100 text-gray-500 px-[9px] py-[3px] rounded-full font-mono">
+            {resources.length} saved
+          </span>
         </div>
-        <div className="res-topbar-right">
+        <div className="flex items-center gap-2">
           <Button
             size="sm"
             variant="outline"
-            className="res-keys-btn"
+            className="gap-1.5"
             onClick={() => { setKeysOpen(true); fetchApiKeys(); }}
             id="manage-api-keys-btn"
             data-testid="manage-api-keys-btn"
@@ -328,7 +332,7 @@ export default function ResourcesView({ showToast }) {
           </Button>
           <Button
             size="sm"
-            className="res-add-btn"
+            className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white"
             onClick={openAdd}
             id="add-resource-btn"
             data-testid="add-resource-btn"
@@ -340,11 +344,11 @@ export default function ResourcesView({ showToast }) {
       </div>
 
       {/* ── FILTERS ── */}
-      <div className="res-filters">
-        <div className="res-search-wrap">
-          <Search size={14} className="res-search-icon" />
+      <div className="flex items-center gap-3 mb-5 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
-            className="res-search"
+            className="w-full border border-[#e9eaed] rounded-lg pl-8 pr-8 py-2 text-sm text-[#374151] bg-white outline-none focus:border-blue-600 transition-colors"
             placeholder="Search title or description…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -352,14 +356,17 @@ export default function ResourcesView({ showToast }) {
             data-testid="resource-search"
           />
           {search && (
-            <button className="res-search-clear" onClick={() => setSearch("")}>
+            <button
+              className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-gray-400 hover:text-gray-600 transition-colors p-0 flex items-center"
+              onClick={() => setSearch("")}
+            >
               <X size={12} />
             </button>
           )}
         </div>
 
         <select
-          className="res-filter-select"
+          className="border border-[#e9eaed] rounded-lg px-3 py-2 text-sm text-[#374151] bg-white outline-none focus:border-blue-600 transition-colors cursor-pointer"
           value={filterType}
           onChange={(e) => setFilterType(e.target.value)}
           id="resource-type-filter"
@@ -373,7 +380,7 @@ export default function ResourcesView({ showToast }) {
 
         {allTags.length > 0 && (
           <select
-            className="res-filter-select"
+            className="border border-[#e9eaed] rounded-lg px-3 py-2 text-sm text-[#374151] bg-white outline-none focus:border-blue-600 transition-colors cursor-pointer"
             value={filterTag}
             onChange={(e) => setFilterTag(e.target.value)}
             id="resource-tag-filter"
@@ -386,9 +393,12 @@ export default function ResourcesView({ showToast }) {
           </select>
         )}
 
-        <div className="res-view-toggle">
+        <div className="flex border border-[#e9eaed] rounded-lg overflow-hidden">
           <button
-            className={`res-toggle-btn${viewMode === "table" ? " active" : ""}`}
+            className={cn(
+              "px-3 py-[7px] bg-white border-none cursor-pointer text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors flex items-center",
+              viewMode === "table" && "bg-[#eff2ff] text-blue-600 hover:bg-[#eff2ff] hover:text-blue-600"
+            )}
             onClick={() => setViewMode("table")}
             title="Table view"
             id="view-table-btn"
@@ -397,7 +407,10 @@ export default function ResourcesView({ showToast }) {
             <List size={15} />
           </button>
           <button
-            className={`res-toggle-btn${viewMode === "card" ? " active" : ""}`}
+            className={cn(
+              "px-3 py-[7px] bg-white border-none cursor-pointer text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors flex items-center border-l border-[#e9eaed]",
+              viewMode === "card" && "bg-[#eff2ff] text-blue-600 hover:bg-[#eff2ff] hover:text-blue-600"
+            )}
             onClick={() => setViewMode("card")}
             title="Card view"
             id="view-card-btn"
@@ -410,59 +423,67 @@ export default function ResourcesView({ showToast }) {
 
       {/* ── CONTENT ── */}
       {loading ? (
-        <div className="res-loading">
-          <Loader2 className="res-spinner" />
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
         </div>
       ) : resources.length === 0 ? (
-        <div className="res-empty">
-          <div className="res-empty-icon">📚</div>
-          <p className="res-empty-title">No resources yet</p>
-          <p className="res-empty-sub">Add your first resource to get started.</p>
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="text-[3rem] mb-3">📚</div>
+          <p className="text-base font-semibold text-[#1f2937] mb-1">No resources yet</p>
+          <p className="text-sm text-gray-500">Add your first resource to get started.</p>
         </div>
       ) : viewMode === "table" ? (
-        <div className="res-table-wrap">
-          <table className="res-table" id="resources-table" data-testid="resources-table">
+        <div className="overflow-x-auto rounded-xl border border-[#e9eaed] bg-white">
+          <table
+            className="w-full border-collapse text-sm"
+            id="resources-table"
+            data-testid="resources-table"
+          >
             <thead>
-              <tr>
-                <th>Type</th>
-                <th>Title</th>
-                <th>Tags</th>
-                <th>Added</th>
-                <th></th>
+              <tr className="border-b border-[#e9eaed] bg-[#f8f9fc]">
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Type</th>
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide">Title</th>
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide">Tags</th>
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Added</th>
+                <th className="px-4 py-3"></th>
               </tr>
             </thead>
             <tbody>
               {resources.map((r) => (
-                <tr key={r.id} data-testid={`resource-row-${r.id}`}>
-                  <td>
+                <tr
+                  key={r.id}
+                  className="border-b border-[#f0f1f4] last:border-b-0 hover:bg-[#fafbfc] transition-colors"
+                  data-testid={`resource-row-${r.id}`}
+                >
+                  <td className="px-4 py-3 whitespace-nowrap">
                     <span
-                      className="res-type-badge"
+                      className="inline-flex items-center px-[9px] py-[3px] rounded-full text-[0.72rem] font-semibold"
                       style={TYPE_COLORS[r.resourceType]}
                     >
                       {TYPE_LABELS[r.resourceType]}
                     </span>
                   </td>
-                  <td>
+                  <td className="px-4 py-3">
                     <a
                       href={r.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="res-title-link"
+                      className="font-medium text-[#1f2937] no-underline hover:text-blue-600 hover:underline inline-flex items-center gap-1 transition-colors"
                       data-testid={`resource-title-${r.id}`}
                     >
                       {r.title}
-                      <ExternalLink size={11} className="res-ext-icon" />
+                      <ExternalLink size={11} className="text-gray-400 flex-shrink-0" />
                     </a>
                     {r.description && (
-                      <p className="res-row-desc">{r.description}</p>
+                      <p className="text-[0.77rem] text-gray-500 mt-[3px] m-0 line-clamp-1">{r.description}</p>
                     )}
                   </td>
-                  <td>
-                    <div className="res-tags">
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1">
                       {r.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="res-tag"
+                          className="inline-block bg-gray-100 text-gray-600 text-[0.72rem] px-[7px] py-[2px] rounded-full cursor-pointer hover:bg-gray-200 transition-colors"
                           onClick={() => setFilterTag(tag)}
                           title={`Filter by "${tag}"`}
                         >
@@ -471,13 +492,13 @@ export default function ResourcesView({ showToast }) {
                       ))}
                     </div>
                   </td>
-                  <td className="res-date">
+                  <td className="px-4 py-3 text-[0.77rem] text-gray-400 whitespace-nowrap">
                     {new Date(r.createdAt).toLocaleDateString()}
                   </td>
-                  <td>
-                    <div className="res-actions">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-1">
                       <button
-                        className="res-action-btn"
+                        className="w-7 h-7 flex items-center justify-center rounded-[6px] bg-transparent border-none cursor-pointer text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                         onClick={() => openEdit(r)}
                         title="Edit"
                         data-testid={`edit-resource-${r.id}`}
@@ -487,7 +508,7 @@ export default function ResourcesView({ showToast }) {
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
                           <button
-                            className="res-action-btn danger"
+                            className="w-7 h-7 flex items-center justify-center rounded-[6px] bg-transparent border-none cursor-pointer text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                             title="Delete"
                             data-testid={`delete-resource-${r.id}`}
                           >
@@ -517,25 +538,33 @@ export default function ResourcesView({ showToast }) {
           </table>
         </div>
       ) : (
-        <div className="res-card-grid" id="resources-card-grid" data-testid="resources-card-grid">
+        <div
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+          id="resources-card-grid"
+          data-testid="resources-card-grid"
+        >
           {resources.map((r) => (
-            <div key={r.id} className="res-card" data-testid={`resource-card-${r.id}`}>
+            <div
+              key={r.id}
+              className="bg-white border border-[#e9eaed] rounded-xl overflow-hidden flex flex-col hover:shadow-sm transition-shadow h-full"
+              data-testid={`resource-card-${r.id}`}
+            >
               {r.image && (
-                <div className="res-card-img-wrap">
-                  <img src={r.image} alt={r.title} className="res-card-img" />
+                <div className="h-[160px] overflow-hidden bg-gray-100">
+                  <img src={r.image} alt={r.title} className="w-full h-full object-cover" />
                 </div>
               )}
-              <div className="res-card-body">
-                <div className="res-card-top">
+              <div className="p-4 flex flex-col gap-2 flex-1">
+                <div className="flex items-center justify-between">
                   <span
-                    className="res-type-badge"
+                    className="inline-flex items-center px-[9px] py-[3px] rounded-full text-[0.72rem] font-semibold"
                     style={TYPE_COLORS[r.resourceType]}
                   >
                     {TYPE_LABELS[r.resourceType]}
                   </span>
-                  <div className="res-actions">
+                  <div className="flex items-center gap-1">
                     <button
-                      className="res-action-btn"
+                      className="w-7 h-7 flex items-center justify-center rounded-[6px] bg-transparent border-none cursor-pointer text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
                       onClick={() => openEdit(r)}
                       title="Edit"
                       data-testid={`edit-card-${r.id}`}
@@ -545,7 +574,7 @@ export default function ResourcesView({ showToast }) {
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <button
-                          className="res-action-btn danger"
+                          className="w-7 h-7 flex items-center justify-center rounded-[6px] bg-transparent border-none cursor-pointer text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
                           title="Delete"
                           data-testid={`delete-card-${r.id}`}
                         >
@@ -573,21 +602,21 @@ export default function ResourcesView({ showToast }) {
                   href={r.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="res-card-title"
+                  className="font-medium text-[#1f2937] no-underline hover:text-blue-600 hover:underline inline-flex items-center gap-1 text-sm transition-colors"
                   data-testid={`card-title-${r.id}`}
                 >
                   {r.title}
                   <ExternalLink size={12} />
                 </a>
                 {r.description && (
-                  <p className="res-card-desc">{r.description}</p>
+                  <p className="text-[0.77rem] text-gray-500 line-clamp-2 m-0">{r.description}</p>
                 )}
                 {r.tags.length > 0 && (
-                  <div className="res-tags">
+                  <div className="flex flex-wrap gap-1">
                     {r.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="res-tag"
+                        className="inline-block bg-gray-100 text-gray-600 text-[0.72rem] px-[7px] py-[2px] rounded-full cursor-pointer hover:bg-gray-200 transition-colors"
                         onClick={() => setFilterTag(tag)}
                         title={`Filter by "${tag}"`}
                       >
@@ -596,7 +625,7 @@ export default function ResourcesView({ showToast }) {
                     ))}
                   </div>
                 )}
-                <p className="res-card-date">
+                <p className="text-[0.72rem] text-gray-400 mt-auto pt-1 m-0">
                   {new Date(r.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -667,15 +696,17 @@ export default function ResourcesView({ showToast }) {
 
             <div className="space-y-1">
               <Label htmlFor="res-tags">Tags</Label>
-              {/* Current tags as chips */}
               {form.tags.length > 0 && (
-                <div className="res-tags mb-2">
+                <div className="flex flex-wrap gap-1 mb-2">
                   {form.tags.map((tag) => (
-                    <span key={tag} className="res-tag-chip">
+                    <span
+                      key={tag}
+                      className="inline-flex items-center gap-1 bg-[#eff2ff] border border-[#c7d2fe] text-blue-700 text-[0.72rem] px-[8px] py-[3px] rounded-full"
+                    >
                       {tag}
                       <button
                         type="button"
-                        className="res-tag-chip-remove"
+                        className="bg-transparent border-none cursor-pointer text-blue-400 hover:text-red-500 p-0 flex items-center transition-colors"
                         onClick={() => removeTag(tag)}
                         data-testid={`remove-tag-${tag}`}
                       >
@@ -685,8 +716,7 @@ export default function ResourcesView({ showToast }) {
                   ))}
                 </div>
               )}
-              {/* Tag input row */}
-              <div className="res-tag-input-row">
+              <div className="flex gap-2">
                 <Input
                   id="res-tags"
                   data-testid="res-tags-input"
@@ -707,10 +737,9 @@ export default function ResourcesView({ showToast }) {
                   Add
                 </Button>
               </div>
-              {/* Existing tag suggestions */}
               {allTags.filter((t) => !form.tags.includes(t) && t.includes(tagInput.toLowerCase())).length > 0 && (
-                <div className="res-tag-suggestions">
-                  <span className="res-tag-suggest-label">Suggestions:</span>
+                <div className="flex flex-wrap items-center gap-1 mt-1">
+                  <span className="text-[0.72rem] text-gray-500">Suggestions:</span>
                   {allTags
                     .filter((t) => !form.tags.includes(t) && (!tagInput || t.includes(tagInput.toLowerCase())))
                     .slice(0, 8)
@@ -718,7 +747,7 @@ export default function ResourcesView({ showToast }) {
                       <button
                         key={t}
                         type="button"
-                        className="res-tag-suggest"
+                        className="inline-block bg-gray-100 text-gray-600 text-[0.72rem] px-[7px] py-[2px] rounded-full cursor-pointer hover:bg-gray-200 border-none transition-colors"
                         onClick={() => addTag(t)}
                         data-testid={`suggest-tag-${t}`}
                       >
