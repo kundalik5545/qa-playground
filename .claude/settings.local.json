@@ -28,7 +28,8 @@
       "Bash(ls \"d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/_components/\")",
       "Bash(ls \"d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/dashboard/\")",
       "Bash(wc -l \"d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/study-tracker.css\")",
-      "Bash(npx shadcn@latest add tabs --yes)"
+      "Bash(npx shadcn@latest add tabs --yes)",
+      "Bash(pnpm install:*)"
     ]
   }
 }
