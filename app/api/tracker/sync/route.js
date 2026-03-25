@@ -80,12 +80,13 @@ export async function POST(request) {
         if (!Array.isArray(tasks)) continue;
         for (const task of tasks) {
           if (!task.id) continue;
+          const taskId = String(task.id);
           await tx.dailyTask.upsert({
-            where: { userId_taskId: { userId, taskId: task.id } },
+            where: { userId_taskId: { userId, taskId } },
             create: {
               userId,
               date,
-              taskId: task.id,
+              taskId,
               title: task.title,
               done: task.done ?? false,
               timeMin: task.timeMin ?? 0,

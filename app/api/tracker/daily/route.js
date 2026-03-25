@@ -16,12 +16,13 @@ export async function POST(request) {
       { status: 400 }
     );
 
+  const taskId = String(task.id);
   await prisma.dailyTask.upsert({
-    where: { userId_taskId: { userId, taskId: task.id } },
+    where: { userId_taskId: { userId, taskId } },
     create: {
       userId,
       date,
-      taskId: task.id,
+      taskId,
       title: task.title,
       done: task.done ?? false,
       timeMin: task.timeMin ?? 0,

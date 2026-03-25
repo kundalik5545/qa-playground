@@ -12,7 +12,7 @@ export async function DELETE(request, { params }) {
   const { taskId } = await params;
 
   await prisma.dailyTask.deleteMany({
-    where: { userId, taskId },
+    where: { userId, taskId: String(taskId) },
   });
 
   return new NextResponse(null, { status: 204 });

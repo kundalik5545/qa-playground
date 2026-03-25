@@ -1,8 +1,10 @@
 # Study Tracker — localStorage → DB Migration: Task Tracker
 
 > Created: 2026-03-24
+> Last updated: 2026-03-25
 > Reference analysis: `docs/STUDY_TRACKER_DB_MIGRATION_ANALYSIS.md`
-> Branch: work off `master`, ship as a single feature branch (e.g. `feat/study-tracker-db`)
+> Branch: `feat/localstorage-sync`
+> **Status: Phases 1–6 complete. Phase 7 deferred pending prod validation.**
 
 ---
 
@@ -140,6 +142,9 @@ All routes must:
 | 2026-03-24 | Bulk sync only on first login | One-way migration; avoids conflict complexity |
 | 2026-03-24 | `UserSyllabus.data` stored as `Json` | Syllabus is deeply nested and rarely queried field-by-field |
 | 2026-03-24 | DB write failures are silent | Never block the UI for a background sync failure |
+| 2026-03-25 | All keys routed through `POST /api/tracker/sync` for dual-write | Avoids maintaining per-key granular routes in `updateState()`; sync endpoint handles partial `fullState` |
+| 2026-03-25 | `habitLog` dual-write includes `habits` in payload | Sync endpoint resolves `clientHabitId → DB Habit.id` from existing rows; passing habits ensures new habits are resolvable |
+| 2026-03-25 | `HabitLog` FK points to `Habit.id` (CUID), not `Habit.habitId` | Enforces referential integrity; client ID stored separately as `habitId` field |
 
 ---
 
@@ -157,6 +162,6 @@ All routes must:
 
 ## Open Questions
 
-- [ ] Should `qa_tracker_custom` (user topic overrides) be migrated to DB or kept localStorage-only? Current plan: localStorage-only (low value, large payload).
-- [ ] Should the Resources tab (already on DB) be factored into this migration or stay as-is?
-- [ ] Phase 7 timing: ship phases 1–6 first, monitor in prod, then decide on Phase 7.
+- [x] Should `qa_tracker_custom` (user topic overrides) be migrated to DB or kept localStorage-only? **Resolved: localStorage-only** (low value, large payload, not worth the complexity).
+- [x] Should the Resources tab (already on DB) be factored into this migration or stay as-is? **Resolved: stays as-is** — Resources already has full DB CRUD via `/api/resources`.
+- [ ] Phase 7 timing: ship phases 1–6 to prod, monitor for regressions, then decide on localStorage removal for auth users.
