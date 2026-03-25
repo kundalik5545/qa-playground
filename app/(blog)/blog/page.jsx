@@ -87,7 +87,7 @@ const BlogMainPage = () => {
 
               {/* Read More Button */}
               <div className="mt-4">
-                <Link href={`${blog.mainPageLink}/${blog.slug}`}>
+                <Link href={`${blog.mainPageLink}/${blog.slug}`} prefetch={false}>
                   <Button className="w-full bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-md">
                     Read More →
                   </Button>

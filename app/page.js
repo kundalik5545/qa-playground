@@ -365,7 +365,7 @@ const LandingPage = () => {
                 Free courses on software testing and automation development.
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Link href="/learn/courses">
+                <Link href="/learn/courses" prefetch={false}>
                   <Button variant="default" className="rounded-full px-5">
                     Explore Free Courses
                   </Button>
@@ -390,12 +390,12 @@ const LandingPage = () => {
                 Solve real QA interview questions and logic programs.
               </p>
               <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Link href="/learn/automation-test-cases">
+                <Link href="/learn/automation-test-cases" prefetch={false}>
                   <Button variant="default" className="rounded-full px-5">
                     Practice Automation TC
                   </Button>
                 </Link>
-                <Link href="/learn/logical-programs-list-to-crack-interviews">
+                <Link href="/learn/logical-programs-list-to-crack-interviews" prefetch={false}>
                   <Button variant="outline" className="rounded-full px-5">
                     Logical Programs
                   </Button>
@@ -421,7 +421,7 @@ const LandingPage = () => {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {featuresData.map((f, i) => (
-              <Link key={i} href={f.to} aria-label={`Practice ${f.title}`}>
+              <Link key={i} href={f.to} prefetch={false} aria-label={`Practice ${f.title}`}>
                 <Card className="p-5 shadow hover:shadow-md transition-shadow rounded-xl h-full">
                   <CardContent className="pt-0">
                     <div className="flex items-start justify-between mb-4">

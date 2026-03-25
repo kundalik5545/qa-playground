@@ -134,7 +134,7 @@ export default function ToolCard({ tool }) {
 
   if (isLive) {
     return (
-      <Link href={tool.href} style={{ textDecoration: "none", display: "block", height: "100%" }}>
+      <Link href={tool.href} prefetch={false} style={{ textDecoration: "none", display: "block", height: "100%" }}>
         {cardInner}
       </Link>
     );

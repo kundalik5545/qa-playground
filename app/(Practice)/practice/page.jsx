@@ -201,7 +201,7 @@ const PracticePage = () => {
                   </p>
                 </CardContent>
                 <CardFooter className="flex flex-col items-center justify-center p-2 border-t ">
-                  <Link href={el.link}>
+                  <Link href={el.link} prefetch={false}>
                     <span className="underline text-blue-600 dark:text-teal-200 font-light">
                       {el.footerTitle}
                     </span>

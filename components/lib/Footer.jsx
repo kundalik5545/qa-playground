@@ -146,6 +146,7 @@ const Footer = () => {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={false}
                   className="flex items-center gap-2 text-sm text-foreground/80 hover:text-foreground transition-colors group"
                 >
                   {link.icon && (
@@ -176,6 +177,7 @@ const Footer = () => {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={false}
                   target={link.external ? "_blank" : undefined}
                   rel={link.external ? "noopener noreferrer" : undefined}
                   className="text-sm text-foreground/80 hover:text-foreground transition-colors"
@@ -196,6 +198,7 @@ const Footer = () => {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={false}
                   className="text-sm text-foreground/80 hover:text-foreground transition-colors"
                 >
                   {link.label}
