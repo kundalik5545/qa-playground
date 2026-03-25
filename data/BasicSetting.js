@@ -5,11 +5,6 @@ export const basicDetails = {
   tagLine: "Learn, practice, and excel in automation testing.",
   websiteEmail: "kundalikjadhav5545@gmail.com",
   websiteURL: "https://www.qaplayground.com",
-
-  // Formspree endpoint for homepage alert popup responses.
-  // Sign up at https://formspree.io, create a form targeting websiteEmail,
-  // paste the endpoint here OR set it from the /site-alerts admin page.
-  formspreeEndpoint: "https://formspree.io/f/mwvravzw",
 };
 
 export const allUrls = {

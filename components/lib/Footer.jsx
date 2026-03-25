@@ -1,11 +1,6 @@
 import Link from "next/link";
 import { basicDetails, allUrls } from "@/data/BasicSetting";
-import {
-  FaYoutube,
-  FaGithub,
-  FaTwitter,
-  FaTelegram,
-} from "react-icons/fa";
+import { FaYoutube, FaGithub, FaTwitter, FaTelegram } from "react-icons/fa";
 import { LayoutGrid, CreditCard, BookOpen } from "lucide-react";
 
 const platformLinks = [
@@ -14,21 +9,24 @@ const platformLinks = [
     label: "Practice Elements",
     icon: <LayoutGrid className="h-3.5 w-3.5" />,
     badge: "22+ elements",
-    badgeClass: "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
+    badgeClass:
+      "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
   },
   {
     href: "/bank",
     label: "Bank Demo App",
     icon: <CreditCard className="h-3.5 w-3.5" />,
     badge: "E2E testing",
-    badgeClass: "bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400",
+    badgeClass:
+      "bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400",
   },
   {
-    href: "/study-tracker",
+    href: "/study-tracker/dashboard",
     label: "Study Tracker",
     icon: <BookOpen className="h-3.5 w-3.5" />,
     badge: "New",
-    badgeClass: "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
+    badgeClass:
+      "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
   },
   {
     href: "/blog",
@@ -56,6 +54,7 @@ const companyLinks = [
   { href: "/about-us", label: "About Us" },
   { href: "/contact-us", label: "Contact Us" },
   { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/login", label: "Login" },
 ];
 
 const socialLinks = [
@@ -205,7 +204,9 @@ const Footer = () => {
             </nav>
 
             <div className="mt-4 pt-4 border-t border-border">
-              <p className="text-xs text-muted-foreground">No login required.</p>
+              <p className="text-xs text-muted-foreground">
+                No login required.
+              </p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 All data stored locally in your browser.
               </p>

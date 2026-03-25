@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import { cn } from "@/lib/utils";
 import { getTodayStr } from "@/lib/studyTrackerStorage";
 
 const CHECK_SVG = (
@@ -19,18 +20,18 @@ export default function SyllabusView({ syllabus, state, updateState, showToast }
   const [openSections, setOpenSections] = useState({});
   const [openTopics, setOpenTopics]     = useState({});
 
-  const color    = syllabus.color;
-  const progress = state.progress;
-  const custom   = state.custom;
+  const color     = syllabus.color;
+  const progress  = state.progress;
+  const custom    = state.custom;
   const subtopics = state.subtopics;
 
   // Compute stats
   let total = 0, done = 0;
   for (const sec of syllabus.sections)
     for (const t of sec.topics) { total++; if (progress[t.id]?.done) done++; }
-  const pct = total ? Math.round((done / total) * 100) : 0;
+  const pct          = total ? Math.round((done / total) * 100) : 0;
   const circumference = Math.round(2 * Math.PI * 30);
-  const offset = Math.round(circumference * (1 - pct / 100));
+  const offset        = Math.round(circumference * (1 - pct / 100));
 
   const toggleSection = (id) =>
     setOpenSections((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -41,14 +42,12 @@ export default function SyllabusView({ syllabus, state, updateState, showToast }
   const handleCheck = useCallback((topicId, checked, topic) => {
     const newProgress = { ...state.progress, [topicId]: { done: checked, date: checked ? getTodayStr() : null } };
 
-    // Sync subtopics
     let newSubtopics = { ...state.subtopics };
     if (topic.subtopics?.length) {
       newSubtopics[topicId] = {};
       topic.subtopics.forEach((_, i) => { newSubtopics[topicId][i] = checked; });
     }
 
-    // Log activity
     if (checked) {
       const today = getTodayStr();
       const log   = [...state.log];
@@ -69,7 +68,6 @@ export default function SyllabusView({ syllabus, state, updateState, showToast }
     };
     updateState("subtopics", newSubtopics);
 
-    // Auto-check main topic if all subtopics done
     const allDone = Array.from({ length: totalSubs }, (_, i) => !!newSubtopics[topicId][i]).every(Boolean);
     if (allDone && !state.progress[topicId]?.done) {
       handleCheck(topicId, true, topic);
@@ -108,14 +106,17 @@ export default function SyllabusView({ syllabus, state, updateState, showToast }
   return (
     <div>
       {/* Syllabus header */}
-      <div className="st-syl-header" style={{ borderLeft: `4px solid ${color}` }}>
-        <div className="st-syl-title-row">
-          <span className="st-syl-icon">{syllabus.icon}</span>
+      <div
+        className="bg-white rounded-[14px] border border-[#e9eaed] px-[22px] pt-5 pb-4 mb-[18px]"
+        style={{ borderLeft: `4px solid ${color}` }}
+      >
+        <div className="flex items-center gap-3">
+          <span className="text-[1.9rem] flex-shrink-0">{syllabus.icon}</span>
           <div>
-            <h1 className="st-syl-title">{syllabus.label}</h1>
-            <p className="st-syl-meta">{total} topics &bull; {done} completed</p>
+            <h1 className="text-[1.4rem] font-bold tracking-[-0.5px] text-[#111827] m-0">{syllabus.label}</h1>
+            <p className="text-[0.8rem] text-gray-400 mt-[3px] m-0">{total} topics &bull; {done} completed</p>
           </div>
-          <div className="st-syl-ring-wrap">
+          <div className="ml-auto relative flex-shrink-0 w-[68px] h-[68px]">
             <svg width="68" height="68" viewBox="0 0 72 72">
               <circle cx="36" cy="36" r="30" fill="none" stroke="#e5e7eb" strokeWidth="6" />
               <circle
@@ -124,33 +125,41 @@ export default function SyllabusView({ syllabus, state, updateState, showToast }
                 strokeLinecap="round" transform="rotate(-90 36 36)"
               />
             </svg>
-            <span className="st-ring-pct" style={{ color }}>{pct}%</span>
+            <span
+              className="absolute inset-0 flex items-center justify-center text-[0.85rem] font-bold font-mono"
+              style={{ color }}
+            >
+              {pct}%
+            </span>
           </div>
         </div>
-        <div className="st-syl-bar-wrap">
-          <div className="st-syl-bar" style={{ background: color, width: `${pct}%` }} />
+        <div className="h-1 bg-[#f0f1f4] rounded-full overflow-hidden mt-4">
+          <div className="h-full rounded-full transition-[width] duration-500" style={{ background: color, width: `${pct}%` }} />
         </div>
       </div>
 
       {/* Sections */}
-      <div className="st-section-list">
+      <div className="flex flex-col gap-[10px]">
         {syllabus.sections.map((sec) => {
-          const secDone  = sec.topics.filter((t) => progress[t.id]?.done).length;
-          const isOpen   = openSections[sec.id] ?? false;
+          const secDone = sec.topics.filter((t) => progress[t.id]?.done).length;
+          const isOpen  = openSections[sec.id] ?? false;
           return (
-            <div className="st-section-card" key={sec.id}>
-              <button className="st-section-header" onClick={() => toggleSection(sec.id)}>
-                <div className="st-sec-title-wrap">
-                  <span className={`st-sec-chevron${isOpen ? " open" : ""}`}>▶</span>
-                  <h2 className="st-sec-title">{sec.title}</h2>
+            <div className="bg-white border border-[#e9eaed] rounded-xl overflow-hidden" key={sec.id}>
+              <button
+                className="flex justify-between items-center px-4 py-[13px] cursor-pointer hover:bg-[#fafafa] transition-all border-none bg-white w-full font-[inherit]"
+                onClick={() => toggleSection(sec.id)}
+              >
+                <div className="flex items-center gap-[9px]">
+                  <span className={cn("text-[0.6rem] text-gray-400 w-3 transition-transform duration-200", isOpen && "rotate-90")}>▶</span>
+                  <h2 className="text-[0.92rem] font-semibold text-[#1f2937] m-0">{sec.title}</h2>
                 </div>
-                <span className="st-sec-count" style={{ color }}>
+                <span className="text-[0.76rem] font-semibold font-mono" style={{ color }}>
                   {secDone}/{sec.topics.length}
                 </span>
               </button>
 
               {isOpen && (
-                <div className="st-section-body">
+                <div className="px-3 pb-3">
                   {sec.topics.map((topic) => (
                     <TopicCard
                       key={topic.id}
@@ -189,11 +198,15 @@ function TopicCard({ topic, color, isDone, isOpen, customData, subtopicState, on
   };
 
   return (
-    <div className={`st-topic-card${isDone ? " done" : ""}`} style={{ "--syl-color": color }}>
-      <div className="st-topic-top">
+    <div className={cn(
+      "border border-[#f0f1f4] rounded-[10px] mt-[9px] bg-[#fafbfc] transition-all overflow-hidden",
+      isDone && "bg-green-50 border-green-200"
+    )}>
+      <div className="flex items-center gap-[9px] px-[13px] py-[10px]">
         {/* Checkbox */}
         <div
-          className={`st-custom-check${isDone ? " checked" : ""}`}
+          className="w-5 h-5 border-2 border-gray-300 rounded-[5px] flex items-center justify-center transition-all flex-shrink-0 cursor-pointer"
+          style={isDone ? { background: color, borderColor: color } : {}}
           onClick={() => onCheck(!isDone)}
         >
           {isDone && CHECK_SVG}
@@ -201,38 +214,46 @@ function TopicCard({ topic, color, isDone, isOpen, customData, subtopicState, on
 
         {/* Title */}
         <span
-          className={`st-topic-title${isDone ? " done" : ""}`}
+          className={cn("flex-1 text-sm font-medium text-[#1f2937] cursor-pointer transition-colors duration-200", isDone && "line-through text-gray-400")}
           onClick={onToggle}
         >
           {topic.title}
         </span>
 
         {/* Expand btn */}
-        <button className="st-topic-expand-btn" onClick={onToggle}>
+        <button
+          className="bg-transparent border-none cursor-pointer text-[0.95rem] text-gray-400 w-6 h-6 rounded-[5px] flex items-center justify-center hover:bg-gray-100 hover:text-[#374151] transition-all"
+          onClick={onToggle}
+        >
           {isOpen ? "－" : "＋"}
         </button>
       </div>
 
       {/* Details panel */}
       {isOpen && (
-        <div className="st-topic-details">
+        <div className="px-[13px] pb-3 border-t border-[#f0f1f4]">
           {/* Subtopics */}
           {topic.subtopics?.length > 0 && (
-            <div className="st-subtopics-section">
-              <span className="st-notes-label">📋 Subtopics</span>
-              <div className="st-subtopics-checklist">
+            <div className="mb-[10px]">
+              <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px] mb-[5px]">📋 Subtopics</span>
+              <div className="flex flex-col gap-1 py-[5px]">
                 {topic.subtopics.map((st, i) => {
                   const checked = !!subtopicState[i];
                   return (
                     <div
                       key={i}
-                      className="st-subtopic-item"
+                      className="flex items-center gap-[7px] cursor-pointer px-[5px] py-1 rounded-[6px] hover:bg-gray-100 transition-all select-none"
                       onClick={() => onSubtopicCheck(i, !checked)}
                     >
-                      <div className={`st-subtopic-check${checked ? " checked" : ""}`} style={{ "--syl-color": color }}>
+                      <div
+                        className="w-[15px] h-[15px] border-2 border-gray-300 rounded-[4px] flex items-center justify-center flex-shrink-0 transition-all"
+                        style={checked ? { background: color, borderColor: color } : {}}
+                      >
                         {checked && SMALL_CHECK_SVG}
                       </div>
-                      <span className={`st-subtopic-label${checked ? " done" : ""}`}>{st}</span>
+                      <span className={cn("text-[0.8rem] text-[#4b5563] leading-[1.3]", checked && "line-through text-gray-400")}>
+                        {st}
+                      </span>
                     </div>
                   );
                 })}
@@ -241,47 +262,52 @@ function TopicCard({ topic, color, isDone, isOpen, customData, subtopicState, on
           )}
 
           {/* Notes + Resources */}
-          <div className="st-det-cols">
+          <div className="grid grid-cols-2 gap-[14px] mt-[10px]">
             <div>
-              <span className="st-notes-label">📝 Notes</span>
+              <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px] mb-[5px]">📝 Notes</span>
               <textarea
-                className="st-notes-input"
+                className="w-full min-h-[72px] border border-[#e9eaed] rounded-lg px-[10px] py-2 font-[inherit] text-[0.82rem] text-[#374151] bg-white resize-y outline-none focus:border-blue-600 transition-colors"
                 placeholder="Add your notes here..."
                 defaultValue={customData.notes || ""}
                 onBlur={(e) => onNoteSave(e.target.value)}
               />
             </div>
             <div>
-              <span className="st-notes-label">🔗 Resources</span>
-              <div className="st-res-list">
+              <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px] mb-[5px]">🔗 Resources</span>
+              <div className="flex flex-wrap gap-[5px] mb-[7px] min-h-[26px]">
                 {customData.resources?.length > 0
                   ? customData.resources.map((r, i) => (
-                    <span key={i} className="st-res-chip">
-                      <a href={r.url} target="_blank" rel="noopener noreferrer">
+                    <span key={i} className="inline-flex items-center bg-[#eff2ff] border border-[#c7d2fe] rounded-full py-[2px] pl-[9px] pr-[7px] gap-1 text-[0.74rem]">
+                      <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-blue-600 no-underline font-medium hover:underline">
                         {r.label || r.url}
                       </a>
-                      <button className="st-res-del" onClick={() => onDeleteResource(i)}>×</button>
+                      <button
+                        className="bg-transparent border-none cursor-pointer text-gray-400 text-[0.9rem] leading-none p-0 hover:text-red-500 transition-colors"
+                        onClick={() => onDeleteResource(i)}
+                      >
+                        ×
+                      </button>
                     </span>
                   ))
-                  : <span className="st-no-res">No resources added yet</span>
+                  : <span className="text-[0.75rem] text-[#c1c7d0] italic">No resources added yet</span>
                 }
               </div>
-              <div className="st-res-form">
+              <div className="flex gap-[5px] flex-wrap mt-[5px]">
                 <input
-                  className="st-res-input"
+                  className="border border-[#e9eaed] rounded-[7px] px-[9px] py-[5px] font-[inherit] text-[0.79rem] text-[#374151] bg-white flex-1 min-w-[100px] outline-none focus:border-blue-600 transition-colors"
                   placeholder="Label (e.g. MDN Docs)"
                   value={labelVal}
                   onChange={(e) => setLabelVal(e.target.value)}
                 />
                 <input
-                  className="st-res-input"
+                  className="border border-[#e9eaed] rounded-[7px] px-[9px] py-[5px] font-[inherit] text-[0.79rem] text-[#374151] bg-white flex-1 min-w-[100px] outline-none focus:border-blue-600 transition-colors"
                   placeholder="URL (https://...)"
                   value={urlVal}
                   onChange={(e) => setUrlVal(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleAddRes()}
                 />
                 <button
-                  className="st-res-add-btn"
+                  className="border-none rounded-[7px] px-3 py-[5px] font-[inherit] text-[0.79rem] font-semibold text-white cursor-pointer hover:opacity-[0.88] transition-opacity whitespace-nowrap"
                   style={{ background: color }}
                   onClick={handleAddRes}
                 >

@@ -1,4 +1,3 @@
-import "../study-tracker.css";
 import PromptPageContent from "./PromptPageContent";
 
 export const metadata = {

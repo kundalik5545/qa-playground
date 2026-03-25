@@ -6,6 +6,12 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Study Tracker — alternative font candidates (uncomment to activate) */
+/* --font-st-body: 'DM Sans', sans-serif;  */
+/* --font-st-mono: 'DM Mono', monospace;   */
+/* CDN import to pair with above: */
+/* @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap'); */
+
 @layer base {
   :root {
     --background: 0 0% 100%;

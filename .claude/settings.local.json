@@ -15,7 +15,20 @@
       "Bash(mkdir -p \"D:/new-playground/01_qa_playground/qa-playground/docs\")",
       "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/AI_CODING_GUIDELINES.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
       "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/BANK_MIGRATION_NOTES.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
-      "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/DEV_QUICK_REFERENCE.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")"
+      "Bash(mv \"D:/new-playground/01_qa_playground/qa-playground/DEV_QUICK_REFERENCE.md\" \"D:/new-playground/01_qa_playground/qa-playground/docs/\")",
+      "Bash(ls d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/*.yaml)",
+      "Bash(ls d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/*.lock)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(node -e \"const ba = require\\(''./node_modules/better-auth/package.json''\\); console.log\\(ba.version\\)\")",
+      "WebSearch",
+      "WebFetch(domain:www.prisma.io)",
+      "WebFetch(domain:better-auth.com)",
+      "WebFetch(domain:github.com)",
+      "Bash(ls \"d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/_components/\")",
+      "Bash(ls \"d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/dashboard/\")",
+      "Bash(wc -l \"d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/study-tracker.css\")",
+      "Bash(npx shadcn@latest add tabs --yes)"
     ]
   }
 }

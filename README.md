@@ -5,7 +5,7 @@
 Practice Selenium, Playwright, and Cypress against realistic, automation-friendly web elements — without fighting with production apps that weren't designed for testing.
 
 [![Live](https://img.shields.io/badge/Live-qaplayground.com-blue)](https://www.qaplayground.com)
-[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org)
+[![Next.js](https://img.shields.io/badge/Next.js-16-black)](https://nextjs.org)
 [![React](https://img.shields.io/badge/React-19-61DAFB)](https://react.dev)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38BDF8)](https://tailwindcss.com)
 [![Deployed on Vercel](https://img.shields.io/badge/Deployed-Vercel-black)](https://vercel.com)
@@ -20,6 +20,8 @@ It provides:
 
 - **22 interactive UI elements** — inputs, buttons, tables, calendars, drag-and-drop, alerts, shadow DOM, iframes, and more
 - **Bank Demo App** — a full simulated application (login, accounts, dashboard, transactions) for end-to-end automation scenarios
+- **Study Tracker** — track your QA learning progress across syllabi, daily logs, and saved resources
+- **QA Tools** — free online utilities built for daily QA workflows
 - **Automation-friendly markup** — every element has stable `id`, `data-testid`, and `data-action` attributes
 - **Learning content** — markdown-based blog and tutorials on QA automation and JavaScript
 
@@ -54,6 +56,35 @@ A simulated banking application for practicing end-to-end test flows:
 - 100% client-side (localStorage) — no backend required
 - All elements tagged with `id`, `data-testid`, `data-action`
 
+### Study Tracker (`/study-tracker`)
+
+Track your QA learning journey:
+
+- Multiple syllabi — Manual Testing, Automation, API Testing, Playwright, and more
+- Daily study log to record what you covered each day
+- Syllabus Manager — import/export syllabi as JSON (supports AI-generated format)
+- AI Syllabus Prompt helper to generate study plans
+- Resources — save and organise articles, videos, courses, books, and tools by type
+- Resources synced to PostgreSQL for authenticated users
+
+### QA Tools (`/qa-tools`)
+
+Free online tools for daily QA workflows:
+
+| Tool | Status |
+|---|---|
+| JSON → Downloadable File | Live |
+| JSON Formatter & Validator | Coming soon |
+| Base64 Encoder / Decoder | Coming soon |
+| JWT Token Decoder | Coming soon |
+| Regex Tester for QA | Coming soon |
+
+### Authentication
+
+- Email/password sign-up and login via Better-Auth
+- Role-based access: `USER` (default) and `ADMIN`
+- Admin dashboard at `/admin/dashboard` — protected by middleware
+
 ### Blog & Learning Content
 
 - Markdown-based articles on QA automation, Selenium, Playwright, Cypress
@@ -66,11 +97,14 @@ A simulated banking application for practicing end-to-end test flows:
 
 | Category | Technology |
 |---|---|
-| Framework | Next.js 15 (App Router) |
+| Framework | Next.js 16 (App Router) |
 | Runtime | React 19 |
 | Language | JavaScript / JSX (no TypeScript) |
 | Styling | Tailwind CSS 3 + shadcn/ui (new-york) |
 | UI Primitives | Radix UI |
+| Authentication | Better-Auth + Prisma (PostgreSQL) |
+| ORM | Prisma |
+| Database | PostgreSQL |
 | Markdown | unified + remark + rehype pipeline |
 | Syntax Highlighting | shiki + rehype-pretty-code |
 | Deployment | Vercel |
@@ -84,6 +118,7 @@ A simulated banking application for practicing end-to-end test flows:
 
 - Node.js 18+
 - npm
+- PostgreSQL database (for auth and resources features)
 
 ### Setup
 
@@ -95,11 +130,26 @@ cd qatesting
 # Install dependencies
 npm install
 
+# Configure environment variables
+cp .env.example .env
+# Set DATABASE_URL, BETTER_AUTH_SECRET, BETTER_AUTH_URL in .env
+
+# Push Prisma schema to your database
+npx prisma db push
+
 # Start development server (Turbopack)
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
+
+### Environment Variables
+
+```bash
+DATABASE_URL=postgresql://...       # PostgreSQL connection string
+BETTER_AUTH_SECRET=your-secret      # Secret for session signing
+BETTER_AUTH_URL=http://localhost:3000
+```
 
 ### Available Scripts
 
@@ -119,18 +169,22 @@ npm run postbuild  # Generate sitemap (runs automatically after build)
 /
 ├── app/                    Next.js App Router — all pages and layouts
 │   ├── (bank)/             Bank Demo App (/bank)
+│   ├── (contact)/          Static/contact pages (about, privacy, site-alerts)
+│   ├── (admin)/            Auth pages + Admin dashboard (/login, /signup, /admin/dashboard)
 │   ├── (Practice)/         Practice elements (/practice) + Learn content
-│   ├── (admin)/            Static pages (about, contact, privacy)
-│   └── (blog)/             Blog index (/blog)
+│   ├── (study)/            Study Tracker (/study-tracker)
+│   ├── (tools)/            QA Tools (/qa-tools)
+│   ├── (blog)/             Blog index (/blog)
+│   └── api/                API routes (auth, resources, admin, api-keys)
 ├── components/             Shared React components
 │   └── ui/                 shadcn/ui primitives — do not edit manually
 ├── data/                   Static config and content arrays
-├── lib/                    Utility functions (cn(), bankStorage.js)
-├── Blog/                   Markdown content (blog posts, element docs)
-└── public/                 Static assets
+├── lib/                    Utilities (cn, bankStorage, studyTrackerStorage, auth, prisma)
+├── prisma/                 Prisma schema (PostgreSQL)
+└── Blog/                   Markdown content (blog posts, element docs)
 ```
 
-Full architecture details: see [`CLAUDE.md`](./CLAUDE.md) and [`AI_CODING_GUIDELINES.md`](./AI_CODING_GUIDELINES.md).
+Full architecture details: see [`CLAUDE.md`](./CLAUDE.md) and [`docs/AI_CODING_GUIDELINES.md`](./docs/AI_CODING_GUIDELINES.md).
 
 ---
 
@@ -152,7 +206,7 @@ All data is stored in the browser's `localStorage` — no server, no database. D
 
 Contributions are welcome. Before submitting a PR:
 
-1. Follow the component structure patterns documented in `AI_CODING_GUIDELINES.md`
+1. Follow the component structure patterns documented in `docs/AI_CODING_GUIDELINES.md`
 2. Use Tailwind CSS for all styling — no inline styles or CSS Modules
 3. Use the `@/` path alias — no relative imports
 4. Ensure every new practice element has both a `QAPlayGround` section and a `LearningInsight` section

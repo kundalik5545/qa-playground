@@ -7,6 +7,7 @@ import { ThemeProvider } from "@/components/lib/theme-provider";
 import Footer from "@/components/lib/Footer";
 import { basicDetails } from "@/data/BasicSetting";
 import { Analytics } from "@vercel/analytics/next";
+import SiteAlertPopup from "@/components/SiteAlertPopup";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -117,8 +118,11 @@ export default function RootLayout({ children }) {
             {children}
           </main>
 
+          {/* Site Alert Popup */}
+          <SiteAlertPopup />
+
           {/* Toaster Notifications */}
-          <Toaster richColors />
+          <Toaster richColors position="bottom-center" />
 
           {/* Vercel Analytics */}
           <Analytics />

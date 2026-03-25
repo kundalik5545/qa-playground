@@ -19,7 +19,7 @@ const SheetOpen = ({ children }) => {
   // Centralized navigation links data
   const navigationLinks = [
     { href: "/", label: "Home", altText: "Navigate to homepage" },
-    { href: "/study-tracker", label: "Study Tracker", altText: "Track your study progress", badge: "New" },
+    { href: "/study-tracker/dashboard", label: "Study Tracker", altText: "Track your study progress", badge: "New" },
     { href: "/blog", label: "Blog", altText: "Read our latest blog posts" },
     {
       href: "/elements/text-box",

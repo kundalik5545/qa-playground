@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
-  getAlertConfig,
+  getCachedAlertConfig,
+  setCachedAlertConfig,
   shouldShowAlert,
   saveAlertState,
+  getVisitorId,
 } from "@/lib/alertStorage";
 
 export default function SiteAlertPopup() {
@@ -17,12 +19,32 @@ export default function SiteAlertPopup() {
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    const cfg = getAlertConfig();
-    setConfig(cfg);
-    if (shouldShowAlert(cfg)) {
-      const timer = setTimeout(() => setVisible(true), 1500);
-      return () => clearTimeout(timer);
+    async function loadConfig() {
+      // 1. Try the local cache first (no network delay)
+      let cfg = getCachedAlertConfig();
+
+      if (!cfg) {
+        try {
+          const res = await fetch("/api/public/site-alerts/config");
+          if (res.ok) {
+            cfg = await res.json();
+            setCachedAlertConfig(cfg);
+          }
+        } catch {
+          // Silently fail — don't block the page for a popup
+        }
+      }
+
+      if (!cfg) return;
+
+      setConfig(cfg);
+      if (shouldShowAlert(cfg)) {
+        const timer = setTimeout(() => setVisible(true), 1500);
+        return () => clearTimeout(timer);
+      }
     }
+
+    loadConfig();
   }, []);
 
   async function handleAnswer(questionId, answer) {
@@ -36,36 +58,24 @@ export default function SiteAlertPopup() {
       return;
     }
 
-    // Last question answered — save state and submit
-    saveAlertState({
-      answeredAt: new Date().toISOString(),
-      responses: newAnswers,
-    });
-
+    // Last question answered — save local state to suppress re-show
+    saveAlertState({ answeredAt: new Date().toISOString() });
     setDone(true);
     setTimeout(() => setVisible(false), 2000);
 
-    if (config.formspreeEndpoint) {
+    // Submit to DB
+    const visitorId = getVisitorId();
+    if (visitorId) {
       try {
-        const payload = {
-          source: "QA Playground Homepage Alert",
-          timestamp: new Date().toISOString(),
-        };
-        config.questions.forEach((q) => {
-          payload[q.text] = newAnswers[q.id] ?? "—";
-        });
-        const res = await fetch(config.formspreeEndpoint, {
+        const responses = config.questions.map((q) => ({
+          questionId: q.id,
+          answer: newAnswers[q.id] ?? "—",
+        }));
+        await fetch("/api/public/site-alerts/respond", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify(payload),
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ visitorId, responses }),
         });
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          console.error("Formspree error:", res.status, body);
-        }
       } catch (err) {
         console.error("Alert submit failed:", err);
       }
@@ -73,7 +83,6 @@ export default function SiteAlertPopup() {
   }
 
   function handleDismiss() {
-    // Hide for the session only — will show again on next visit
     setVisible(false);
   }
 
@@ -97,7 +106,7 @@ export default function SiteAlertPopup() {
           </div>
         ) : (
           <>
-            {/* Progress dots */}
+            {/* Progress bar */}
             <div className="flex gap-1.5 mb-4">
               {config.questions.map((_, i) => (
                 <div
@@ -139,7 +148,7 @@ export default function SiteAlertPopup() {
                 <Button
                   variant="outline"
                   className="flex-1 gap-2"
-                  onClick={() => handleAnswer(currentQ.id, "👍 Liked it")}
+                  onClick={() => handleAnswer(currentQ.id, "Liked it")}
                 >
                   <ThumbsUp className="h-4 w-4 text-green-500" />
                   Yes
@@ -147,7 +156,7 @@ export default function SiteAlertPopup() {
                 <Button
                   variant="outline"
                   className="flex-1 gap-2"
-                  onClick={() => handleAnswer(currentQ.id, "👎 Did not like")}
+                  onClick={() => handleAnswer(currentQ.id, "Did not like")}
                 >
                   <ThumbsDown className="h-4 w-4 text-red-500" />
                   No

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
+import { Chart, registerables } from "chart.js";
 import {
   getSyllabusStats,
   getLast14Days,
@@ -17,6 +18,9 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
+
+Chart.register(...registerables);
 
 export default function DashboardView({
   state,
@@ -26,70 +30,56 @@ export default function DashboardView({
   onClearAll,
   onNavigate,
 }) {
-  const pieRef = useRef(null); // Today's Tasks doughnut
-  const overallRef = useRef(null); // Overall Progress doughnut
-  const lineRef = useRef(null); // Topics Completed line
-  const barRef = useRef(null); // Progress by Syllabus bar
-  const doughnutRef = useRef(null); // Completion Breakdown doughnut
-  const taskChartRef = useRef(null); // Daily Task Completion % line
-  const charts = useRef({});
+  const pieRef        = useRef(null); // Today's Tasks doughnut
+  const overallRef    = useRef(null); // Overall Progress doughnut
+  const lineRef       = useRef(null); // Topics Completed line
+  const barRef        = useRef(null); // Progress by Syllabus bar
+  const doughnutRef   = useRef(null); // Completion Breakdown doughnut
+  const taskChartRef  = useRef(null); // Daily Task Completion % line
+  const charts        = useRef({});
 
-  // Today's quick stats
-  const today = getTodayStr();
-  const todayTasks = state.daily[today] || [];
+  const today      = getTodayStr();
+  const todayTasks = useMemo(() => state.daily[today] || [], [state.daily, today]);
   const todayTaskDone = todayTasks.filter((t) => t.done).length;
 
+  // Scope effect to only the state keys charts actually read
+  const syllabi  = state.syllabi;
+  const progress = state.progress;
+  const daily    = state.daily;
+
   useEffect(() => {
-    if (window.Chart) {
-      renderCharts();
-      return;
-    }
-    const script = document.createElement("script");
-    script.src =
-      "https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js";
-    script.onload = renderCharts;
-    document.head.appendChild(script);
+    destroyAll();
+    renderCharts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  }, [syllabi, progress, daily]);
 
   function destroyAll() {
-    Object.values(charts.current).forEach((c) => {
-      try {
-        c.destroy();
-      } catch (_) {}
-    });
+    Object.values(charts.current).forEach((c) => { try { c.destroy(); } catch (_) {} });
     charts.current = {};
   }
 
   function renderCharts() {
-    destroyAll();
-    const C = window.Chart;
-    if (!C) return;
-
-    const syllabusIds = Object.keys(state.syllabi);
-    const syllabusLabels = syllabusIds.map((id) => state.syllabi[id].label);
-    const syllabusColors = syllabusIds.map((id) => state.syllabi[id].color);
-    const sylStats = syllabusIds.map((id) =>
-      getSyllabusStats(state.syllabi, state.progress, id),
-    );
-    const days = getLast14Days();
+    const syllabusIds    = Object.keys(syllabi);
+    const syllabusLabels = syllabusIds.map((id) => syllabi[id].label);
+    const syllabusColors = syllabusIds.map((id) => syllabi[id].color);
+    const sylStats       = syllabusIds.map((id) => getSyllabusStats(syllabi, progress, id));
+    const days           = getLast14Days();
+    const todayTasksNow  = daily[today] || [];
+    const doneTasks      = todayTasksNow.filter((t) => t.done).length;
 
     // ── Today's Tasks doughnut ──
     if (pieRef.current) {
-      const done = todayTaskDone;
-      const total = todayTasks.length;
-      const remaining = Math.max(total - done, 0);
-      charts.current.pie = new C(pieRef.current, {
+      const total     = todayTasksNow.length;
+      const remaining = Math.max(total - doneTasks, 0);
+      charts.current.pie = new Chart(pieRef.current, {
         type: "doughnut",
         data: {
           labels: ["Done", "Remaining"],
-          datasets: [
-            {
-              data: [done, remaining || (done ? 0 : 1)],
-              backgroundColor: ["#10b981", "#e5e7eb"],
-              borderWidth: 0,
-            },
-          ],
+          datasets: [{
+            data: [doneTasks, remaining || (doneTasks ? 0 : 1)],
+            backgroundColor: ["#10b981", "#e5e7eb"],
+            borderWidth: 0,
+          }],
         },
         options: {
           responsive: true,
@@ -98,20 +88,12 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: {
-                font: { family: "'DM Sans', sans-serif", size: 12 },
-                boxWidth: 12,
-                padding: 14,
-              },
+              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
             },
             title: {
               display: true,
-              text: total ? `${done}/${total} today` : "No tasks today",
-              font: {
-                family: "'DM Sans', sans-serif",
-                size: 13,
-                weight: "600",
-              },
+              text: total ? `${doneTasks}/${total} today` : "No tasks today",
+              font: { family: "Inter, sans-serif", size: 13, weight: "600" },
               color: "#374151",
               padding: { top: 10 },
             },
@@ -120,21 +102,18 @@ export default function DashboardView({
       });
     }
 
-    // ── Overall Progress doughnut (syllabus topics) ──
+    // ── Overall Progress doughnut ──
     if (overallRef.current) {
-      const total = allStats.total,
-        done = allStats.done;
-      charts.current.overall = new C(overallRef.current, {
+      const { total, done } = allStats;
+      charts.current.overall = new Chart(overallRef.current, {
         type: "doughnut",
         data: {
           labels: ["Completed", "Remaining"],
-          datasets: [
-            {
-              data: [done, Math.max(total - done, 0) || (done ? 0 : 1)],
-              backgroundColor: ["#2563eb", "#e5e7eb"],
-              borderWidth: 0,
-            },
-          ],
+          datasets: [{
+            data: [done, Math.max(total - done, 0) || (done ? 0 : 1)],
+            backgroundColor: ["#2563eb", "#e5e7eb"],
+            borderWidth: 0,
+          }],
         },
         options: {
           responsive: true,
@@ -143,20 +122,12 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: {
-                font: { family: "'DM Sans', sans-serif", size: 12 },
-                boxWidth: 12,
-                padding: 14,
-              },
+              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
             },
             title: {
               display: true,
               text: `${done} / ${total} topics`,
-              font: {
-                family: "'DM Sans', sans-serif",
-                size: 13,
-                weight: "600",
-              },
+              font: { family: "Inter, sans-serif", size: 13, weight: "600" },
               color: "#374151",
               padding: { top: 10 },
             },
@@ -165,18 +136,15 @@ export default function DashboardView({
       });
     }
 
-    // ── Topics completed (line) — last 14 days ──
+    // ── Topics completed line (last 14 days) ──
     if (lineRef.current) {
       const datasets = syllabusIds.map((id) => {
-        const syl = state.syllabi[id];
+        const syl  = syllabi[id];
         const data = days.map((day) => {
           let count = 0;
           for (const sec of syl.sections)
             for (const topic of sec.topics)
-              if (
-                state.progress[topic.id]?.done &&
-                state.progress[topic.id]?.date === day
-              )
+              if (progress[topic.id]?.done && progress[topic.id]?.date === day)
                 count++;
           return count;
         });
@@ -193,7 +161,7 @@ export default function DashboardView({
           spanGaps: true,
         };
       });
-      charts.current.line = new C(lineRef.current, {
+      charts.current.line = new Chart(lineRef.current, {
         type: "line",
         data: { labels: days.map((d) => d.slice(5)), datasets },
         options: {
@@ -201,21 +169,17 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: {
-                font: { family: "'DM Sans', sans-serif", size: 11 },
-                boxWidth: 12,
-                padding: 14,
-              },
+              labels: { font: { family: "Inter, sans-serif", size: 11 }, boxWidth: 12, padding: 14 },
             },
           },
           scales: {
             y: {
               beginAtZero: true,
-              ticks: { stepSize: 1, font: { family: "'DM Sans'" } },
+              ticks: { stepSize: 1, font: { family: "Inter" } },
               grid: { color: "#f3f4f6" },
             },
             x: {
-              ticks: { font: { family: "'DM Sans'", size: 10 } },
+              ticks: { font: { family: "Inter", size: 10 } },
               grid: { display: false },
             },
           },
@@ -223,9 +187,9 @@ export default function DashboardView({
       });
     }
 
-    // ── Progress by syllabus (bar) ──
+    // ── Progress by syllabus bar ──
     if (barRef.current) {
-      charts.current.bar = new C(barRef.current, {
+      charts.current.bar = new Chart(barRef.current, {
         type: "bar",
         data: {
           labels: syllabusLabels,
@@ -261,7 +225,7 @@ export default function DashboardView({
             legend: {
               position: "bottom",
               labels: {
-                font: { family: "'DM Sans', sans-serif", size: 11 },
+                font: { family: "Inter, sans-serif", size: 11 },
                 boxWidth: 10,
                 padding: 12,
                 usePointStyle: true,
@@ -271,10 +235,8 @@ export default function DashboardView({
             tooltip: {
               callbacks: {
                 label: (item) => {
-                  const idx = item.dataIndex;
-                  const s = sylStats[idx];
-                  if (item.datasetIndex === 0)
-                    return ` Completed: ${s.done} (${s.pct}%)`;
+                  const s = sylStats[item.dataIndex];
+                  if (item.datasetIndex === 0) return ` Completed: ${s.done} (${s.pct}%)`;
                   return ` Remaining: ${Math.max(s.total - s.done, 0)}`;
                 },
               },
@@ -283,18 +245,13 @@ export default function DashboardView({
           scales: {
             x: {
               stacked: true,
-              ticks: {
-                font: { family: "'DM Sans'", size: 12 },
-                maxRotation: 40,
-                minRotation: 30,
-                autoSkip: false,
-              },
+              ticks: { font: { family: "Inter", size: 12 }, maxRotation: 40, minRotation: 30, autoSkip: false },
               grid: { display: false },
             },
             y: {
               stacked: true,
               beginAtZero: true,
-              ticks: { stepSize: 5, font: { family: "'DM Sans'", size: 10 } },
+              ticks: { stepSize: 5, font: { family: "Inter", size: 10 } },
               grid: { color: "#f3f4f6" },
             },
           },
@@ -304,18 +261,16 @@ export default function DashboardView({
 
     // ── Completion breakdown doughnut (per syllabus) ──
     if (doughnutRef.current) {
-      charts.current.doughnut = new C(doughnutRef.current, {
+      charts.current.doughnut = new Chart(doughnutRef.current, {
         type: "doughnut",
         data: {
           labels: syllabusLabels,
-          datasets: [
-            {
-              data: sylStats.map((s) => s.done || 0),
-              backgroundColor: syllabusColors,
-              borderWidth: 2,
-              borderColor: "#fff",
-            },
-          ],
+          datasets: [{
+            data: sylStats.map((s) => s.done || 0),
+            backgroundColor: syllabusColors,
+            borderWidth: 2,
+            borderColor: "#fff",
+          }],
         },
         options: {
           responsive: true,
@@ -323,85 +278,65 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: {
-                font: { family: "'DM Sans', sans-serif", size: 12 },
-                boxWidth: 12,
-                padding: 14,
-              },
+              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
             },
           },
         },
       });
     }
 
-    // ── Daily tasks chart — last 14 days (completion % line) ──
+    // ── Daily task completion % line (last 14 days) ──
     if (taskChartRef.current) {
       const taskData = days.map((day) => {
-        const tasks = state.daily[day] || [];
-        const done = tasks.filter((t) => t.done).length;
+        const tasks = daily[day] || [];
+        const done  = tasks.filter((t) => t.done).length;
         const total = tasks.length;
-        return {
-          pct: total > 0 ? Math.round((done / total) * 100) : null,
-          done,
-          total,
-        };
+        return { pct: total > 0 ? Math.round((done / total) * 100) : null, done, total };
       });
-      charts.current.taskChart = new C(taskChartRef.current, {
+      charts.current.taskChart = new Chart(taskChartRef.current, {
         type: "line",
         data: {
           labels: days.map((d) => d.slice(5)),
-          datasets: [
-            {
-              label: "Completion %",
-              data: taskData.map((d) => d.pct),
-              borderColor: "#f59e0b",
-              backgroundColor: "#f59e0b22",
-              borderWidth: 2.5,
-              pointRadius: 4,
-              pointHoverRadius: 6,
-              pointBackgroundColor: "#f59e0b",
-              fill: true,
-              tension: 0.35,
-              spanGaps: false,
-            },
-          ],
+          datasets: [{
+            label: "Completion %",
+            data: taskData.map((d) => d.pct),
+            borderColor: "#f59e0b",
+            backgroundColor: "#f59e0b22",
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            pointBackgroundColor: "#f59e0b",
+            fill: true,
+            tension: 0.35,
+            spanGaps: true,
+          }],
         },
         options: {
           responsive: true,
           plugins: {
             legend: {
               position: "bottom",
-              labels: {
-                font: { family: "'DM Sans', sans-serif", size: 12 },
-                boxWidth: 12,
-                padding: 14,
-              },
+              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
             },
             tooltip: {
               callbacks: {
                 label: (item) => {
                   const d = taskData[item.dataIndex];
-                  return d.total
-                    ? `${d.pct}% (${d.done}/${d.total} tasks)`
-                    : "No tasks";
+                  return d.total ? `${d.pct}% (${d.done}/${d.total} tasks)` : "No tasks";
                 },
               },
             },
           },
           scales: {
             x: {
-              ticks: { font: { family: "'DM Sans'", size: 10 } },
+              ticks: { font: { family: "Inter", size: 10 } },
               grid: { display: false },
             },
             y: {
               beginAtZero: true,
               min: 0,
               max: 100,
-              ticks: {
-                stepSize: 10,
-                font: { family: "'DM Sans'" },
-                callback: (v) => v + "%",
-              },
+              ticks: { stepSize: 10, font: { family: "Inter" }, callback: (v) => v + "%" },
               grid: { color: "#f3f4f6" },
             },
           },
@@ -428,24 +363,28 @@ export default function DashboardView({
   return (
     <div>
       {/* Header */}
-      <div className="st-dash-header">
-        <div className="st-dash-header-row">
+      <div className="mb-[22px]">
+        <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
-            <h1 className="st-dash-title">QA Study Tracker</h1>
-            <p className="st-dash-subtitle">
+            <h1 className="text-[1.75rem] font-bold tracking-[-0.7px] text-[#111827] m-0">
+              QA Study Tracker
+            </h1>
+            <p className="text-gray-500 text-[0.9rem] mt-1 mb-0">
               Your personal learning progress dashboard
             </p>
           </div>
-          <div className="st-dash-actions">
-            <button className="st-action-btn st-export-btn" onClick={onExport}>
+          <div className="flex gap-2">
+            <Button size="sm" onClick={onExport} className="bg-blue-600 hover:bg-blue-700 text-white text-[0.82rem]">
               ⬇ Export
-            </button>
-            <button className="st-action-btn st-import-btn" onClick={onImport}>
+            </Button>
+            <Button size="sm" variant="outline" onClick={onImport} className="text-[0.82rem]">
               ⬆ Import
-            </button>
+            </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <button className="st-action-btn st-clear-btn">🗑 Clear All</button>
+                <Button size="sm" className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-[0.82rem]">
+                  🗑 Clear All
+                </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
@@ -469,9 +408,8 @@ export default function DashboardView({
         </div>
       </div>
 
-
       {/* Syllabus overview cards */}
-      <div className="st-overview-cards">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 mb-[22px]">
         <OverviewCard
           icon="🎯"
           label="Overall"
@@ -495,59 +433,59 @@ export default function DashboardView({
         })}
       </div>
 
-      {/* Row 1: Today's Tasks pie + Daily Task Completion % line */}
-      <div className="st-charts-row">
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Today's Tasks</h3>
-          <div className="st-pie-wrap">
+      {/* Row 1: Today's Tasks doughnut + Daily Task Completion % line */}
+      <div className="grid grid-cols-[1fr_2fr] gap-[14px] mb-[14px]">
+        <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Today's Tasks</h3>
+          <div className="max-w-[260px] mx-auto">
             <canvas ref={pieRef} />
           </div>
         </div>
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">
+        <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
             Daily Task Completion %{" "}
-            <span className="st-chart-subtitle">(last 14 days)</span>
+            <span className="text-[0.73rem] font-normal text-gray-400 ml-[5px]">(last 14 days)</span>
           </h3>
           <canvas ref={taskChartRef} height={110} />
         </div>
       </div>
 
-      {/* Row 2: Overall Progress pie + Topics Completed line */}
-      <div className="st-charts-row">
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Overall Progress</h3>
-          <div className="st-pie-wrap">
+      {/* Row 2: Overall Progress doughnut + Topics Completed line */}
+      <div className="grid grid-cols-[1fr_2fr] gap-[14px] mb-[14px]">
+        <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Overall Progress</h3>
+          <div className="max-w-[260px] mx-auto">
             <canvas ref={overallRef} />
           </div>
         </div>
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">
+        <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
             Topics Completed{" "}
-            <span className="st-chart-subtitle">(last 14 days)</span>
+            <span className="text-[0.73rem] font-normal text-gray-400 ml-[5px]">(last 14 days)</span>
           </h3>
           <canvas ref={lineRef} height={110} />
         </div>
       </div>
 
       {/* Row 3: Progress by Syllabus + Completion Breakdown */}
-      <div className="st-charts-row-equal" style={{ marginBottom: 14 }}>
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Progress by Syllabus</h3>
+      <div className="grid grid-cols-[2fr_1fr] gap-[14px] mb-[14px]">
+        <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Progress by Syllabus</h3>
           <canvas ref={barRef} height={100} />
         </div>
-        <div className="st-chart-card">
-          <h3 className="st-chart-title">Completion Breakdown</h3>
-          <div className="st-pie-wrap">
+        <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Completion Breakdown</h3>
+          <div className="max-w-[260px] mx-auto">
             <canvas ref={doughnutRef} />
           </div>
         </div>
       </div>
 
       {/* Recent activity */}
-      <div className="st-recent-activity">
-        <h3 className="st-chart-title">Recent Activity</h3>
+      <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px] mt-[14px]">
+        <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Recent Activity</h3>
         {recentLog.length === 0 ? (
-          <div className="st-no-activity">
+          <div className="text-gray-400 text-[0.86rem] text-center py-[18px]">
             No activity yet. Start checking off topics!
           </div>
         ) : (
@@ -559,20 +497,19 @@ export default function DashboardView({
               month: "short",
             });
             return (
-              <div key={date} className="st-activity-day">
-                <span className="st-act-date">{label}</span>
-                <div className="st-act-chips">
+              <div key={date} className="flex flex-nowrap items-center gap-3 py-[9px] border-b border-gray-100 last:border-b-0">
+                <span className="text-[0.76rem] font-semibold text-gray-500 min-w-[96px] flex-shrink-0">
+                  {label}
+                </span>
+                <div className="flex flex-wrap gap-[6px] flex-1">
                   {entries.map((entry, i) => {
                     const syl = state.syllabi[entry.tabId];
                     if (!syl) return null;
                     return (
                       <span
                         key={i}
-                        className="st-act-chip"
-                        style={{
-                          background: syl.color + "18",
-                          color: syl.color,
-                        }}
+                        className="text-[0.72rem] font-medium px-[10px] py-[3px] rounded-full whitespace-nowrap"
+                        style={{ background: syl.color + "18", color: syl.color }}
                       >
                         {syl.icon} +{entry.count} in {syl.label}
                       </span>
@@ -591,19 +528,21 @@ export default function DashboardView({
 function OverviewCard({ icon, label, pct, sub, color, onClick }) {
   return (
     <div
-      className="st-ov-card"
+      className="bg-white rounded-xl px-[14px] pt-4 pb-[14px] border border-[#e9eaed] border-t-[3px] cursor-pointer transition-all hover:shadow-[0_4px_18px_rgba(0,0,0,0.09)] hover:-translate-y-0.5"
       style={{ borderTopColor: color }}
       onClick={onClick}
     >
-      <div className="st-ov-icon">{icon}</div>
-      <div className="st-ov-label">{label}</div>
-      <div className="st-ov-pct" style={{ color }}>
+      <div className="text-[1.6rem] mb-[10px]">{icon}</div>
+      <div className="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-[0.8px] mb-[3px]">
+        {label}
+      </div>
+      <div className="text-[1.9rem] font-bold tracking-[-1px] leading-[1.1] mb-[3px] font-mono" style={{ color }}>
         {pct}%
       </div>
-      <div className="st-ov-sub">{sub}</div>
-      <div className="st-ov-bar-wrap">
+      <div className="text-[0.73rem] text-gray-400 mb-[10px]">{sub}</div>
+      <div className="h-1 bg-[#f0f1f4] rounded-full overflow-hidden">
         <div
-          className="st-ov-bar"
+          className="h-full rounded-full transition-[width] duration-700"
           style={{ width: `${pct}%`, background: color }}
         />
       </div>

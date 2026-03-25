@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
+import { Check, Copy, ArrowLeft } from "lucide-react";
 
 const THE_PROMPT = `Generate a study syllabus for the topic: [YOUR TOPIC HERE]
 
@@ -188,6 +190,16 @@ const EXAMPLE_TOPICS = [
   "Appium Mobile Testing",
 ];
 
+// ── Inline code chip ──────────────────────────────────────────────────────────
+function IC({ children }) {
+  return (
+    <code className="bg-[#fef3c7] text-amber-700 border border-amber-200 px-[5px] py-[1px] rounded text-[0.74rem] font-mono">
+      {children}
+    </code>
+  );
+}
+
+// ── Copy button ───────────────────────────────────────────────────────────────
 function CopyButton({ text, label = "Copy" }) {
   const [copied, setCopied] = useState(false);
 
@@ -204,450 +216,45 @@ function CopyButton({ text, label = "Copy" }) {
   return (
     <button
       onClick={handleCopy}
-      style={{
-        padding: "6px 14px",
-        borderRadius: 7,
-        border: "1px solid #e9eaed",
-        background: copied ? "#10b981" : "#fff",
-        color: copied ? "#fff" : "#374151",
-        fontSize: "0.78rem",
-        fontWeight: 600,
-        fontFamily: "'DM Sans', sans-serif",
-        cursor: "pointer",
-        transition: "all 0.15s",
-        whiteSpace: "nowrap",
-        flexShrink: 0,
-      }}
+      className={cn(
+        "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] border text-[0.78rem] font-semibold cursor-pointer transition-all whitespace-nowrap flex-shrink-0",
+        copied
+          ? "bg-emerald-500 border-emerald-500 text-white"
+          : "bg-white border-[#e9eaed] text-[#374151] hover:bg-gray-50 hover:border-gray-300"
+      )}
     >
-      {copied ? "✓ Copied!" : `⎘ ${label}`}
+      {copied ? <Check size={13} /> : <Copy size={13} />}
+      {copied ? "Copied!" : label}
     </button>
   );
 }
 
-export default function PromptPageContent() {
+// ── Light code block ──────────────────────────────────────────────────────────
+function CodeBlock({ filename, icon, copyText, children }) {
   return (
-    <div
-      style={{
-        minHeight: "calc(100vh - 64px)",
-        background: "#f8f9fc",
-        fontFamily: "'DM Sans', sans-serif",
-        color: "#1a1d23",
-      }}
-    >
-      <div
-        style={{ maxWidth: 820, margin: "0 auto", padding: "32px 24px 60px" }}
-      >
-        {/* Back link */}
-        <Link
-          href="/study-tracker"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 6,
-            fontSize: "0.82rem",
-            fontWeight: 600,
-            color: "#6b7280",
-            textDecoration: "none",
-            marginBottom: 28,
-            transition: "color 0.15s",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "#2563eb")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "#6b7280")}
-        >
-          ← Back to Study Tracker
-        </Link>
-
-        {/* Hero */}
-        <div style={{ marginBottom: 36 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              marginBottom: 10,
-            }}
-          >
-            <span
-              style={{
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.8px",
-                textTransform: "uppercase",
-                background: "#eff2ff",
-                color: "#2563eb",
-                padding: "3px 10px",
-                borderRadius: 20,
-              }}
-            >
-              AI-Powered
-            </span>
-            <span
-              style={{
-                fontSize: "0.7rem",
-                fontWeight: 700,
-                letterSpacing: "0.8px",
-                textTransform: "uppercase",
-                background: "#f0fdf4",
-                color: "#059669",
-                padding: "3px 10px",
-                borderRadius: 20,
-              }}
-            >
-              Works with any AI
-            </span>
-          </div>
-          <h1
-            style={{
-              fontSize: "2rem",
-              fontWeight: 700,
-              color: "#1a1d23",
-              margin: "0 0 10px",
-              lineHeight: 1.2,
-            }}
-          >
-            AI Syllabus Generator Prompt
-          </h1>
-          <p
-            style={{
-              fontSize: "1rem",
-              color: "#6b7280",
-              margin: 0,
-              lineHeight: 1.6,
-            }}
-          >
-            Use this ready-made prompt with ChatGPT, Claude, Gemini, or any AI
-            to generate a study syllabus in the exact format the QA Study
-            Tracker can import.
-          </p>
+    <div className="bg-[#f6f8fa] border border-[#e2e8f0] rounded-xl overflow-hidden">
+      <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-[#e2e8f0]">
+        <div className="flex items-center gap-2">
+          {icon && <span className="text-base">{icon}</span>}
+          <span className="text-[0.74rem] font-mono font-medium text-gray-500">{filename}</span>
         </div>
-
-        {/* ── The Prompt ── */}
-        <Section
-          title="The Prompt"
-          hint="Replace [YOUR TOPIC HERE] before using"
-        >
-          <div
-            style={{
-              background: "#1e1e2e",
-              borderRadius: 10,
-              overflow: "hidden",
-              border: "1px solid #2d2d3e",
-            }}
-          >
-            {/* Code toolbar */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "10px 14px",
-                background: "#16162a",
-                borderBottom: "1px solid #2d2d3e",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "0.75rem",
-                  color: "#9ca3af",
-                  fontFamily: "'DM Mono', monospace",
-                }}
-              >
-                prompt.txt
-              </span>
-              <CopyButton text={THE_PROMPT} label="Copy Prompt" />
-            </div>
-            <pre
-              style={{
-                margin: 0,
-                padding: "18px 20px",
-                fontSize: "0.78rem",
-                lineHeight: 1.7,
-                color: "#e2e8f0",
-                fontFamily: "'DM Mono', monospace",
-                overflowX: "auto",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              {THE_PROMPT}
-            </pre>
-          </div>
-        </Section>
-
-        {/* ── Rules ── */}
-        <Section
-          title="JSON Structure Rules"
-          hint="The AI must follow all 13 rules exactly"
-        >
-          <div
-            style={{
-              background: "#fff",
-              border: "1px solid #e9eaed",
-              borderRadius: 12,
-              overflow: "hidden",
-            }}
-          >
-            {RULES.map((rule, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  gap: 12,
-                  padding: "11px 16px",
-                  borderBottom:
-                    i < RULES.length - 1 ? "1px solid #f0f1f4" : "none",
-                  alignItems: "flex-start",
-                }}
-              >
-                <span
-                  style={{
-                    minWidth: 22,
-                    height: 22,
-                    borderRadius: "50%",
-                    background: "#eff2ff",
-                    color: "#2563eb",
-                    fontSize: "0.68rem",
-                    fontWeight: 700,
-                    fontFamily: "'DM Mono', monospace",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    marginTop: 1,
-                  }}
-                >
-                  {i + 1}
-                </span>
-                <span
-                  style={{
-                    fontSize: "0.84rem",
-                    color: "#374151",
-                    lineHeight: 1.55,
-                  }}
-                >
-                  {rule}
-                </span>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* ── Example Output ── */}
-        <Section
-          title="Example Output (Playwright)"
-          hint="This is what a correctly generated syllabus looks like"
-        >
-          <div
-            style={{
-              background: "#1e1e2e",
-              borderRadius: 10,
-              overflow: "hidden",
-              border: "1px solid #2d2d3e",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "10px 14px",
-                background: "#16162a",
-                borderBottom: "1px solid #2d2d3e",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: "1rem" }}>🎭</span>
-                <span
-                  style={{
-                    fontSize: "0.75rem",
-                    color: "#9ca3af",
-                    fontFamily: "'DM Mono', monospace",
-                  }}
-                >
-                  playwright-syllabus.json
-                </span>
-              </div>
-              <CopyButton text={EXAMPLE_JSON} label="Copy JSON" />
-            </div>
-            <pre
-              style={{
-                margin: 0,
-                padding: "18px 20px",
-                fontSize: "0.78rem",
-                lineHeight: 1.7,
-                color: "#e2e8f0",
-                fontFamily: "'DM Mono', monospace",
-                overflowX: "auto",
-                whiteSpace: "pre-wrap",
-                wordBreak: "break-word",
-              }}
-            >
-              {EXAMPLE_JSON}
-            </pre>
-          </div>
-        </Section>
-
-        {/* ── How to Use ── */}
-        <Section title="How to Use" hint="6 simple steps">
-          <div
-            style={{
-              background: "#fff",
-              border: "1px solid #e9eaed",
-              borderRadius: 12,
-              overflow: "hidden",
-            }}
-          >
-            {STEPS.map((step, i) => (
-              <div
-                key={i}
-                style={{
-                  display: "flex",
-                  gap: 14,
-                  padding: "13px 16px",
-                  borderBottom:
-                    i < STEPS.length - 1 ? "1px solid #f0f1f4" : "none",
-                  alignItems: "flex-start",
-                }}
-              >
-                <div
-                  style={{
-                    minWidth: 28,
-                    height: 28,
-                    borderRadius: "50%",
-                    background: "#2563eb",
-                    color: "#fff",
-                    fontSize: "0.75rem",
-                    fontWeight: 700,
-                    fontFamily: "'DM Mono', monospace",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    marginTop: 1,
-                  }}
-                >
-                  {step.num}
-                </div>
-                <span
-                  style={{
-                    fontSize: "0.88rem",
-                    color: "#1f2937",
-                    lineHeight: 1.6,
-                    paddingTop: 4,
-                  }}
-                >
-                  {step.text}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* CTAs */}
-          <div style={{ marginTop: 14, display: "flex", gap: 10, justifyContent: "flex-end", flexWrap: "wrap" }}>
-            <Link
-              href="/qa-tools/json-to-file"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "9px 18px",
-                borderRadius: 8,
-                background: "#f0fdf4",
-                color: "#059669",
-                border: "1px solid #bbf7d0",
-                fontSize: "0.84rem",
-                fontWeight: 600,
-                fontFamily: "'DM Sans', sans-serif",
-                textDecoration: "none",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#dcfce7")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#f0fdf4")}
-            >
-              ⬇ JSON → File Converter
-            </Link>
-            <Link
-              href="/study-tracker"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 6,
-                padding: "9px 18px",
-                borderRadius: 8,
-                background: "#2563eb",
-                color: "#fff",
-                fontSize: "0.84rem",
-                fontWeight: 600,
-                fontFamily: "'DM Sans', sans-serif",
-                textDecoration: "none",
-                transition: "background 0.15s",
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#1d4ed8")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#2563eb")}
-            >
-              Go to Syllabus Manager →
-            </Link>
-          </div>
-        </Section>
-
-        {/* ── Try These Topics ── */}
-        <Section
-          title="Try These Topics"
-          hint="Replace [YOUR TOPIC HERE] with any of these"
-        >
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {EXAMPLE_TOPICS.map((topic) => (
-              <span
-                key={topic}
-                style={{
-                  fontSize: "0.78rem",
-                  fontWeight: 600,
-                  padding: "5px 12px",
-                  borderRadius: 20,
-                  background: "#fff",
-                  border: "1px solid #e9eaed",
-                  color: "#374151",
-                  fontFamily: "'DM Sans', sans-serif",
-                }}
-              >
-                {topic}
-              </span>
-            ))}
-          </div>
-        </Section>
+        <CopyButton text={copyText} label={`Copy${filename ? " " + filename.split(".").pop().toUpperCase() : ""}`} />
       </div>
+      <pre className="m-0 px-5 py-4 text-[0.88rem] leading-[1.75] text-[#24292e] font-mono overflow-x-auto whitespace-pre-wrap break-words">
+        {children}
+      </pre>
     </div>
   );
 }
 
-// ── Section wrapper ────────────────────────────────────────────────────────────
+// ── Section wrapper ───────────────────────────────────────────────────────────
 function Section({ title, hint, children }) {
   return (
-    <div style={{ marginBottom: 36 }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "baseline",
-          gap: 10,
-          marginBottom: 12,
-        }}
-      >
-        <h2
-          style={{
-            fontSize: "1.05rem",
-            fontWeight: 700,
-            color: "#1a1d23",
-            margin: 0,
-          }}
-        >
-          {title}
-        </h2>
+    <div className="mb-9">
+      <div className="flex items-baseline gap-2 mb-3">
+        <h2 className="text-[1.05rem] font-bold text-[#1a1d23] m-0">{title}</h2>
         {hint && (
-          <span
-            style={{ fontSize: "0.74rem", color: "#9ca3af", fontWeight: 500 }}
-          >
-            — {hint}
-          </span>
+          <span className="text-[0.74rem] text-gray-400 font-medium">— {hint}</span>
         )}
       </div>
       {children}
@@ -657,204 +264,203 @@ function Section({ title, hint, children }) {
 
 // ── Rules data ────────────────────────────────────────────────────────────────
 const RULES = [
-  <>
-    "version" must always be{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      1
-    </code>
-    .
-  </>,
-  <>
-    "type" must always be exactly{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      qa-tracker-syllabus
-    </code>
-    .
-  </>,
-  <>
-    {"exportedAt"} must be a valid ISO 8601 timestamp (e.g.{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      2026-03-20T10:00:00.000Z
-    </code>
-    ).
-  </>,
-  <>
-    "id" inside "syllabus" must be a short, lowercase, hyphenated string (e.g.{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      cypress
-    </code>
-    ,{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      rest-api
-    </code>
-    ,{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      java-basics
-    </code>
-    ).
-  </>,
-  <>
-    Section IDs must follow the pattern:{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      &lt;syllabus-id&gt;-s1
-    </code>
-    ,{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      &lt;syllabus-id&gt;-s2
-    </code>
-    , etc.
-  </>,
-  <>
-    Topic IDs must follow the pattern:{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      &lt;syllabus-id&gt;-t1
-    </code>
-    ,{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      &lt;syllabus-id&gt;-t2
-    </code>
-    , etc. Numbered sequentially across all sections.
-  </>,
-  <>
-    Each topic must have <strong>2–5 subtopics</strong> as plain strings.
-  </>,
-  <>
-    "resources" must always be an empty array{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      []
-    </code>
-    .
-  </>,
-  <>
-    Organize topics into <strong>3–5 logical sections</strong> (e.g.
-    Fundamentals, Core Features, Advanced, CI/CD, Best Practices).
-  </>,
-  <>
-    Each section should have <strong>2–5 topics</strong>.
-  </>,
-  <>
-    Choose a relevant <strong>emoji</strong> for the icon.
-  </>,
-  <>
-    Choose a fitting <strong>hex color</strong> (avoid #ffffff and #000000).
-  </>,
-  <>
-    Output must be <strong>valid JSON</strong> — no trailing commas, no
-    comments.
-  </>,
-  <>
-    Always begin the response with a{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      FILENAME: &lt;topic-slug&gt;.json
-    </code>{" "}
-    line before the JSON (e.g.{" "}
-    <code
-      style={{
-        background: "#f3f4f6",
-        padding: "1px 5px",
-        borderRadius: 4,
-        fontSize: "0.75rem",
-        color: "#dc2626",
-      }}
-    >
-      FILENAME: playwright.json
-    </code>
-    ). This is the name the user saves the file as.
-  </>,
+  <>"version" must always be <IC>1</IC>.</>,
+  <>"type" must always be exactly <IC>qa-tracker-syllabus</IC>.</>,
+  <>{"exportedAt"} must be a valid ISO 8601 timestamp (e.g. <IC>2026-03-20T10:00:00.000Z</IC>).</>,
+  <>"id" inside "syllabus" must be a short, lowercase, hyphenated string (e.g. <IC>cypress</IC>, <IC>rest-api</IC>, <IC>java-basics</IC>).</>,
+  <>Section IDs must follow the pattern: <IC>&lt;syllabus-id&gt;-s1</IC>, <IC>&lt;syllabus-id&gt;-s2</IC>, etc.</>,
+  <>Topic IDs must follow the pattern: <IC>&lt;syllabus-id&gt;-t1</IC>, <IC>&lt;syllabus-id&gt;-t2</IC>, etc. Numbered sequentially across all sections.</>,
+  <>Each topic must have <strong>2–5 subtopics</strong> as plain strings.</>,
+  <>"resources" must always be an empty array <IC>[]</IC>.</>,
+  <>Organize topics into <strong>3–5 logical sections</strong> (e.g. Fundamentals, Core Features, Advanced, CI/CD, Best Practices).</>,
+  <>Each section should have <strong>2–5 topics</strong>.</>,
+  <>Choose a relevant <strong>emoji</strong> for the icon.</>,
+  <>Choose a fitting <strong>hex color</strong> (avoid #ffffff and #000000).</>,
+  <>Output must be <strong>valid JSON</strong> — no trailing commas, no comments.</>,
+  <>Always begin the response with a <IC>FILENAME: &lt;topic-slug&gt;.json</IC> line before the JSON (e.g. <IC>FILENAME: playwright.json</IC>). This is the name the user saves the file as.</>,
 ];
+
+// ── Prompt renderer with highlighted topic slot ───────────────────────────────
+function PromptWithHighlight({ topic }) {
+  const placeholder = "[YOUR TOPIC HERE]";
+  const idx = THE_PROMPT.indexOf(placeholder);
+  const before = THE_PROMPT.slice(0, idx);
+  const after  = THE_PROMPT.slice(idx + placeholder.length);
+
+  return (
+    <>
+      {before}
+      <mark className={cn(
+        "rounded px-[3px] not-italic font-semibold",
+        topic
+          ? "bg-emerald-100 text-emerald-700"
+          : "bg-amber-100 text-amber-700"
+      )}>
+        {topic || placeholder}
+      </mark>
+      {after}
+    </>
+  );
+}
+
+export default function PromptPageContent() {
+  const [topic, setTopic] = useState("");
+
+  const trimmed = topic.trim();
+  const promptText = trimmed
+    ? THE_PROMPT.replace("[YOUR TOPIC HERE]", trimmed)
+    : THE_PROMPT;
+
+  return (
+    <div className="min-h-[calc(100vh-64px)] bg-[#f8f9fc] text-[#1a1d23]">
+      <div className="max-w-[820px] mx-auto px-6 pt-8 pb-16">
+
+        {/* Back link */}
+        <Link
+          href="/study-tracker/dashboard"
+          className="inline-flex items-center gap-1.5 text-[0.82rem] font-semibold text-gray-500 no-underline mb-7 hover:text-blue-600 transition-colors"
+        >
+          <ArrowLeft size={14} />
+          Back to Study Tracker
+        </Link>
+
+        {/* Hero */}
+        <div className="mb-9">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-[0.7rem] font-bold tracking-[0.8px] uppercase bg-[#eff2ff] text-blue-600 px-[10px] py-[3px] rounded-full">
+              AI-Powered
+            </span>
+            <span className="text-[0.7rem] font-bold tracking-[0.8px] uppercase bg-[#f0fdf4] text-emerald-600 px-[10px] py-[3px] rounded-full">
+              Works with any AI
+            </span>
+          </div>
+          <h1 className="text-[2rem] font-bold text-[#1a1d23] leading-[1.2] mb-[10px] m-0">
+            AI Syllabus Generator Prompt
+          </h1>
+          <p className="text-base text-gray-500 m-0 leading-relaxed">
+            Use this ready-made prompt with ChatGPT, Claude, Gemini, or any AI to generate a study
+            syllabus in the exact format the QA Study Tracker can import.
+          </p>
+        </div>
+
+        {/* ── Topic Input ── */}
+        <div className="mb-9">
+          <div className="bg-white border border-[#e9eaed] rounded-xl px-5 py-5">
+            <label className="block text-[0.82rem] font-semibold text-[#374151] mb-[10px]">
+              ✦ Enter your topic — it will be placed in the prompt automatically
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                placeholder='e.g. "Cypress automation testing" or "Docker for QA Engineers"'
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                className="flex-1 border border-[#e9eaed] rounded-lg px-4 py-[10px] text-sm text-[#1f2937] bg-white outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all placeholder:text-gray-400"
+              />
+              {topic && (
+                <button
+                  onClick={() => setTopic("")}
+                  className="px-3 py-[10px] rounded-lg border border-[#e9eaed] bg-white text-gray-400 hover:text-gray-600 hover:border-gray-300 transition-colors text-sm"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            {/* Quick-pick chips */}
+            <div className="flex flex-wrap gap-[6px] mt-3">
+              {EXAMPLE_TOPICS.map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTopic(t)}
+                  className={cn(
+                    "text-[0.74rem] font-medium px-[10px] py-[4px] rounded-full border transition-colors cursor-pointer",
+                    trimmed === t
+                      ? "bg-blue-600 border-blue-600 text-white"
+                      : "bg-[#f8f9fc] border-[#e9eaed] text-[#374151] hover:border-blue-300 hover:text-blue-600 hover:bg-[#eff2ff]"
+                  )}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── The Prompt ── */}
+        <Section
+          title="The Prompt"
+          hint={trimmed ? `Topic set to "${trimmed}"` : "Enter a topic above to auto-fill"}
+        >
+          <CodeBlock filename="prompt.txt" copyText={promptText}>
+            <PromptWithHighlight topic={trimmed} />
+          </CodeBlock>
+        </Section>
+
+        {/* ── Rules ── */}
+        <Section title="JSON Structure Rules" hint="The AI must follow all 14 rules exactly">
+          <div className="bg-white border border-[#e9eaed] rounded-xl overflow-hidden">
+            {RULES.map((rule, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "flex gap-3 px-4 py-[11px] items-start",
+                  i < RULES.length - 1 && "border-b border-[#f0f1f4]"
+                )}
+              >
+                <span className="min-w-[22px] h-[22px] rounded-full bg-[#eff2ff] text-blue-600 text-[0.68rem] font-bold font-mono flex items-center justify-center flex-shrink-0 mt-[1px]">
+                  {i + 1}
+                </span>
+                <span className="text-[0.84rem] text-[#374151] leading-[1.55]">{rule}</span>
+              </div>
+            ))}
+          </div>
+        </Section>
+
+        {/* ── Example Output ── */}
+        <Section title="Example Output (Playwright)" hint="This is what a correctly generated syllabus looks like">
+          <CodeBlock filename="playwright-syllabus.json" icon="🎭" copyText={EXAMPLE_JSON}>
+            {EXAMPLE_JSON}
+          </CodeBlock>
+        </Section>
+
+        {/* ── How to Use ── */}
+        <Section title="How to Use" hint="6 simple steps">
+          <div className="bg-white border border-[#e9eaed] rounded-xl overflow-hidden">
+            {STEPS.map((step, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "flex gap-[14px] px-4 py-[13px] items-start",
+                  i < STEPS.length - 1 && "border-b border-[#f0f1f4]"
+                )}
+              >
+                <div className="min-w-[28px] h-[28px] rounded-full bg-blue-600 text-white text-[0.75rem] font-bold font-mono flex items-center justify-center flex-shrink-0 mt-[1px]">
+                  {step.num}
+                </div>
+                <span className="text-[0.88rem] text-[#1f2937] leading-[1.6] pt-1">{step.text}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* CTAs */}
+          <div className="mt-4 flex gap-3 justify-end flex-wrap">
+            <Link
+              href="/qa-tools/json-to-file"
+              className="inline-flex items-center gap-1.5 px-[18px] py-[9px] rounded-lg bg-[#f0fdf4] text-emerald-600 border border-[#bbf7d0] text-[0.84rem] font-semibold no-underline hover:bg-[#dcfce7] transition-colors"
+            >
+              ⬇ JSON → File Converter
+            </Link>
+            <Link
+              href="/study-tracker/dashboard"
+              className="inline-flex items-center gap-1.5 px-[18px] py-[9px] rounded-lg bg-blue-600 text-white text-[0.84rem] font-semibold no-underline hover:bg-blue-700 transition-colors"
+            >
+              Go to Syllabus Manager →
+            </Link>
+          </div>
+        </Section>
+
+
+      </div>
+    </div>
+  );
+}
