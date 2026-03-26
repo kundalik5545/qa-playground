@@ -1,48 +1,17 @@
 ---
-title: Complete javascript syllabus to study
-description: "Javascript syllabus with important topics list."
-author: random coders
-date: 5 Sep 2025
-image: "/Images/blogs/b3.jpg"
-keywords: "js syllabus"
-testing: ["sample", "accept"]
-isBlog: Yes
+title: "JavaScript Syllabus for QA Engineers: Topics and String Methods"
+description: "A complete JavaScript syllabus for QA engineers covering essential topics, must-know concepts, and all string methods with practical code examples."
+author: "Kundalik Jadhav"
+authorUrl: "https://www.qaplayground.com/about-me"
+date: "2025-09-05"
+lastModified: "2025-09-05"
+category: ["automation", "general"]
+keywords: "javascript syllabus, javascript for QA engineers, javascript string methods, learn javascript, javascript topics list"
+slug: "javascript-syllabus-for-qa-engineers"
+image: "https://ik.imagekit.io/randomcoder/QAPlayground/id-02-people-in-meeting-with-laptop.webp"
+imageAlt: "JavaScript syllabus and topics for QA engineers"
+draft: false
 ---
-
-## Typescript with react & nextjs
-
-## To run .ts file use this commands
-
-This will run .ts file directly in terminal
-
-```npm
-node filename.ts
-```
-
-This will create .js file from .ts file then we need index.html to run this file
-
-```npm
-tsc filename.ts
-```
-
-## Data types in typescript / Javascripts
-
-```js
-var myName = "kundalik";
-```
-
-Here..
-var - variable
-myName - variable Name
-"kudalik" - data
-
-![alt text](image-1.png)
-
-Now in typescript this is
-
-```ts
-let myName: string = "kundalik";
-```
 
 ## Javascript topics
 
@@ -91,7 +60,6 @@ let myName: string = "kundalik";
 
 ### String methods
 
-````markdown
 #### Commonly Used String Methods
 
 1. **`length`** - Returns the length of the string.
@@ -258,8 +226,8 @@ let myName: string = "kundalik";
     ```
 
 24. **`toString()`** - Returns the string representation of the value.
+
     ```js
     let str = new String("hello");
     console.log(str.toString()); // "hello"
     ```
-````

@@ -1,13 +1,16 @@
 ---
-id: 2
-title: Practice Automation test cases
-description: "Practice automation test cases and to improve your knowledge"
-author: random coders
-date: 06 Oct 2025
-keywords: "automation, testing, selenium"
-slug: automation-test-cases
-image: "https://ik.imagekit.io/randomcoder/QAPlayground/id-02-people-in-meeting-with-laptop.webp?updatedAt=1759727596773"
-isBlog: Yes
+title: "25 Real-World Automation Test Cases for QA Engineers"
+description: "Practice automation testing with 25 real-world test cases covering e-commerce, banking, healthcare, and travel. Ideal for QA engineers preparing for interviews or building hands-on skills."
+author: "Kundalik Jadhav"
+authorUrl: "https://www.qaplayground.com/about-me"
+date: "2025-10-06"
+lastModified: "2025-10-06"
+category: ["automation", "testing"]
+keywords: "automation test cases, selenium test cases, playwright test cases, QA practice scenarios, automation testing practice"
+slug: "25-real-world-automation-test-cases-for-qa-engineers"
+image: "https://ik.imagekit.io/randomcoder/QAPlayground/id-02-people-in-meeting-with-laptop.webp"
+imageAlt: "QA engineers practicing automation test cases"
+draft: false
 ---
 
 ## ✨ Introduction
@@ -196,4 +199,4 @@ The key to success in automation testing lies in continuous learning, adapting t
 
 Whether you're preparing for interviews, enhancing your current skills, or transitioning into automation testing, these practice scenarios will serve as valuable stepping stones in your automation journey. Keep practicing, stay curious, and embrace the evolving landscape of test automation technologies.
 
-> 📄 **Also Read:** [Top 10 Best Automation Practice Website](https://www.qaplayground.com/practice/top-10-best-automation-practice-website)
+> 📄 **Also Read:** [Top 10 Best Automation Practice Website](https://www.qaplayground.com/blog/top-10-best-automation-practice-website)

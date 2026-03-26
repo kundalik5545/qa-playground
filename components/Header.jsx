@@ -11,7 +11,7 @@ const Header = () => {
   const mainNavLinks = [
     { to: "/", text: "Home" },
     { to: "/study-tracker/dashboard", text: "Study Tracker", badge: "New" },
-    { to: "/bank", text: "Bank" },
+    { to: "/bank", text: "Bank Demo" },
     { to: "/practice", text: "Practice" },
     { to: "/blog", text: "Blog" },
     { to: "/login", text: "Login" },
@@ -42,7 +42,10 @@ const Header = () => {
         </SheetOpen>
 
         {/* Desktop Navigation */}
-        <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-4">
+        <nav
+          aria-label="Main navigation"
+          className="hidden lg:flex items-center gap-4"
+        >
           {mainNavLinks.map(({ to, text, badge }, index) => (
             <Link
               key={index}

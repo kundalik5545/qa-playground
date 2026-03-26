@@ -230,8 +230,7 @@ export default function BlogClientContent({ posts }) {
   }, [posts, activeTag, search, sortOrder]);
 
   const visible = filtered.slice(0, visibleCount);
-  const [featured, ...allRest] = visible;
-  const rest = allRest.slice(0, SECONDARY_GRID_POSTS);
+  const [featured, ...rest] = visible;
   const hasMore = visibleCount < filtered.length;
 
   const handleTagClick = (tag) => {

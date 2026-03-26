@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Database } from "lucide-react";
 
 export const metadata = {
   title: "About Me",
@@ -22,7 +23,7 @@ export const metadata = {
 const ProfilePage = () => {
   const socialLinks = [
     {
-      href: "mailto:kundalikjadhav5545@gmail.com",
+      href: "mailto:kundalik.dev@gmail.com",
       icon: <Mail />,
       label: "Email",
     },
@@ -32,7 +33,7 @@ const ProfilePage = () => {
       label: "LinkedIn",
     },
     {
-      href: "https://github.com/kundalik5545",
+      href: "https://github.com/kundalik-dev",
       icon: <Github />,
       label: "GitHub",
     },
@@ -42,7 +43,7 @@ const ProfilePage = () => {
       label: "YouTube",
     },
     {
-      href: "https://twitter.com/randomcoders",
+      href: "https://twitter.com/qaplayground",
       icon: <Twitter />,
       label: "Twitter",
     },
@@ -59,39 +60,38 @@ const ProfilePage = () => {
       company: "Lumera",
       duration: "Jan 2025 - Present",
       project:
-        "DMP (DataHub) Software –  Developed an automation framework using C#, Selenium, and NUnit with database integration for data-driven testing.  Automated Client Portal and EmployerHub to ensure robust pre-production testing.",
+        "eMember Public & Admin Portal — a platform enabling users to track their pensions and retirement benefits. Designed and developed an automation framework using C#, Selenium, and NUnit with database integration for data-driven testing.",
     },
     {
       role: "Test Analyst",
       company: "ITM",
       duration: "Aug 2022 - Jan 2025",
       project:
-        "Penscope (Pension Administration) – Developed an automation framework using C#, Selenium, and NUnit with JSON-based data-driven testing. Which reduce 60% manual testing effort.",
+        "Penscope (Pension Administration) — Designed and developed an automation framework using C#, Selenium, and NUnit with JSON-based data-driven testing, reducing manual testing effort by 60%.",
     },
     {
       role: "Junior Analyst",
       company: "Mindtree",
       duration: "Jun 2019 - Aug 2022",
       project:
-        "Banking Admin – Performed manual and API testing for banking applications, focusing on quality and reliability.",
+        "Banking Admin — Performed manual and automation testing for banking applications, with a focus on quality assurance and application reliability.",
     },
   ];
 
   const mySkills = [
     {
-      lang: "C#, Java, JavaScript, SQL",
-      API_Database: " RestAssured ,RestSharp, Postman, SQL Server, PostGresSQL",
-      automation: "Selenium, WebDriver, NUnit, TestNG, Playwright ",
-      framework:
-        "POM, Builder Pattern, Data-Driven, Testng(JSON, NUnit), SOLID Principles",
-      CI_CD: " Git, Azure DevOps, Jenkins, Maven ",
+      automation: "Selenium, Playwright, NUnit, TestNG",
+      lang: "C#, JavaScript, SQL",
+      framework: "POM, Builder Pattern, Data-Driven, TestNG (JSON, NUnit)",
+      API: "RestAssured, Postman",
+      Database: "SQL Server, PostGresSQL",
       test_Management: "JIRA, Azure Test Plans",
-      devSkills:
-        "MERN Stack, Express.js, Node.js, React.js, Next.js, Tailwind CSS, JavaScript, TypeScript, HTML, CSS",
+      CI_CD: "Git, Jenkins",
+      devSkills: "Next.js, Tailwind CSS, JavaScript, Shadcn, HTML, CSS",
     },
   ];
 
-  const keyAchivement = [
+  const keyAchievement = [
     "Employee of the month and top performer.",
     "Successfully reduced manual testing effort by 60% through automation.",
     "Contributed to the development of a comprehensive automation framework.",
@@ -101,7 +101,7 @@ const ProfilePage = () => {
 
   const myGithub = [
     {
-      name: "Ai Website Generator",
+      name: "AI Website Generator",
       description:
         "Create stunning websites in minutes with our AI Website Generator. Powered by Next.js and Tailwind CSS, it offers customizable templates and seamless deployment.",
       url: "https://github.com/kundalik5545/ai-website-generator",
@@ -112,21 +112,23 @@ const ProfilePage = () => {
       description:
         "A comprehensive automation testing platform with interactive labs, real-world scenarios, and built-in UI components for hands-on learning.",
       url: "https://github.com/kundalik5545/qatesting",
-      liveUrl: "https://qatesting.vercel.app/",
+      liveUrl: "https://qaplayground.com/",
     },
     {
-      name: "Random Coders Blog",
+      name: "QA Playground Clipper",
       description:
-        "A modern blogging platform for sharing automation, QA, and coding tutorials, featuring markdown support and a clean, responsive UI.",
-      url: "https://github.com/kundalik5545/random_coders",
-      liveUrl: "https://random-coders.vercel.app/",
+        "Chrome extension that allows users to capture any web page, article, or YouTube video link and save it to QA Playground for future reference and learning.",
+      url: "https://github.com/kundalik-dev/save-to-qa-playground",
+      liveUrl:
+        "https://chromewebstore.google.com/detail/jegdkegbomfbmhhimfjgacdblcoodfpd?utm_source=item-share-cb",
     },
     {
-      name: "QA Xpath",
+      name: "QA Capture",
       description:
-        "A full-stack MERN application for managing and visualizing XPath queries, demonstrating best practices in React, Node.js, and MongoDB.",
-      url: "https://github.com/kundalik5545/qa-xpath",
-      liveUrl: "https://qa-xpath.vercel.app/",
+        "QA Capture is a Chrome extension that allows users to continuously capture screenshots and convert them into PDF, MD, or HTML files.",
+      url: "https://chromewebstore.google.com/detail/jhgkhnokloeklnagbkgkgcfphafifefg?utm_source=item-share-cb",
+      liveUrl:
+        "https://chromewebstore.google.com/detail/jhgkhnokloeklnagbkgkgcfphafifefg?utm_source=item-share-cb",
     },
   ];
 
@@ -172,7 +174,7 @@ const ProfilePage = () => {
           </p>
         </div>
 
-        {/* My SKills*/}
+        {/* My Skills */}
         <div className="mt-8 pb-3">
           <h2 className="text-2xl font-semibold">Skills</h2>
           <hr />
@@ -200,9 +202,15 @@ const ProfilePage = () => {
                   </div>
                   <div className="flex">
                     <span className="font-semibold text-primary min-w-[150px]">
-                      API & Database
+                      API Testing
                     </span>
-                    <span className="ml-2">: {skill.API_Database}</span>
+                    <span className="ml-2">: {skill.API}</span>
+                  </div>
+                  <div className="flex">
+                    <span className="font-semibold text-primary min-w-[150px]">
+                      Database Testing
+                    </span>
+                    <span className="ml-2">: {skill.Database}</span>
                   </div>
                   <div className="flex">
                     <span className="font-semibold text-primary min-w-[150px]">
@@ -258,7 +266,7 @@ const ProfilePage = () => {
           <h2 className="text-2xl font-semibold">Key Accomplishments</h2>
           <hr />
           <ul className="mt-4 space-y-4">
-            {keyAchivement.map((key, index) => (
+            {keyAchievement.map((key, index) => (
               <li key={index} className="border-l-4 border-primary pl-4">
                 <p className="text-sm text-muted-foreground">{key}</p>
               </li>
@@ -327,8 +335,8 @@ const ProfilePage = () => {
           <h2 className="text-2xl font-semibold">Education</h2>
           <hr />
           <p className="text-sm text-muted-foreground mt-2">
-            Batchelors Of Engg From - Gov. College Of Engg. & Research, Awsari
-            Pune | 2017
+            Bachelor of Engineering from Gov. College of Engineering & Research,
+            Awsari Pune | 2017
           </p>
         </div>
       </div>

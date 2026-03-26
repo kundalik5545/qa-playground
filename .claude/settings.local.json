@@ -37,7 +37,8 @@
       "Bash(mv button.md buttons.md)",
       "Bash(mv select.md dropdowns.md)",
       "Bash(mv alert.md alerts-dialogs.md)",
-      "Bash(mv radio.md radio-checkbox.md)"
+      "Bash(mv radio.md radio-checkbox.md)",
+      "Bash(ls \"D:/new-playground/01_qa_playground/00_new-qa-playground/qa-playground/app/\\(Practice\\)/\")"
     ]
   }
 }

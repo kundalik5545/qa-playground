@@ -14,10 +14,28 @@ import { transformerCopyButton } from "@rehype-pretty/transformers";
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, ArrowLeft } from "lucide-react";
+import { Calendar, ArrowLeft, ArrowRight } from "lucide-react";
 import { basicDetails } from "@/data/BasicSetting";
 
 const POSTS_DIR = path.join(process.cwd(), "Blog/posts");
+
+function getAllPostsMeta() {
+  return fs
+    .readdirSync(POSTS_DIR)
+    .filter((f) => f.endsWith(".md"))
+    .map((filename) => {
+      const { data } = matter(fs.readFileSync(path.join(POSTS_DIR, filename), "utf-8"));
+      return { ...data, slug: data.slug || filename.replace(/\.md$/, "") };
+    })
+    .filter((p) => p.draft !== true)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+function getPreviousPost(currentSlug) {
+  const posts = getAllPostsMeta();
+  const idx = posts.findIndex((p) => p.slug === currentSlug);
+  return idx !== -1 && idx + 1 < posts.length ? posts[idx + 1] : null;
+}
 
 export async function generateStaticParams() {
   return fs
@@ -113,6 +131,7 @@ const BlogPostPage = async ({ params }) => {
   ).toString();
 
   const postUrl = `${basicDetails.websiteURL}/blog/${slug}`;
+  const previousPost = getPreviousPost(slug);
 
   return (
     <div className="container mx-auto px-4 lg:px-8 pt-6 pb-20">
@@ -168,6 +187,50 @@ const BlogPostPage = async ({ params }) => {
       <article className="prose dark:prose-invert max-w-5xl mx-auto">
         <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
       </article>
+
+      {/* Previous post */}
+      {previousPost && (
+        <div className="max-w-5xl mx-auto mt-12 pt-8 border-t border-border">
+          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-4">
+            Previous Post
+          </p>
+          <Link
+            href={`/blog/${previousPost.slug}`}
+            prefetch={false}
+            className="group flex flex-col sm:flex-row gap-4 rounded-xl border border-border bg-card hover:border-blue-400 dark:hover:border-blue-500 transition-colors p-4"
+          >
+            {previousPost.image && (
+              <div className="relative w-full sm:w-36 h-24 flex-shrink-0 rounded-lg overflow-hidden">
+                <Image
+                  src={previousPost.image}
+                  alt={previousPost.imageAlt || previousPost.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, 144px"
+                  className="object-cover"
+                />
+              </div>
+            )}
+            <div className="flex flex-col justify-center gap-1 flex-1 min-w-0">
+              <div className="flex flex-wrap gap-1.5 mb-1">
+                {(previousPost.category || []).map((cat) => (
+                  <Badge key={cat} variant="outline" className="capitalize text-xs">
+                    {cat}
+                  </Badge>
+                ))}
+              </div>
+              <p className="text-base font-semibold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                {previousPost.title}
+              </p>
+              <p className="text-sm text-muted-foreground line-clamp-2">
+                {previousPost.description}
+              </p>
+              <span className="mt-1 inline-flex items-center gap-1 text-sm font-medium text-blue-600 dark:text-blue-400 group-hover:underline self-start">
+                Read post <ArrowRight size={14} />
+              </span>
+            </div>
+          </Link>
+        </div>
+      )}
 
       {/* JSON-LD — Article structured data for Google + AI crawlers */}
       <script

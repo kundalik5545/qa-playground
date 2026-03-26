@@ -17,7 +17,4 @@ export const siteMapUrls = [
   { url: "practice/date-picker" },
   { url: "practice/forms" },
   { url: "practice/file-upload" },
-  // Learn pages
-  { url: "learn/logical-programs-list-to-crack-interviews" },
-  { url: "learn/top-10-best-chrome-extension-for-automation-tester" },
 ];
