@@ -264,8 +264,9 @@ lib/
 
 ```
 Blog/
-├── AutomationBlog/               Blog markdown posts
-├── ElementBlogs/                 Element docs markdown (one per practice element)
+├── elements/                     Element docs markdown (one per practice element — slug = filename)
+├── posts/                        Blog post markdown files
+├── learn/                        Learn content markdown
 └── JavascriptBlog/               JS syllabus content
 ```
 
@@ -349,9 +350,9 @@ See `docs/STUDY_TRACKER_DB_MIGRATION_ANALYSIS.md` for full schema and migration 
 
 ### Dynamic Practice Pages ([slug])
 
-1. `generateStaticParams()` reads all `.md` files from `Blog/ElementBlogs/`
+1. `generateStaticParams()` reads all `.md` files from `Blog/elements/`
 2. Page reads the matching `.md` file, parses frontmatter + content
-3. A `componentMap` object maps slug → React component (e.g. `"input"` → `<InputPage />`)
+3. A `componentMap` object maps slug → React component (e.g. `"input-fields"` → `<InputPage />`)
 4. Both the markdown content AND the interactive component render on the same page
 
 ### Bank App Data Flow
@@ -505,7 +506,7 @@ Uses **CSS variables** defined in `app/globals.css` for light + dark mode, follo
 | Layouts | lowercase `layout.js` | `layout.js` |
 | Data files | camelCase `.js` | `basicSetting.js`, `landingPage.js` |
 | Utilities | camelCase `.js` | `bankStorage.js`, `utils.js` |
-| Slugs | kebab-case | `file-upload-download`, `advance-table` |
+| Slugs | kebab-case | `file-upload`, `input-fields`, `alerts-dialogs` |
 
 ### Import Paths
 
@@ -580,8 +581,7 @@ Exception: `prisma.config.ts` is required by Prisma tooling — do not convert i
 
 ## Known Issues / TODOs
 
-- Several practice elements listed on the hub page (`/practice`) may not have corresponding `_components/` files yet (Drag, Drop, Sort, Slider, Shadow DOM, Frame were listed in the hub but not all confirmed in `_components/`).
-- `Blog/ElementBlogs/test.md` appears to be a test/scratch file — review whether it should be kept.
+- Practice elements without a markdown file in `Blog/elements/` yet: Drag, Drop, Sort, Slider, Shadow DOM, Advance Table — these routes are not statically generated and should not be in `sitemap-links.js` until the `.md` files are added.
 - **[IN PROGRESS]** Study Tracker full DB migration underway — moving all 8 localStorage keys (`qa_tracker_*`) to PostgreSQL per-user. Plan + tasks tracked in `docs/tasks/STUDY_TRACKER_DB_MIGRATION_TASKS.md`. Analysis in `docs/STUDY_TRACKER_DB_MIGRATION_ANALYSIS.md`. Anonymous users remain unaffected (localStorage-only). Phases 1–6 must ship before Phase 7 (localStorage removal).
 - QA Tools beyond JSON-to-file (JSON Formatter, Base64, JWT Decoder, Regex Tester) are stubbed as "coming soon".
 

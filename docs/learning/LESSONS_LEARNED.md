@@ -19,6 +19,7 @@ Add new lessons at the top of the relevant section (newest first).
 
 | #   | Title                                                                | Section           | Date       |
 | --- | -------------------------------------------------------------------- | ----------------- | ---------- |
+| 014 | Sitemap Slugs Must Match `Blog/elements/` Filenames Exactly          | Next.js / Vercel  | 2026-03-26 |
 | 013 | Central Resource Registry Pattern for Practice Element Metadata      | General           | 2026-03-26 |
 | 012 | `label for` Must Match Input `id` — Mismatch Is a Silent Bug         | UI / Styling      | 2026-03-26 |
 | 011 | Footer `<h3>` Pollutes Practice Page Heading Hierarchy               | UI / Styling      | 2026-03-26 |
@@ -37,6 +38,62 @@ Add new lessons at the top of the relevant section (newest first).
 ---
 
 ## Next.js / Vercel
+
+---
+
+### Lesson 014 — Sitemap Slugs Must Match `Blog/elements/` Filenames Exactly
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+`data/sitemap-links.js` had 11 practice element URLs using stale slugs that no longer matched the actual routes — e.g. `practice/input`, `practice/button`, `practice/select`, `practice/waits`. None of these resolved to real pages. Google was indexing 404s for every one of them.
+
+Additionally, 5 slugs (`drag`, `drop`, `sort`, `slider`, `shadow-dom`) were listed that had no markdown file in `Blog/elements/` and no component — they were wishlist routes that were never built.
+
+#### Root Cause
+
+`sitemap-links.js` was written manually at project start when slugs were simple and short. The slugs were later renamed to be more descriptive (`input` → `input-fields`, `button` → `buttons`, `radio` → `radio-checkbox`, `waits` → `dynamic-waits`, `simple-table` → `data-table`, etc.) as the practice elements were built out. The sitemap file was never updated to match.
+
+There was also no mechanism enforcing that the sitemap stay in sync with `Blog/elements/` — the two were completely independent files with no shared source of truth.
+
+#### Fix
+
+Audited `Blog/elements/` directory and replaced every slug in `sitemap-links.js` with the actual filename (minus `.md`):
+
+```js
+// Before (broken slugs)
+{ url: "practice/input" },
+{ url: "practice/button" },
+{ url: "practice/select" },
+{ url: "practice/radio" },
+{ url: "practice/window" },
+{ url: "practice/waits" },
+{ url: "practice/simple-table" },
+{ url: "practice/upload-download" },
+{ url: "practice/drag" },      // no .md file — removed
+{ url: "practice/shadow-dom" }, // no .md file — removed
+
+// After (real filenames from Blog/elements/)
+{ url: "practice/input-fields" },
+{ url: "practice/buttons" },
+{ url: "practice/dropdowns" },
+{ url: "practice/radio-checkbox" },
+{ url: "practice/tabs-windows" },
+{ url: "practice/dynamic-waits" },
+{ url: "practice/data-table" },
+{ url: "practice/file-upload" },
+// drag, drop, sort, slider, shadow-dom removed until .md files exist
+```
+
+Also updated `CLAUDE.md` in three places: the `Blog/` directory tree, the Dynamic Practice Pages flow description, and the Slugs naming convention example.
+
+#### Key Takeaways
+
+- The sitemap source of truth for practice slugs is the `Blog/elements/` directory — check it with `ls Blog/elements/` before editing `sitemap-links.js`.
+- `generateStaticParams()` in `app/(Practice)/practice/[slug]/page.jsx` reads from `Blog/elements/` directly — if a `.md` file doesn't exist there, the route is not statically generated and should not be in the sitemap.
+- Never add a slug to `sitemap-links.js` for a route that doesn't have a `.md` file yet — submit it to Google only when the page is live.
+- When renaming a route, grep for the old slug in: `sitemap-links.js`, `CLAUDE.md`, `data/practiceResources.js`, and `componentMapping` in `page.jsx`.
 
 ---
 

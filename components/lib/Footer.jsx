@@ -63,11 +63,11 @@ const socialLinks = [
     icon: <FaYoutube size={18} />,
     label: "YouTube",
   },
-  {
-    href: "https://github.com/kundalik5545/qatesting",
-    icon: <FaGithub size={18} />,
-    label: "GitHub",
-  },
+  // {
+  //   href: "https://github.com/kundalik5545/qatesting",
+  //   icon: <FaGithub size={18} />,
+  //   label: "GitHub",
+  // },
   {
     href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(basicDetails.websiteURL)}`,
     icon: <FaTwitter size={18} />,
