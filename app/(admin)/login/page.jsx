@@ -65,7 +65,7 @@ export default function LoginPage() {
 
   return (
     <div
-      className="auth-page-bg min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex items-center justify-center p-4"
       id="login-page-container"
     >
       <div className="w-full max-w-[480px]" id="login-wrapper">
@@ -98,7 +98,10 @@ export default function LoginPage() {
             >
               <div className="space-y-5">
                 {/* Email — T17: aria-describedby + aria-invalid wired to global error */}
-                <div className="flex flex-col gap-1.5" id="email-field-container">
+                <div
+                  className="flex flex-col gap-1.5"
+                  id="email-field-container"
+                >
                   <Label htmlFor="email" id="email-label">
                     Email
                   </Label>
@@ -119,7 +122,10 @@ export default function LoginPage() {
                 </div>
 
                 {/* Password — T16: show/hide toggle | T17: aria wired */}
-                <div className="flex flex-col gap-1.5" id="password-field-container">
+                <div
+                  className="flex flex-col gap-1.5"
+                  id="password-field-container"
+                >
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" id="password-label">
                       Password
@@ -153,7 +159,9 @@ export default function LoginPage() {
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                       data-testid="toggle-password-visibility"
                       tabIndex={-1}
                     >
@@ -167,7 +175,10 @@ export default function LoginPage() {
                 </div>
 
                 {/* Remember Me */}
-                <div className="flex items-center gap-2" id="remember-me-container">
+                <div
+                  className="flex items-center gap-2"
+                  id="remember-me-container"
+                >
                   <Checkbox
                     id="remember-me"
                     name="remember"
@@ -184,7 +195,12 @@ export default function LoginPage() {
                 </div>
 
                 {error && (
-                  <Alert variant="destructive" id="login-error" data-testid="login-error" role="alert">
+                  <Alert
+                    variant="destructive"
+                    id="login-error"
+                    data-testid="login-error"
+                    role="alert"
+                  >
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}

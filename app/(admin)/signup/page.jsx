@@ -51,7 +51,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);         // T16
+  const [showPassword, setShowPassword] = useState(false); // T16
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // T16
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -99,7 +99,7 @@ export default function SignUpPage() {
 
   return (
     <div
-      className="auth-page-bg min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex items-center justify-center p-4"
       id="signup-page-container"
     >
       <div className="w-full max-w-[480px]" id="signup-wrapper">
@@ -132,7 +132,10 @@ export default function SignUpPage() {
             >
               <div className="space-y-5">
                 {/* Full Name */}
-                <div className="flex flex-col gap-1.5" id="name-field-container">
+                <div
+                  className="flex flex-col gap-1.5"
+                  id="name-field-container"
+                >
                   <Label htmlFor="name" id="name-label">
                     Full Name
                   </Label>
@@ -151,7 +154,10 @@ export default function SignUpPage() {
                 </div>
 
                 {/* Email — T17: aria-describedby wired to global error */}
-                <div className="flex flex-col gap-1.5" id="email-field-container">
+                <div
+                  className="flex flex-col gap-1.5"
+                  id="email-field-container"
+                >
                   <Label htmlFor="email" id="email-label">
                     Email
                   </Label>
@@ -172,7 +178,10 @@ export default function SignUpPage() {
                 </div>
 
                 {/* Password — T15: strength bar | T16: show/hide | T17: aria */}
-                <div className="flex flex-col gap-1.5" id="password-field-container">
+                <div
+                  className="flex flex-col gap-1.5"
+                  id="password-field-container"
+                >
                   <Label htmlFor="password" id="password-label">
                     Password
                   </Label>
@@ -193,15 +202,17 @@ export default function SignUpPage() {
                         password.length > 0
                           ? "password-strength-container"
                           : error
-                          ? "signup-error"
-                          : undefined
+                            ? "signup-error"
+                            : undefined
                       }
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                       data-testid="toggle-password-visibility"
                       tabIndex={-1}
                     >
@@ -214,7 +225,10 @@ export default function SignUpPage() {
                   </div>
                   {/* Strength bar */}
                   {password.length > 0 && (
-                    <div id="password-strength-container" data-testid="password-strength">
+                    <div
+                      id="password-strength-container"
+                      data-testid="password-strength"
+                    >
                       <div className="h-1.5 w-full bg-gray-200 dark:bg-gray-700 rounded-full mt-1">
                         <div
                           className={`h-1.5 rounded-full transition-all duration-300 ${barWidth} ${barColor}`}
@@ -223,7 +237,8 @@ export default function SignUpPage() {
                       </div>
                       <div className="flex items-center justify-between mt-1">
                         <p className="text-xs text-slate-500 dark:text-gray-400">
-                          Use 8+ characters with uppercase, numbers &amp; symbols.
+                          Use 8+ characters with uppercase, numbers &amp;
+                          symbols.
                         </p>
                         {label && (
                           <span
@@ -239,7 +254,10 @@ export default function SignUpPage() {
                 </div>
 
                 {/* Confirm Password — T14: match validation | T16: show/hide | T17: aria */}
-                <div className="flex flex-col gap-1.5" id="confirm-password-field-container">
+                <div
+                  className="flex flex-col gap-1.5"
+                  id="confirm-password-field-container"
+                >
                   <Label htmlFor="confirm-password" id="confirm-password-label">
                     Confirm Password
                   </Label>
@@ -259,16 +277,22 @@ export default function SignUpPage() {
                         !passwordsMatch
                           ? "confirm-password-error"
                           : error
-                          ? "signup-error"
-                          : undefined
+                            ? "signup-error"
+                            : undefined
                       }
                       aria-invalid={!passwordsMatch || !!error}
                     />
                     <button
                       type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                      aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                      aria-label={
+                        showConfirmPassword
+                          ? "Hide confirm password"
+                          : "Show confirm password"
+                      }
                       data-testid="toggle-confirm-password-visibility"
                       tabIndex={-1}
                     >
@@ -292,7 +316,12 @@ export default function SignUpPage() {
                 </div>
 
                 {error && (
-                  <Alert variant="destructive" id="signup-error" data-testid="signup-error" role="alert">
+                  <Alert
+                    variant="destructive"
+                    id="signup-error"
+                    data-testid="signup-error"
+                    role="alert"
+                  >
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
                 )}
