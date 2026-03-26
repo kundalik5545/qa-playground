@@ -19,6 +19,7 @@ Add new lessons at the top of the relevant section (newest first).
 
 | #   | Title                                                                | Section           | Date       |
 | --- | -------------------------------------------------------------------- | ----------------- | ---------- |
+| 013 | Central Resource Registry Pattern for Practice Element Metadata      | General           | 2026-03-26 |
 | 012 | `label for` Must Match Input `id` — Mismatch Is a Silent Bug         | UI / Styling      | 2026-03-26 |
 | 011 | Footer `<h3>` Pollutes Practice Page Heading Hierarchy               | UI / Styling      | 2026-03-26 |
 | 010 | `<nav>` Inside `<nav>` Is Valid — Nested Navs Need `aria-label`      | UI / Styling      | 2026-03-26 |
@@ -271,6 +272,51 @@ The outer `<nav>` that wraps the full header layout does not need a label becaus
 - Two `<nav>` elements on the same page must each have a distinct `aria-label` — screen readers list landmarks by name.
 - An outer `<nav>` used only for layout flex container is a semantic smell — consider using a `<div>` instead to avoid creating an unintended landmark.
 - NVDA/VoiceOver announce `<nav>` as a "navigation" landmark — if two exist unlabeled, users can't tell them apart.
+
+---
+
+### Lesson 013 — Central Resource Registry Pattern for Practice Element Metadata
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Every practice component had `const youtubeLink = ""` hardcoded inline. Adding a YouTube link to any element required opening and editing a specific component file. Difficulty, time estimates, and scenario counts were also hardcoded strings scattered across components.
+
+#### Root Cause
+
+No single source of truth for practice element metadata. Each component was self-contained with its own magic strings, making bulk updates or future data-driven features (e.g. filtering by difficulty) impossible without touching every file.
+
+#### Fix
+
+Created `data/practiceResources.js` — a keyed object indexed by URL slug:
+
+```js
+export const practiceResources = {
+  "input-fields": {
+    difficulty: "Beginner",
+    difficultyColor: "green",
+    timeMin: 15,
+    scenarioCount: 6,
+    youtubeUrl: "",           // set when video is published
+    relatedElements: ["dropdowns", "forms"],
+  },
+  // ... one entry per element
+};
+```
+
+Components import and destructure:
+```js
+const res = practiceResources["input-fields"];
+// res.difficulty, res.timeMin, res.youtubeUrl — all from one file
+```
+
+#### Key Takeaways
+
+- Any data that appears in multiple components and needs periodic updates belongs in a central data file, not hardcoded in each component.
+- Keying by URL slug ties the data directly to routing — no separate mapping needed.
+- Tailwind dynamic class problem applies here too: store full class strings in a lookup (`difficultyStyles`) not constructed at runtime.
+- When a YouTube URL is empty string, render "coming soon" text; when it has a value, render a real link — zero component changes needed.
 
 ---
 
