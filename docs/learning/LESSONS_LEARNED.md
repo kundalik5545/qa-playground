@@ -19,6 +19,8 @@ Add new lessons at the top of the relevant section (newest first).
 
 | #   | Title                                                                | Section           | Date       |
 | --- | -------------------------------------------------------------------- | ----------------- | ---------- |
+| 010 | `<nav>` Inside `<nav>` Is Valid — Nested Navs Need `aria-label`      | UI / Styling      | 2026-03-26 |
+| 009 | `<Link><Button>` in Next.js Renders Invalid `<a><button>` HTML        | UI / Styling      | 2026-03-26 |
 | 008 | Tailwind Dynamic Classes Require a Lookup Map                        | UI / Styling      | 2026-03-26 |
 | 007 | JSX Comment Nesting Trap Silently Swallows Content                   | UI / Styling      | 2026-03-26 |
 | 006 | Auth Session Dedup — One `useSession()` Per Provider                 | Authentication    | 2026-03-26 |
@@ -235,6 +237,82 @@ This stopped the client component from being included in every RSC prefetch payl
 - `prefetch={false}` on `<Link>` is the correct opt-out — it disables the background RSC fetch while keeping normal navigation working.
 - Placing client components directly in high-traffic Server Component pages (especially the root landing page) has hidden costs at the RSC prefetch layer — consider whether a client component truly needs to live there.
 - When debugging unexpected Vercel Edge invocations, look at RSC prefetch traffic first before assuming real user load.
+
+---
+
+### Lesson 010 — `<nav>` Inside `<nav>` Is Valid — Nested Navs Need `aria-label`
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+The Header component had a top-level `<nav>` (the flex container for the whole header bar) and a second `<nav aria-label="Main navigation">` inside it for the desktop link list. This raised a question: is `<nav>` inside `<nav>` valid HTML?
+
+#### Root Cause
+
+HTML5 allows nested `<nav>` elements. The spec permits having a site-wide `<nav>` as the outer container and a specific `<nav>` for distinct link groups inside. However, without `aria-label`, assistive technologies cannot distinguish multiple `<nav>` landmarks — they'll announce both as simply "navigation", confusing screen reader users who navigate by landmarks.
+
+#### Fix
+
+Added `aria-label="Main navigation"` to the inner desktop nav:
+
+```jsx
+<nav aria-label="Main navigation" className="hidden lg:flex items-center gap-4">
+  {/* desktop links */}
+</nav>
+```
+
+The outer `<nav>` that wraps the full header layout does not need a label because it acts as the flex container, not a landmark (though it technically is one). If two unlabeled `<nav>` elements exist, give them both distinct `aria-label` values.
+
+#### Key Takeaways
+
+- Two `<nav>` elements on the same page must each have a distinct `aria-label` — screen readers list landmarks by name.
+- An outer `<nav>` used only for layout flex container is a semantic smell — consider using a `<div>` instead to avoid creating an unintended landmark.
+- NVDA/VoiceOver announce `<nav>` as a "navigation" landmark — if two exist unlabeled, users can't tell them apart.
+
+---
+
+### Lesson 009 — `<Link><Button>` in Next.js Renders Invalid `<a><button>` HTML
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Navigation items in the Header used the pattern `<Link href="..."><Button>Label</Button></Link>`. This compiles to `<a href="..."><button>Label</button></a>` in the DOM — invalid HTML per the spec. Accessibility audits flag this as a High-severity issue.
+
+#### Root Cause
+
+The HTML spec forbids interactive elements inside other interactive elements. `<a>` and `<button>` are both interactive — nesting them produces undefined behavior in browsers and confuses screen readers (which element is the actual interactive control?). Tab order becomes ambiguous.
+
+The pattern is tempting in Next.js + shadcn/ui because `<Button variant="ghost">` provides convenient hover/focus styles that `<Link>` does not inherently have.
+
+#### Fix
+
+Two options:
+
+1. **Use `<Link>` with direct Tailwind classes** (simplest):
+```jsx
+<Link
+  href={to}
+  className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+>
+  {text}
+</Link>
+```
+
+2. **Use shadcn `<Button asChild>`** with `<Link>` as the child (keeps Button styles, correct DOM):
+```jsx
+<Button variant="ghost" asChild>
+  <Link href={to}>{text}</Link>
+</Button>
+```
+The `asChild` pattern merges `<Button>` props onto `<Link>`, rendering a single `<a>` in the DOM.
+
+#### Key Takeaways
+
+- Never wrap `<Button>` inside `<Link>` — it produces `<a><button>`, which is invalid HTML.
+- Prefer direct `<Link>` with Tailwind classes for nav items, or use `<Button asChild><Link>` to merge the two into one element.
+- shadcn/ui `asChild` is the canonical fix when you need Button styles on a link element.
 
 ---
 

@@ -1,9 +1,8 @@
 "use client";
 
-import { CirclePlay, Code, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { Button } from "./ui/button";
 import SheetOpen from "./NavbarSheet";
 import { ModeToggle } from "./lib/Mode-toggle";
 import Image from "next/image";
@@ -43,26 +42,29 @@ const Header = () => {
         </SheetOpen>
 
         {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-4">
+        <nav aria-label="Main navigation" className="hidden lg:flex items-center gap-4">
           {mainNavLinks.map(({ to, text, badge }, index) => (
-            <Link key={index} href={to} prefetch={false}>
-              <Button
-                variant="ghost"
-                className="hover:bg-gray-200 dark:hover:bg-gray-700 relative"
-              >
-                {text}
-                {badge && (
-                  <span className="ml-1.5 rounded-full bg-green-500 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
-                    {badge}
-                  </span>
-                )}
-              </Button>
+            <Link
+              key={index}
+              href={to}
+              prefetch={false}
+              className="relative inline-flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              {text}
+              {badge && (
+                <span
+                  aria-label="(New feature)"
+                  className="ml-1.5 rounded-full bg-green-500 px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white"
+                >
+                  {badge}
+                </span>
+              )}
             </Link>
           ))}
 
           {/* Dark Mode Toggle */}
           <ModeToggle />
-        </div>
+        </nav>
       </nav>
     </header>
   );

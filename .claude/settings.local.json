@@ -30,7 +30,8 @@
       "Bash(wc -l \"d:/new-playground/01_qa_playground/new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/study-tracker.css\")",
       "Bash(npx shadcn@latest add tabs --yes)",
       "Bash(pnpm install:*)",
-      "Bash(pnpm run:*)"
+      "Bash(pnpm run:*)",
+      "Bash(ls \"D:\\\\new-playground\\\\01_qa_playground\\\\00_new-qa-playground\\\\qa-playground\\\\app\\\\\\(Practice\\)\\\\practice\\\\_components\")"
     ]
   }
 }

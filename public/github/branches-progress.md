@@ -7,6 +7,10 @@
 - feat/localstorage-sync
 - feat/css-migration-to-tailwindcss
 - feat/user-activity-track
+- fix/login-issues
+- fix/network-issues
+- fix/blog-page-ui-issues — blog card UI fixes, posts-per-page variable, Tailwind dynamic class lookup map
+- fix/practice-page-ui-issues — SEO metadata, JSON-LD, canonical/og:url, H1 fix, card accessibility (aria-label, aria-hidden), invalid Link>Button nesting removed, nav aria-label, card hover effects, CTA labels standardized, 5 descriptions rewritten, POM Bank Demo badge
 
 ## Fonts used in study-tracker
 
