@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState } from "react";
 import {
   Card,
@@ -7,6 +6,12 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -18,62 +23,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { GraduationCap, CircleCheckBig } from "lucide-react";
+import {
+  GraduationCap,
+  Clock,
+  ListChecks,
+  Video,
+  CircleCheckBig,
+} from "lucide-react";
 import Link from "next/link";
+import { practiceResources, difficultyStyles } from "@/data/practiceResources";
+import { formsTC } from "@/data/formsTestCases";
 
-const youtubeLink = "";
+const SLUG = "forms";
 
-const FormsPage = () => {
-  return (
-    <div className="pt-2">
-      <h2 className="text-4xl font-semibold pl-1 py-4">Forms</h2>
-      <div className="flex flex-col sm:flex-row w-full gap-4">
-        {/* Main Card Section */}
-        <div className="w-full sm:w-2/3 pb-5 md:pb-0">
-          <Card className="w-full shadow-lg rounded-xl dark:bg-gray-800">
-            <CardContent className="space-y-6 pt-5 text-sm sm:text-base text-gray-900 dark:text-gray-200">
-              <QAPlayGround />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Insight Card */}
-        <div className="w-full sm:w-1/3">
-          <Card className="w-full shadow-lg rounded-xl dark:bg-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between p-4 shadow-md dark:shadow-gray-800">
-              <p className="text-lg font-semibold text-gray-900 dark:text-white">
-                Insight
-              </p>
-              <GraduationCap className="text-gray-700 dark:text-teal-300" />
-            </CardHeader>
-            <CardContent className="p-4 text-center text-gray-800 dark:text-gray-300">
-              <p className="font-light py-3 text-base">
-                On completion of this exercise, you can learn the following
-                concepts:
-              </p>
-              <LearningInsight />
-            </CardContent>
-            <CardFooter className="flex justify-center border-t border-gray-200 dark:border-gray-700 p-4">
-              <Link
-                href={youtubeLink}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <span className="underline text-blue-600 dark:text-teal-200 font-light hover:text-blue-800 dark:hover:text-teal-300">
-                  Watch tutorial
-                </span>
-              </Link>
-            </CardFooter>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
+const techMethods = {
+  selenium: [
+    { name: "sendKeys()", color: "bg-purple-500" },
+    { name: "click()", color: "bg-blue-500" },
+    { name: "selectByVisibleText()", color: "bg-orange-400" },
+    { name: "submit()", color: "bg-emerald-500" },
+    { name: "isDisplayed()", color: "bg-slate-500" },
+  ],
+  playwright: [
+    { name: "fill()", color: "bg-blue-500" },
+    { name: "check()", color: "bg-emerald-500" },
+    { name: "selectOption()", color: "bg-orange-400" },
+    { name: "locator.click()", color: "bg-purple-500" },
+    { name: "toBeVisible()", color: "bg-red-400" },
+  ],
 };
-
-export default FormsPage;
-
-// ─── QA Playground Section ────────────────────────────────────────────────────
 
 const INTERESTS = [
   { id: "selenium", label: "Selenium" },
@@ -99,12 +77,10 @@ const INITIAL_FORM = {
   terms: false,
 };
 
-const QAPlayGround = () => {
+const RegistrationForm = () => {
   const [form, setForm] = useState(INITIAL_FORM);
   const [errors, setErrors] = useState({});
   const [submitted, setSubmitted] = useState(false);
-
-  // ── handlers ──────────────────────────────────────────────────────────────
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -180,8 +156,6 @@ const QAPlayGround = () => {
     setSubmitted(false);
   };
 
-  // ── success state ──────────────────────────────────────────────────────────
-
   if (submitted) {
     return (
       <div
@@ -220,8 +194,6 @@ const QAPlayGround = () => {
     );
   }
 
-  // ── form ───────────────────────────────────────────────────────────────────
-
   return (
     <form
       id="userRegistrationForm"
@@ -230,13 +202,12 @@ const QAPlayGround = () => {
       noValidate
       className="space-y-6"
     >
-      {/* ── Personal Details ─────────────────────────────────────────────── */}
+      {/* Personal Details */}
       <section>
-        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-600">
+        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-700">
           Personal Details
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* First Name */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="firstName">
               First Name <span className="text-red-500">*</span>
@@ -251,17 +222,12 @@ const QAPlayGround = () => {
               className={errors.firstName ? "border-red-500" : ""}
             />
             {errors.firstName && (
-              <p
-                id="firstNameError"
-                data-testid="error-first-name"
-                className="text-xs text-red-500"
-              >
+              <p id="firstNameError" data-testid="error-first-name" className="text-xs text-red-500">
                 {errors.firstName}
               </p>
             )}
           </div>
 
-          {/* Last Name */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="lastName">
               Last Name <span className="text-red-500">*</span>
@@ -276,17 +242,12 @@ const QAPlayGround = () => {
               className={errors.lastName ? "border-red-500" : ""}
             />
             {errors.lastName && (
-              <p
-                id="lastNameError"
-                data-testid="error-last-name"
-                className="text-xs text-red-500"
-              >
+              <p id="lastNameError" data-testid="error-last-name" className="text-xs text-red-500">
                 {errors.lastName}
               </p>
             )}
           </div>
 
-          {/* Email */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="email">
               Email <span className="text-red-500">*</span>
@@ -302,17 +263,12 @@ const QAPlayGround = () => {
               className={errors.email ? "border-red-500" : ""}
             />
             {errors.email && (
-              <p
-                id="emailError"
-                data-testid="error-email"
-                className="text-xs text-red-500"
-              >
+              <p id="emailError" data-testid="error-email" className="text-xs text-red-500">
                 {errors.email}
               </p>
             )}
           </div>
 
-          {/* Phone */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="phone">
               Phone <span className="text-red-500">*</span>
@@ -328,17 +284,12 @@ const QAPlayGround = () => {
               className={errors.phone ? "border-red-500" : ""}
             />
             {errors.phone && (
-              <p
-                id="phoneError"
-                data-testid="error-phone"
-                className="text-xs text-red-500"
-              >
+              <p id="phoneError" data-testid="error-phone" className="text-xs text-red-500">
                 {errors.phone}
               </p>
             )}
           </div>
 
-          {/* Date of Birth */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="dob">
               Date of Birth <span className="text-red-500">*</span>
@@ -353,26 +304,17 @@ const QAPlayGround = () => {
               className={errors.dob ? "border-red-500" : ""}
             />
             {errors.dob && (
-              <p
-                id="dobError"
-                data-testid="error-dob"
-                className="text-xs text-red-500"
-              >
+              <p id="dobError" data-testid="error-dob" className="text-xs text-red-500">
                 {errors.dob}
               </p>
             )}
           </div>
 
-          {/* Gender */}
           <div className="flex flex-col gap-1">
             <Label>
               Gender <span className="text-red-500">*</span>
             </Label>
-            <div
-              id="genderGroup"
-              data-testid="gender-group"
-              className="flex gap-5 pt-1"
-            >
+            <div id="genderGroup" data-testid="gender-group" className="flex gap-5 pt-1">
               {["Male", "Female", "Other"].map((g) => (
                 <label key={g} className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -390,11 +332,7 @@ const QAPlayGround = () => {
               ))}
             </div>
             {errors.gender && (
-              <p
-                id="genderError"
-                data-testid="error-gender"
-                className="text-xs text-red-500"
-              >
+              <p id="genderError" data-testid="error-gender" className="text-xs text-red-500">
                 {errors.gender}
               </p>
             )}
@@ -402,13 +340,12 @@ const QAPlayGround = () => {
         </div>
       </section>
 
-      {/* ── Address ──────────────────────────────────────────────────────── */}
+      {/* Address */}
       <section>
-        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-600">
+        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-700">
           Address
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Country */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="country">
               Country <span className="text-red-500">*</span>
@@ -434,17 +371,12 @@ const QAPlayGround = () => {
               </SelectContent>
             </Select>
             {errors.country && (
-              <p
-                id="countryError"
-                data-testid="error-country"
-                className="text-xs text-red-500"
-              >
+              <p id="countryError" data-testid="error-country" className="text-xs text-red-500">
                 {errors.country}
               </p>
             )}
           </div>
 
-          {/* City */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="city">
               City <span className="text-red-500">*</span>
@@ -459,17 +391,12 @@ const QAPlayGround = () => {
               className={errors.city ? "border-red-500" : ""}
             />
             {errors.city && (
-              <p
-                id="cityError"
-                data-testid="error-city"
-                className="text-xs text-red-500"
-              >
+              <p id="cityError" data-testid="error-city" className="text-xs text-red-500">
                 {errors.city}
               </p>
             )}
           </div>
 
-          {/* Bio */}
           <div className="flex flex-col gap-1 sm:col-span-2">
             <Label htmlFor="bio">About You</Label>
             <textarea
@@ -480,22 +407,18 @@ const QAPlayGround = () => {
               value={form.bio}
               onChange={handleChange}
               rows={3}
-              className="w-full rounded-md border px-3 py-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
+              className="w-full rounded-md border px-3 py-2 text-sm bg-white dark:bg-gray-900 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 resize-none"
             />
           </div>
         </div>
       </section>
 
-      {/* ── Interests ────────────────────────────────────────────────────── */}
+      {/* Interests */}
       <section>
-        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-600">
+        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-700">
           Interests
         </h3>
-        <div
-          id="interestsGroup"
-          data-testid="interests-group"
-          className="flex flex-wrap gap-4"
-        >
+        <div id="interestsGroup" data-testid="interests-group" className="flex flex-wrap gap-4">
           {INTERESTS.map((item) => (
             <label
               key={item.id}
@@ -514,13 +437,12 @@ const QAPlayGround = () => {
         </div>
       </section>
 
-      {/* ── Account Details ──────────────────────────────────────────────── */}
+      {/* Account Details */}
       <section>
-        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-600">
+        <h3 className="text-base font-semibold mb-3 border-b pb-1 dark:border-gray-700">
           Account Details
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Password */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="password">
               Password <span className="text-red-500">*</span>
@@ -536,17 +458,12 @@ const QAPlayGround = () => {
               className={errors.password ? "border-red-500" : ""}
             />
             {errors.password && (
-              <p
-                id="passwordError"
-                data-testid="error-password"
-                className="text-xs text-red-500"
-              >
+              <p id="passwordError" data-testid="error-password" className="text-xs text-red-500">
                 {errors.password}
               </p>
             )}
           </div>
 
-          {/* Confirm Password */}
           <div className="flex flex-col gap-1">
             <Label htmlFor="confirmPassword">
               Confirm Password <span className="text-red-500">*</span>
@@ -562,11 +479,7 @@ const QAPlayGround = () => {
               className={errors.confirmPassword ? "border-red-500" : ""}
             />
             {errors.confirmPassword && (
-              <p
-                id="confirmPasswordError"
-                data-testid="error-confirm-password"
-                className="text-xs text-red-500"
-              >
+              <p id="confirmPasswordError" data-testid="error-confirm-password" className="text-xs text-red-500">
                 {errors.confirmPassword}
               </p>
             )}
@@ -574,12 +487,9 @@ const QAPlayGround = () => {
         </div>
       </section>
 
-      {/* ── Terms ────────────────────────────────────────────────────────── */}
+      {/* Terms */}
       <div className="flex flex-col gap-1">
-        <label
-          htmlFor="terms"
-          className="flex items-center gap-3 cursor-pointer"
-        >
+        <label htmlFor="terms" className="flex items-center gap-3 cursor-pointer">
           <Checkbox
             id="terms"
             data-testid="checkbox-terms"
@@ -589,23 +499,19 @@ const QAPlayGround = () => {
           />
           <span className="text-sm">
             I agree to the{" "}
-            <span className="text-blue-600 dark:text-teal-300 underline">
+            <span className="text-blue-600 dark:text-blue-400 underline">
               Terms &amp; Conditions
             </span>
           </span>
         </label>
         {errors.terms && (
-          <p
-            id="termsError"
-            data-testid="error-terms"
-            className="text-xs text-red-500 pl-7"
-          >
+          <p id="termsError" data-testid="error-terms" className="text-xs text-red-500 pl-7">
             {errors.terms}
           </p>
         )}
       </div>
 
-      {/* ── Action Buttons ───────────────────────────────────────────────── */}
+      {/* Actions */}
       <div className="flex gap-3 pt-2">
         <Button
           id="submitFormBtn"
@@ -630,23 +536,168 @@ const QAPlayGround = () => {
   );
 };
 
-// ─── Learning Insight Section ─────────────────────────────────────────────────
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
-const LearningInsight = () => {
+const FormsPage = () => {
+  const [activeTech, setActiveTech] = useState("selenium");
+
+  const res = practiceResources[SLUG];
+  const badgeClass =
+    difficultyStyles[res.difficultyColor]?.badge ?? difficultyStyles.green.badge;
+
   return (
-    <>
-      <ol className="font-light list-decimal pl-6 text-left space-y-1">
-        <li>sendKeys() — text inputs</li>
-        <li>clear() — reset fields</li>
-        <li>click() — radio &amp; checkbox</li>
-        <li>Select — dropdowns</li>
-        <li>isSelected() — verify state</li>
-        <li>submit() / click submit</li>
-        <li>isDisplayed() — errors</li>
-        <li>getAttribute(&quot;value&quot;)</li>
-        <li>Form validation flow</li>
-        <li>Success state assertion</li>
-      </ol>
-    </>
+    <div className="space-y-6">
+      {/* Hero section */}
+      <div className="px-1">
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <span
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border ${badgeClass}`}
+          >
+            <GraduationCap size={12} /> {res.difficulty}
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+            <Clock size={12} /> {res.timeMin} min
+          </span>
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border border-gray-200 bg-gray-50 text-gray-600 dark:border-gray-700 dark:bg-gray-800/50 dark:text-gray-400">
+            <ListChecks size={12} /> {res.scenarioCount} scenarios
+          </span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-semibold mb-2">
+          Form Automation Practice
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
+          Practice end-to-end form automation in Selenium &amp; Playwright —
+          filling inputs, selecting dropdowns, toggling checkboxes, triggering
+          validation errors, and asserting success states.
+        </p>
+      </div>
+
+      {/* Main layout: Practice card + What You'll Learn */}
+      <div className="flex md:flex-row flex-col items-start gap-5">
+
+        {/* Practice Card */}
+        <section
+          aria-label="Form practice exercises"
+          className="flex-1 min-w-0"
+        >
+          <Card className="w-full shadow-md rounded-lg">
+            <CardContent className="pt-5 pb-5 px-5 text-sm">
+              <RegistrationForm />
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* What You'll Learn card */}
+        <div className="shrink-0 w-64 md:w-72">
+          <Card className="shadow-md">
+            <CardHeader className="flex flex-row items-center justify-between p-3 pb-2 border-b space-y-0">
+              <p className="text-base font-semibold">What You&apos;ll Learn</p>
+              <GraduationCap size={18} />
+            </CardHeader>
+            <CardContent className="p-3 space-y-3">
+              {/* Tech toggle */}
+              <div className="flex rounded-lg bg-gray-100 dark:bg-gray-800 p-0.5 gap-0.5">
+                <button
+                  onClick={() => setActiveTech("selenium")}
+                  className={`flex-1 text-xs font-medium py-1.5 px-2 rounded-md transition-colors ${
+                    activeTech === "selenium"
+                      ? "bg-white dark:bg-gray-700 shadow text-foreground"
+                      : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+                  }`}
+                >
+                  Selenium (Java)
+                </button>
+                <button
+                  onClick={() => setActiveTech("playwright")}
+                  className={`flex-1 text-xs font-medium py-1.5 px-2 rounded-md transition-colors ${
+                    activeTech === "playwright"
+                      ? "bg-white dark:bg-gray-700 shadow text-foreground"
+                      : "text-gray-500 dark:text-gray-400 hover:text-foreground"
+                  }`}
+                >
+                  Playwright (JS/PY)
+                </button>
+              </div>
+
+              {/* Method list */}
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-2">
+                  {activeTech === "selenium"
+                    ? "Selenium (Java)"
+                    : "Playwright (JS / Python)"}
+                </p>
+                <ul className="space-y-1.5">
+                  {techMethods[activeTech].map((method) => (
+                    <li
+                      key={method.name}
+                      className="flex items-center gap-2 text-sm"
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full shrink-0 ${method.color}`}
+                      />
+                      <span className="font-light">{method.name}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </CardContent>
+            <CardFooter className="flex items-center justify-center gap-1.5 p-3 border-t">
+              <Video size={14} className="text-gray-400 dark:text-gray-500" />
+              {res.youtubeUrl ? (
+                <Link
+                  href={res.youtubeUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  Watch Tutorial
+                </Link>
+              ) : (
+                <span className="text-xs text-gray-400 dark:text-gray-500">
+                  Tutorial video coming soon
+                </span>
+              )}
+            </CardFooter>
+          </Card>
+        </div>
+      </div>
+
+      {/* Test Cases */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Test Cases</h2>
+        <Accordion type="multiple" className="space-y-2">
+          {formsTC.map((tc) => (
+            <AccordionItem
+              key={tc.TestId}
+              value={tc.TestId}
+              className="border rounded-lg px-4 bg-background"
+            >
+              <AccordionTrigger className="text-sm py-3 hover:no-underline">
+                <span className="font-medium text-left">
+                  {tc.TestId}: {tc.TestCaseName}
+                </span>
+              </AccordionTrigger>
+              <AccordionContent className="pb-3">
+                <ol className="space-y-0 divide-y divide-gray-100 dark:divide-gray-800">
+                  {tc.steps.map((step, i) => (
+                    <li
+                      key={i}
+                      className="flex gap-3 py-2 text-xs xl:text-sm text-gray-600 dark:text-gray-400"
+                    >
+                      <span className="shrink-0 font-medium text-gray-400 dark:text-gray-500 w-4 text-right">
+                        {i + 1}.
+                      </span>
+                      <span>{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </div>
   );
 };
+
+export default FormsPage;
