@@ -100,7 +100,8 @@ body {
 
   /* Auth pages — background gradient */
   .auth-page-bg {
-    background: linear-gradient(135deg, #f0f4ff 0%, #faf0ff 50%, #f0f9ff 100%);
+    background: linear-gradient(135deg, #e8eeff 0%, #f3e8ff 40%, #e0f2fe 100%);
+    background-attachment: fixed;
   }
 
   /* Auth card — soft layered shadow with brand tint */
@@ -113,7 +114,8 @@ body {
 }
 
 .dark .auth-page-bg {
-  background: linear-gradient(135deg, #0a0a1a 0%, #0f0520 100%);
+  background: linear-gradient(135deg, #080818 0%, #0d0420 50%, #080c18 100%);
+  background-attachment: fixed;
 }
 
 .dark .auth-card-shadow {

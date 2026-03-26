@@ -109,8 +109,8 @@ export default function SignUpPage() {
         >
           <CardHeader className="text-center space-y-2" id="signup-header">
             <div className="flex justify-center mb-4">
-              <div className="p-4 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full shadow-[0_4px_12px_rgba(124,58,237,0.25)] ring-[6px] ring-violet-500/[0.12]">
-                <UserPlus className="h-10 w-10 text-white" />
+              <div className="p-3 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full shadow-[0_4px_12px_rgba(124,58,237,0.25)] ring-[6px] ring-violet-500/[0.12]">
+                <UserPlus className="h-7 w-7 text-white" />
               </div>
             </div>
             <h1 className="text-3xl font-bold gradient-title" id="signup-title">
