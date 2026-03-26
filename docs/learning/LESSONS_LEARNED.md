@@ -19,6 +19,12 @@ Add new lessons at the top of the relevant section (newest first).
 
 | #   | Title                                                                | Section           | Date       |
 | --- | -------------------------------------------------------------------- | ----------------- | ---------- |
+| 020 | `replace_all` on className Won't Catch Variants With Extra Classes   | UI / Styling      | 2026-03-26 |
+| 019 | Security Headers Belong in `next.config.mjs` `headers()`, Not Pages  | Next.js / Vercel  | 2026-03-26 |
+| 018 | Metadata in a `"use client"` Page — Put It in a Sibling `layout.js`  | Next.js / Vercel  | 2026-03-26 |
+| 017 | `.dark` Overrides for Custom CSS Classes Must Live Outside `@layer`  | UI / Styling      | 2026-03-26 |
+| 016 | Multi-Layer `box-shadow` Needs a CSS Utility Class, Not Tailwind     | UI / Styling      | 2026-03-26 |
+| 015 | `CardTitle` (shadcn) Renders as `<div>` — Use `<h1>` for Auth Pages  | UI / Styling      | 2026-03-26 |
 | 014 | Sitemap Slugs Must Match `Blog/elements/` Filenames Exactly          | Next.js / Vercel  | 2026-03-26 |
 | 013 | Central Resource Registry Pattern for Practice Element Metadata      | General           | 2026-03-26 |
 | 012 | `label for` Must Match Input `id` — Mismatch Is a Silent Bug         | UI / Styling      | 2026-03-26 |
@@ -474,6 +480,243 @@ The `asChild` pattern merges `<Button>` props onto `<Link>`, rendering a single 
 - Never wrap `<Button>` inside `<Link>` — it produces `<a><button>`, which is invalid HTML.
 - Prefer direct `<Link>` with Tailwind classes for nav items, or use `<Button asChild><Link>` to merge the two into one element.
 - shadcn/ui `asChild` is the canonical fix when you need Button styles on a link element.
+
+---
+
+### Lesson 020 — `replace_all` on className Won't Catch Variants With Extra Classes
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Used `replace_all` to add dark mode classes to `className="h-11 rounded-lg"` across both auth pages. The email input (which had exactly that string) was updated correctly. The password input (which had `className="h-11 rounded-lg pr-10"`) was silently skipped — its className still had no dark mode classes after the replace.
+
+#### Root Cause
+
+`replace_all` matches exact strings. `"h-11 rounded-lg"` and `"h-11 rounded-lg pr-10"` are different strings. The replace found and updated only the exact-match occurrences, leaving any inputs with additional classes untouched with no warning or error.
+
+#### Fix
+
+After any `replace_all` on className values, verify with a targeted grep:
+
+```bash
+grep -n 'h-11' app/(admin)/login/page.jsx
+```
+
+Then manually edit remaining className variants that weren't caught.
+
+#### Key Takeaways
+
+- `replace_all` on partial className strings is unreliable when components share a base class but have different additional classes — always grep to verify coverage.
+- Prefer adding a shared wrapper class or a CSS utility for styles that must apply to a group, so one edit covers all instances.
+- When grepping for className misses: filter by the distinguishing class (`h-11`) rather than the full string.
+
+---
+
+### Lesson 019 — Security Headers Belong in `next.config.mjs` `headers()`, Not Pages
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Security headers (`X-Frame-Options`, `X-Content-Type-Options`, HSTS, etc.) needed to apply to all routes. The options were: add meta tags per-page, add them in middleware, or use `next.config.mjs`.
+
+#### Root Cause / Decision
+
+- **Meta tags** don't work for most security headers — `X-Frame-Options` and `Strict-Transport-Security` are HTTP response headers, not `<meta>` tags. Browsers ignore them when set via meta.
+- **Middleware** works but adds overhead to every request that hits the edge function.
+- **`next.config.mjs` `headers()`** is the right primitive — headers are injected at the server/CDN layer with zero runtime cost per request.
+
+#### Fix
+
+```js
+const securityHeaders = [
+  { key: "X-Frame-Options", value: "DENY" },
+  { key: "X-Content-Type-Options", value: "nosniff" },
+  { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
+  { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+];
+
+async headers() {
+  return [{ source: "/(.*)", headers: securityHeaders }];
+}
+```
+
+#### Key Takeaways
+
+- HTTP security headers cannot be set via `<meta>` tags — they must be actual HTTP response headers.
+- `next.config.mjs` `headers()` applies them globally with `source: "/(.*)"` and has no per-request overhead.
+- CSP is intentionally separate — it needs per-app tuning before enabling (start permissive, tighten progressively).
+- Vercel respects `headers()` config in production without any extra setup.
+
+---
+
+### Lesson 018 — Metadata in a `"use client"` Page — Put It in a Sibling `layout.js`
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+`/login` and `/signup` pages are `"use client"` components (they use `useState`, `useEffect`, `useRouter`). Exporting `metadata` from a client component is silently ignored by Next.js — the browser tab title stays as the root layout default.
+
+#### Root Cause
+
+Next.js `metadata` exports only work in Server Components. The `"use client"` directive makes the entire module a client component. Any named export other than `default` from a client component is not processed by Next.js's metadata system.
+
+#### Fix
+
+Create a sibling `layout.js` in the same route directory (without `"use client"`). Export `metadata` from there. The layout wraps the client page component without changing anything structurally:
+
+```js
+// app/(admin)/login/layout.js — Server Component by default
+export const metadata = {
+  title: "Sign In — QA Playground",
+  description: "...",
+};
+
+export default function LoginLayout({ children }) {
+  return children; // no visual wrapping needed
+}
+```
+
+#### Key Takeaways
+
+- `export const metadata` is silently ignored in `"use client"` files — no error, no warning.
+- The fix is always a sibling or parent `layout.js` (which is a Server Component by default).
+- `return children` is valid — the layout doesn't need to add any wrapping markup if the page handles its own structure.
+- This applies to any route where the page component is a client component but needs page-specific `<title>`, `description`, or OG tags.
+
+---
+
+### Lesson 017 — `.dark` Overrides for Custom CSS Classes Must Live Outside `@layer utilities`
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Added `.auth-page-bg` and `.auth-card-shadow` inside `@layer utilities` in `globals.css`. The dark mode override `.dark .auth-page-bg` was also placed inside the same `@layer utilities` block. The dark gradient never applied.
+
+#### Root Cause
+
+`@layer utilities` is processed by Tailwind and its specificity is intentionally lower than base styles. Placing `.dark .auth-page-bg` inside the layer puts it in a lower-specificity bucket than the default dark mode CSS variable overrides. The selector loses the cascade fight before it can apply.
+
+#### Fix
+
+Keep the class definitions inside `@layer utilities`, but place the `.dark` overrides at the root level of the CSS file — outside any `@layer` block:
+
+```css
+@layer utilities {
+  .auth-page-bg {
+    background: linear-gradient(135deg, #f0f4ff 0%, #faf0ff 50%, #f0f9ff 100%);
+  }
+}
+
+/* Outside @layer — normal cascade specificity wins */
+.dark .auth-page-bg {
+  background: linear-gradient(135deg, #0a0a1a 0%, #0f0520 100%);
+}
+```
+
+#### Key Takeaways
+
+- CSS `@layer` controls cascade order, not just grouping — styles inside a layer have lower specificity than un-layered styles.
+- `.dark .class` overrides for custom utilities must be un-layered so they win the cascade against the base class inside `@layer utilities`.
+- Tailwind's own `dark:` prefix utilities are processed correctly because they are part of Tailwind's internal layer management — custom classes don't get that treatment automatically.
+
+---
+
+### Lesson 016 — Multi-Layer `box-shadow` Needs a CSS Utility Class, Not Tailwind
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Needed a 3-layer box-shadow with brand-tinted rgba colors on auth cards to replace `shadow-2xl`. Tailwind's built-in shadow utilities (`shadow-sm`, `shadow-lg`, `shadow-2xl`) only produce a single predefined shadow — no rgba tinting, no multiple layers.
+
+#### Root Cause
+
+Tailwind's `shadow-*` utilities map to fixed single-layer box-shadow values defined in the default theme. Arbitrary values like `shadow-[0_4px_6px_rgba(99,102,241,0.08)]` only support a **single** value — CSS `box-shadow` accepts a comma-separated list, but Tailwind's arbitrary value syntax doesn't allow commas (commas are used to separate multiple class arguments).
+
+#### Fix
+
+Add a named utility class in `globals.css` using raw CSS:
+
+```css
+@layer utilities {
+  .auth-card-shadow {
+    box-shadow:
+      0 4px 6px -1px rgba(99, 102, 241, 0.08),
+      0 10px 30px -5px rgba(99, 102, 241, 0.12),
+      0 0 0 1px rgba(99, 102, 241, 0.05);
+  }
+}
+```
+
+The dark override goes outside `@layer` (see Lesson 017):
+
+```css
+.dark .auth-card-shadow {
+  box-shadow:
+    0 4px 6px -1px rgba(99, 102, 241, 0.15),
+    0 10px 30px -5px rgba(99, 102, 241, 0.2),
+    0 0 0 1px rgba(139, 92, 246, 0.1);
+}
+```
+
+#### Key Takeaways
+
+- Tailwind arbitrary values for `shadow` do not support comma-separated multi-layer shadows — commas are reserved in the class syntax.
+- For any `box-shadow` with more than one layer or rgba tinting, write a named CSS utility class.
+- Name it semantically (`.auth-card-shadow`) not generically (`.shadow-custom`) — specificity and intent are clear, and it is easy to find and update.
+
+---
+
+### Lesson 015 — `CardTitle` (shadcn) Renders as `<div>` — Use `<h1>` for Auth Pages
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+Auth page headings ("Sign In", "Create Account") were wrapped in `<CardTitle>`. An accessibility audit flagged: no `<h1>` on the page. Screen readers had no semantic page title to announce.
+
+#### Root Cause
+
+shadcn/ui `CardTitle` renders as a `<div>` (not a heading element) in the new-york style:
+
+```jsx
+// shadcn CardTitle source
+const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("font-semibold leading-none tracking-tight", className)}
+    {...props}
+  />
+))
+```
+
+There is no implicit heading semantics — it is purely a styled div. Pages that rely on `CardTitle` for their main visible title have zero `<h1>` in the DOM.
+
+#### Fix
+
+For auth pages where the card title IS the page title, replace `CardTitle` with a direct `<h1>`:
+
+```jsx
+// Before — no semantic heading
+<CardTitle className="text-3xl font-bold gradient-title">Sign In</CardTitle>
+
+// After — proper h1
+<h1 className="text-3xl font-bold gradient-title">Sign In</h1>
+```
+
+Remove `CardTitle` from the Card component imports since it is no longer used.
+
+#### Key Takeaways
+
+- `CardTitle` is a styled `<div>`, not an `<h1>`. Never assume shadcn layout components add heading semantics.
+- Every page must have exactly one `<h1>` that describes the page's primary purpose.
+- For content cards where the card title is not the page title (e.g. dashboard widget cards), `CardTitle` as a `<div>` is fine — context matters.
+- Use browser devtools → Accessibility → Heading tree to verify heading structure on every new page.
 
 ---
 
