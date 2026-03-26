@@ -1,10 +1,13 @@
 ---
-title: How to Handle Input Fields in Selenium and Playwright
-description: Learn how to automate text input fields using Selenium WebDriver (Java), Playwright (JS), and Playwright (Python). Covers sendKeys, clear, getAttribute, disabled, and readonly inputs.
+title: "Input Field Automation Practice — Selenium & Playwright (Java, JS, Python) | QA Playground"
+description: "Practice automating input fields with Selenium (Java) & Playwright (JS/Python). Interactive exercises covering sendKeys, clear, disabled, readonly inputs. Try it free."
 author: random coders
 date: 18 march 2026
 image: "/Images/blogs/b3.jpg"
-keywords: "input field selenium, sendKeys selenium, clear input, disabled input, readonly input, playwright fill, input automation"
+keywords: "input field selenium, sendKeys selenium, clear input, disabled input, readonly input, playwright fill, input automation, xpath for input field, css selector input selenium, data-testid automation, selenium java sendkeys example"
+teaches: ["sendKeys", "fill", "clear", "getAttribute", "isEnabled", "Keys.TAB", "inputValue", "toBeDisabled", "toHaveAttribute"]
+programmingLanguage: ["Java", "JavaScript", "Python"]
+educationalLevel: "Beginner"
 ---
 
 ## Introduction
@@ -51,6 +54,8 @@ page.fill("#movieName", "Inception")
 
 ## 2. Append text and press Tab
 
+> ⚠️ **Note:** Playwright's `fill()` clears the field before typing. To truly append existing text, use `click()` + `keyboard.type()` instead.
+
 ### Selenium (Java)
 ```java
 WebElement field = driver.findElement(By.id("appendText"));
@@ -60,13 +65,19 @@ field.sendKeys(Keys.TAB);
 
 ### Playwright (JS)
 ```js
-await page.locator("#appendText").fill("I am good and feeling great");
+// click to focus, then type to append (fill() would clear first)
+await page.locator("#appendText").click();
+await page.keyboard.press("End");
+await page.keyboard.type(" and feeling great");
 await page.locator("#appendText").press("Tab");
 ```
 
 ### Playwright (Python)
 ```python
-page.locator("#appendText").fill("I am good and feeling great")
+# click to focus, then type to append (fill() would clear first)
+page.locator("#appendText").click()
+page.keyboard.press("End")
+page.keyboard.type(" and feeling great")
 page.locator("#appendText").press("Tab")
 ```
 

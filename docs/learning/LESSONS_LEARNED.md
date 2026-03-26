@@ -19,6 +19,8 @@ Add new lessons at the top of the relevant section (newest first).
 
 | #   | Title                                                                | Section           | Date       |
 | --- | -------------------------------------------------------------------- | ----------------- | ---------- |
+| 012 | `label for` Must Match Input `id` — Mismatch Is a Silent Bug         | UI / Styling      | 2026-03-26 |
+| 011 | Footer `<h3>` Pollutes Practice Page Heading Hierarchy               | UI / Styling      | 2026-03-26 |
 | 010 | `<nav>` Inside `<nav>` Is Valid — Nested Navs Need `aria-label`      | UI / Styling      | 2026-03-26 |
 | 009 | `<Link><Button>` in Next.js Renders Invalid `<a><button>` HTML        | UI / Styling      | 2026-03-26 |
 | 008 | Tailwind Dynamic Classes Require a Lookup Map                        | UI / Styling      | 2026-03-26 |
@@ -269,6 +271,62 @@ The outer `<nav>` that wraps the full header layout does not need a label becaus
 - Two `<nav>` elements on the same page must each have a distinct `aria-label` — screen readers list landmarks by name.
 - An outer `<nav>` used only for layout flex container is a semantic smell — consider using a `<div>` instead to avoid creating an unintended landmark.
 - NVDA/VoiceOver announce `<nav>` as a "navigation" landmark — if two exist unlabeled, users can't tell them apart.
+
+---
+
+### Lesson 012 — `label for` Must Match Input `id` — Mismatch Is a Silent Bug
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+The first input in `InputPage.jsx` had `<Label htmlFor="fullName">` but the `<Input id="movieName">`. The `for`/`id` values didn't match, so clicking the label did nothing and screen readers couldn't associate the label with the input.
+
+#### Root Cause
+
+The label and input were added at different times. The label used a draft name (`fullName`) that was never updated when the input got its real id (`movieName`). No browser error or console warning is thrown — the mismatch fails silently.
+
+#### Fix
+
+```jsx
+// Before (broken)
+<Label htmlFor="fullName">Enter any movie name</Label>
+<Input id="movieName" ... />
+
+// After (fixed)
+<Label htmlFor="movieName">Enter any movie name</Label>
+<Input id="movieName" ... />
+```
+
+#### Key Takeaways
+
+- `htmlFor` must equal the `id` of the target input — any mismatch silently breaks click-to-focus and screen reader association.
+- Accessibility audits and automated tests (axe, Playwright `getByLabel`) will catch this; eyeballing the UI will not.
+- When renaming an input `id`, always grep for `htmlFor` referencing the old value.
+
+---
+
+### Lesson 011 — Footer `<h3>` Pollutes Practice Page Heading Hierarchy
+
+**Date:** 2026-03-26
+
+#### What Happened
+
+The audit found `<h3>Platform</h3>`, `<h3>Learn</h3>`, `<h3>Company</h3>` in the footer appearing in the page heading outline of practice pages. Since practice pages now have a real `<h1>`, screen readers and crawlers saw h3 footer headings without any intervening h2 — broken hierarchy.
+
+#### Root Cause
+
+Footer section labels were marked as `<h3>` when they were first built (before practice pages had a proper h1/h2 structure). They were styled to look small and subtle but semantically acted as heading landmarks.
+
+#### Fix
+
+Changed footer section labels from `<h3>` to `<h4>`. Visually identical (same Tailwind classes), semantically correct within a page that has h1 → h2 → content structure.
+
+#### Key Takeaways
+
+- Footer heading elements participate in the full page heading outline — they're not isolated.
+- Use `<h4>` or a visually styled `<p>` for footer section labels; never `<h2>` or `<h3>` which are too high in the hierarchy.
+- When adding a real `<h1>` to a page, audit the full heading tree including footer and nav.
 
 ---
 

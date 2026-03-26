@@ -12,17 +12,18 @@ import rehypePrettyCode from "rehype-pretty-code";
 import { transformerCopyButton } from "@rehype-pretty/transformers";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
 import Image from "next/image";
+import Link from "next/link";
+import Script from "next/script";
 import { basicDetails } from "@/data/BasicSetting";
-import { Calendar } from "lucide-react";
+import { Calendar, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
-// Blog Components
+// Practice Components
 import ElementsPage from "../_components/ElementsPage";
 import InputPage from "../_components/InputPage";
 import ButtonPage from "../_components/ButtonPage";
 import SelectPage from "../_components/SelectPage";
-// import LinksPage from "../_components/LinksPage";
 import LinksPage from "../_components/LinkPage";
 import AlertPage from "../_components/AlertPage";
 import RadioButtonPage from "../_components/RadioButton";
@@ -35,26 +36,24 @@ import AdvanceTablePage from "../_components/AdvanceTablePage";
 import MultiSelectPage from "../_components/MultiSelectPage";
 import FormsPage from "../_components/FormsPage";
 
-// Blog Slug to Component Mapping
 const componentMapping = {
   pom: ElementsPage,
-  input: InputPage,
-  button: ButtonPage,
-  select: SelectPage,
+  "input-fields": InputPage,
+  buttons: ButtonPage,
+  dropdowns: SelectPage,
   links: LinksPage,
-  alert: AlertPage,
-  radio: RadioButtonPage,
-  window: WindowsPage,
-  waits: WaitPage,
-  calendar: CalendarPage,
-  "upload-download": FilePage,
-  "simple-table": SimpleTablePage,
+  "alerts-dialogs": AlertPage,
+  "radio-checkbox": RadioButtonPage,
+  "tabs-windows": WindowsPage,
+  "dynamic-waits": WaitPage,
+  "date-picker": CalendarPage,
+  "file-upload": FilePage,
+  "data-table": SimpleTablePage,
   "advance-table": AdvanceTablePage,
   "multi-select": MultiSelectPage,
   forms: FormsPage,
 };
 
-// Fetch all blog slugs dynamically
 export async function generateStaticParams() {
   const postsDirectory = path.join(process.cwd(), "Blog/elements");
   return fs.readdirSync(postsDirectory).map((filename) => ({
@@ -62,7 +61,6 @@ export async function generateStaticParams() {
   }));
 }
 
-// Generate dynamic metadata for SEO
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const filePath = path.join(process.cwd(), "Blog/elements", `${slug}.md`);
@@ -70,25 +68,63 @@ export async function generateMetadata({ params }) {
   if (!fs.existsSync(filePath)) return notFound();
 
   const { data } = matter(fs.readFileSync(filePath, "utf-8"));
+  const pageUrl = `${basicDetails.websiteURL}/practice/${slug}`;
 
   return {
-    title: data.title ? `${data.title.slice(0, 60)}` : "New Blog Post",
-    description: data.description?.slice(0, 160) || "Automation blog",
-    keywords: data.keywords || "automation, selenium",
-    author: data.author || "Random Coders",
+    title: data.title?.slice(0, 70) || "Practice Element | QA Playground",
+    description: data.description?.slice(0, 160) || "Automation practice element",
+    keywords: data.keywords || "automation, selenium, playwright",
+    alternates: { canonical: pageUrl },
     openGraph: {
-      title: data.title || "QA Playground - Practice automation",
+      type: "article",
+      url: pageUrl,
+      title: data.title || "Practice Element | QA Playground",
       description: data.description?.slice(0, 200) || "Practice automation",
-      url: `${basicDetails.websiteURL}/practice/${slug}`,
-      images: data.image ? [{ url: data.image }] : [],
+      locale: "en_US",
+      images: data.image ? [{ url: data.image, width: 1200, height: 630 }] : [],
     },
-    alternates: {
-      canonical: `${basicDetails.websiteURL}/practice/${slug}`,
+    twitter: {
+      card: "summary_large_image",
+      title: data.title || "Practice Element | QA Playground",
+      description: data.description?.slice(0, 160) || "Practice automation",
+      images: data.image ? [data.image] : [],
     },
   };
 }
 
-// Blog Post Component
+// Build JSON-LD for practice (non-blog) pages
+function buildJsonLd(slug, data) {
+  const pageUrl = `${basicDetails.websiteURL}/practice/${slug}`;
+  const elementName = data.title || slug;
+
+  return [
+    {
+      "@context": "https://schema.org",
+      "@type": "LearningResource",
+      name: elementName,
+      description: data.description || "",
+      url: pageUrl,
+      educationalLevel: data.educationalLevel || "Beginner to Intermediate",
+      teaches: data.teaches || [],
+      programmingLanguage: data.programmingLanguage || [],
+      provider: {
+        "@type": "Organization",
+        name: "QA Playground",
+        url: basicDetails.websiteURL,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Home", item: basicDetails.websiteURL },
+        { "@type": "ListItem", position: 2, name: "Practice", item: `${basicDetails.websiteURL}/practice` },
+        { "@type": "ListItem", position: 3, name: elementName, item: pageUrl },
+      ],
+    },
+  ];
+}
+
 const PracticePage = async ({ params }) => {
   const { slug } = await params;
   const filePath = path.join(process.cwd(), "Blog/elements", `${slug}.md`);
@@ -99,7 +135,6 @@ const PracticePage = async ({ params }) => {
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const { content, data } = matter(fileContent);
 
-    // Convert Markdown to HTML
     const htmlContent = (
       await unified()
         .use(remarkParse)
@@ -121,14 +156,26 @@ const PracticePage = async ({ params }) => {
     ).toString();
 
     const DynamicComponent = componentMapping[slug] || null;
+    const isPracticePage = data?.isBlog !== "Yes";
 
     return (
       <div className="container mx-auto px-4 lg:px-8">
+        {/* JSON-LD for practice pages */}
+        {isPracticePage && (
+          <Script
+            id={`practice-${slug}-jsonld`}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify(buildJsonLd(slug, data)),
+            }}
+          />
+        )}
+
         {data.isBlog === "Yes" ? (
           <>
             {/* Blog Header */}
             <header className="max-w-5xl mx-auto text-start text-foreground bg-background py-6">
-              <h1 className="text-3xl sm:text-4xl font-semibold  pb-2">
+              <h1 className="text-3xl sm:text-4xl font-semibold pb-2">
                 {data.title}
               </h1>
               <div className="flex flex-wrap justify-start items-center gap-3 text-sm mt-2 pb-2">
@@ -142,10 +189,9 @@ const PracticePage = async ({ params }) => {
                   })}
                 </p>
               </div>
-              <hr className="" />
+              <hr />
             </header>
 
-            {/* Blog Image */}
             {data.image && (
               <div className="flex justify-center mb-6">
                 <Image
@@ -161,23 +207,49 @@ const PracticePage = async ({ params }) => {
           </>
         ) : (
           <>
-            {/* Main Playground */}
-            <section
-              className={cn("pb-20", data?.isBlog === "Yes" && "hidden")}
+            {/* Breadcrumb */}
+            <nav
+              aria-label="Breadcrumb"
+              className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 py-3"
             >
+              <Link
+                href="/"
+                prefetch={false}
+                className="hover:text-foreground transition-colors"
+              >
+                Home
+              </Link>
+              <ChevronRight size={12} />
+              <Link
+                href="/practice"
+                prefetch={false}
+                className="hover:text-foreground transition-colors"
+              >
+                Practice
+              </Link>
+              <ChevronRight size={12} />
+              <span className="text-foreground font-medium capitalize">
+                {data.title
+                  ? data.title.split("—")[0].trim().split("|")[0].trim()
+                  : slug}
+              </span>
+            </nav>
+
+            {/* Practice Component */}
+            <section className={cn("pb-20")}>
               {DynamicComponent && <DynamicComponent />}
             </section>
           </>
         )}
 
-        {/* Blog Content */}
+        {/* Markdown content */}
         <article className="prose dark:prose-invert max-w-5xl mx-auto">
           <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
         </article>
       </div>
     );
   } catch (error) {
-    console.error("Error reading blog post:", error);
+    console.error("Error reading practice page:", error);
     return notFound();
   }
 };

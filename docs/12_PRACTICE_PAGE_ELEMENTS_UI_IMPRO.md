@@ -849,3 +849,36 @@ Connect to the Study Tracker.
 What test cases should an automation engineer write for input fields? This is missing entirely.
 
 **Fix:** Add a "Test Cases to Automate" section:
+
+---
+
+## 11. URL Slug Alignment for SEO
+
+### 11.1 Problem — Slugs Don't Match Page Titles or User Intent
+
+The practice page card titles were updated for clarity (e.g. "Select" → "Dropdowns", "Waits" → "Dynamic Waits") but the URL slugs were not updated to match. Misaligned slugs reduce SEO keyword relevance and make URLs harder to read.
+
+### 11.2 Slug Rename Map
+
+| Card Title | Old Slug | New Slug |
+|---|---|---|
+| Input Fields | `/practice/input` | `/practice/input-fields` |
+| Buttons | `/practice/button` | `/practice/buttons` |
+| Dropdowns | `/practice/select` | `/practice/dropdowns` |
+| Alerts & Dialogs | `/practice/alert` | `/practice/alerts-dialogs` |
+| Radio & Checkbox | `/practice/radio` | `/practice/radio-checkbox` |
+| Date Picker | `/practice/calendar` | `/practice/date-picker` |
+| Tabs & Windows | `/practice/window` | `/practice/tabs-windows` |
+| Dynamic Waits | `/practice/waits` | `/practice/dynamic-waits` |
+| Data Table | `/practice/simple-table` | `/practice/data-table` |
+| File Upload | `/practice/upload-download` | `/practice/file-upload` |
+| Links | `/practice/links` | unchanged |
+| Forms | `/practice/forms` | unchanged |
+| Multi Select | `/practice/multi-select` | unchanged |
+
+### 11.3 Required Code Changes
+
+1. **Rename** 10 markdown files in `Blog/elements/`
+2. **Update** `componentMapping` keys in `app/(Practice)/practice/[slug]/page.jsx`
+3. **Update** `link` values in `app/(Practice)/practice/_components/PracticeClientContent.jsx`
+4. **Add** 301 redirects in `next.config.mjs` for all old slugs → new slugs (preserves any existing backlinks/bookmarks)

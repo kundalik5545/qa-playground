@@ -138,9 +138,9 @@ const Footer = () => {
 
           {/* Column 2 — Platform */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Platform
-            </h3>
+            </h4>
             <nav className="flex flex-col gap-2.5" aria-label="Platform links">
               {platformLinks.map((link) => (
                 <Link
@@ -169,9 +169,9 @@ const Footer = () => {
 
           {/* Column 3 — Learn */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Learn
-            </h3>
+            </h4>
             <nav className="flex flex-col gap-2.5" aria-label="Learn links">
               {learnLinks.map((link) => (
                 <Link
@@ -190,9 +190,9 @@ const Footer = () => {
 
           {/* Column 4 — Company */}
           <div className="flex flex-col gap-3">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Company
-            </h3>
+            </h4>
             <nav className="flex flex-col gap-2.5" aria-label="Company links">
               {companyLinks.map((link) => (
                 <Link

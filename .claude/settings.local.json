@@ -31,7 +31,13 @@
       "Bash(npx shadcn@latest add tabs --yes)",
       "Bash(pnpm install:*)",
       "Bash(pnpm run:*)",
-      "Bash(ls \"D:\\\\new-playground\\\\01_qa_playground\\\\00_new-qa-playground\\\\qa-playground\\\\app\\\\\\(Practice\\)\\\\practice\\\\_components\")"
+      "Bash(ls \"D:\\\\new-playground\\\\01_qa_playground\\\\00_new-qa-playground\\\\qa-playground\\\\app\\\\\\(Practice\\)\\\\practice\\\\_components\")",
+      "Bash(\"D:\\\\new-playground\\\\01_qa_playground\\\\00_new-qa-playground\\\\qa-playground\\\\docs\\\\12_PRACTICE_PAGE_ELEMENTS_UI_IMPRO.md\")",
+      "Bash(mv input.md input-fields.md)",
+      "Bash(mv button.md buttons.md)",
+      "Bash(mv select.md dropdowns.md)",
+      "Bash(mv alert.md alerts-dialogs.md)",
+      "Bash(mv radio.md radio-checkbox.md)"
     ]
   }
 }
