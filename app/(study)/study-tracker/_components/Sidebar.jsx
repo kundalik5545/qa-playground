@@ -1,7 +1,13 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronDown, ChevronLeft, ChevronRight, LogIn, LogOut } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronsLeft,
+  ChevronsRight,
+  LogIn,
+  LogOut,
+} from "lucide-react";
 import { useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { getSyllabusStats } from "@/lib/studyTrackerStorage";
@@ -10,10 +16,30 @@ import { cn } from "@/lib/utils";
 import NavBtn from "./NavBtn";
 
 const NAV_ITEMS = [
-  { id: "dashboard", label: "Dashboard",        icon: "📊", href: "/study-tracker/dashboard"     },
-  { id: "daily",     label: "Daily Tracker",    icon: "📅", href: "/study-tracker/daily-tracker"  },
-  { id: "syllabi",   label: "Syllabus Manager", icon: "📚", href: "/study-tracker/syllabus"        },
-  { id: "resources", label: "Resources",        icon: "🔖", href: "/study-tracker/resources"      },
+  {
+    id: "dashboard",
+    label: "Dashboard",
+    icon: "📊",
+    href: "/study-tracker/dashboard",
+  },
+  {
+    id: "daily",
+    label: "Daily Tracker",
+    icon: "📅",
+    href: "/study-tracker/daily-tracker",
+  },
+  {
+    id: "syllabi",
+    label: "Syllabus Manager",
+    icon: "📚",
+    href: "/study-tracker/syllabus",
+  },
+  {
+    id: "resources",
+    label: "Resources",
+    icon: "🔖",
+    href: "/study-tracker/resources",
+  },
 ];
 
 export default function Sidebar({ collapsed, onToggle }) {
@@ -39,27 +65,27 @@ export default function Sidebar({ collapsed, onToggle }) {
     <nav
       className={cn(
         "bg-white border-r border-[#e9eaed] flex flex-col h-full z-40 flex-shrink-0 transition-[width] duration-200 ease-in-out",
-        collapsed ? "w-[64px] min-w-[64px]" : "w-[252px] min-w-[252px]"
+        collapsed ? "w-[64px] min-w-[64px]" : "w-[252px] min-w-[252px]",
       )}
     >
       {/* Top bar with toggle trigger */}
       <div
         className={cn(
           "flex items-center border-b border-[#e9eaed] px-[10px] py-[10px] flex-shrink-0",
-          collapsed ? "justify-center" : "justify-between"
+          collapsed ? "justify-center" : "justify-between",
         )}
       >
         {!collapsed && (
-          <span className="text-[0.72rem] font-bold tracking-[1.2px] text-[#c1c7d0] uppercase select-none px-[2px]">
+          <span className="text-[0.72rem] font-bold tracking-[1.2px] text-[#6b7280] uppercase select-none px-[2px] ml-2">
             Study Tracker
           </span>
         )}
         <button
           onClick={onToggle}
           title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="w-7 h-7 flex items-center justify-center rounded-[6px] border-none bg-transparent cursor-pointer text-gray-400 hover:bg-gray-100 hover:text-[#374151] transition-all flex-shrink-0"
+          className="w-7 h-7 flex items-center justify-center rounded-[6px] border-none bg-transparent cursor-pointer text-[#6b7280] hover:bg-gray-100 hover:text-[#111827] transition-all flex-shrink-0"
         >
-          {collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}
+          {collapsed ? <ChevronsRight size={15} /> : <ChevronsLeft size={15} />}
         </button>
       </div>
 
@@ -86,9 +112,15 @@ export default function Sidebar({ collapsed, onToggle }) {
                   </span>
                 </li>
               )}
-              {collapsed && <li className="border-t border-[#e9eaed] my-[6px]" />}
+              {collapsed && (
+                <li className="border-t border-[#e9eaed] my-[6px]" />
+              )}
               {Object.values(state.syllabi).map((syl) => {
-                const stats = getSyllabusStats(state.syllabi, state.progress, syl.id);
+                const stats = getSyllabusStats(
+                  state.syllabi,
+                  state.progress,
+                  syl.id,
+                );
                 return (
                   <NavBtn
                     key={syl.id}
@@ -97,7 +129,10 @@ export default function Sidebar({ collapsed, onToggle }) {
                     icon={syl.icon}
                     pathname={pathname}
                     badge={stats.pct + "%"}
-                    badgeStyle={{ background: syl.color + "22", color: syl.color }}
+                    badgeStyle={{
+                      background: syl.color + "22",
+                      color: syl.color,
+                    }}
                     collapsed={collapsed}
                   />
                 );
@@ -114,7 +149,7 @@ export default function Sidebar({ collapsed, onToggle }) {
             <button
               className={cn(
                 "flex items-center gap-[9px] px-[10px] py-[9px] rounded-lg w-full border-none bg-transparent cursor-pointer text-sm font-medium text-gray-600 text-left transition-all hover:bg-gray-100 hover:text-[#1a1d23]",
-                collapsed && "justify-center px-0"
+                collapsed && "justify-center px-0",
               )}
               onClick={() => setProfileOpen((o) => !o)}
               id="user-profile-btn"
@@ -127,14 +162,18 @@ export default function Sidebar({ collapsed, onToggle }) {
               {!collapsed && (
                 <>
                   <div className="flex-1 min-w-0">
-                    <div className="text-[0.8rem] font-semibold text-[#111827] truncate">{user.name}</div>
-                    <div className="text-[0.7rem] text-gray-400 truncate">{user.email}</div>
+                    <div className="text-[0.8rem] font-semibold text-[#111827] truncate">
+                      {user.name}
+                    </div>
+                    <div className="text-[0.7rem] text-gray-400 truncate">
+                      {user.email}
+                    </div>
                   </div>
                   <ChevronDown
                     size={14}
                     className={cn(
                       "text-gray-400 flex-shrink-0 transition-transform duration-150",
-                      profileOpen && "rotate-180"
+                      profileOpen && "rotate-180",
                     )}
                   />
                 </>
@@ -144,13 +183,21 @@ export default function Sidebar({ collapsed, onToggle }) {
             {profileOpen && (
               <div
                 className="absolute bottom-[calc(100%+6px)] bg-white border border-gray-200 rounded-[10px] shadow-[0_8px_24px_rgba(0,0,0,0.10)] p-2 z-50"
-                style={collapsed ? { left: "100%", marginLeft: 8, minWidth: 200 } : { left: 0, right: 0, minWidth: 160 }}
+                style={
+                  collapsed
+                    ? { left: "100%", marginLeft: 8, minWidth: 200 }
+                    : { left: 0, right: 0, minWidth: 160 }
+                }
                 id="user-profile-dropdown"
                 data-testid="user-profile-dropdown"
               >
                 <div className="px-[10px] pt-2 pb-[10px] border-b border-gray-100 mb-[6px]">
-                  <p className="text-[0.8rem] font-semibold text-[#111827] m-0">{user.name}</p>
-                  <p className="text-[0.72rem] text-gray-500 m-0">{user.email}</p>
+                  <p className="text-[0.8rem] font-semibold text-[#111827] m-0">
+                    {user.name}
+                  </p>
+                  <p className="text-[0.72rem] text-gray-500 m-0">
+                    {user.email}
+                  </p>
                   <span className="text-[0.65rem] font-bold px-[7px] py-[2px] rounded-full bg-[#eff2ff] text-blue-600 inline-block mt-1">
                     {user.role ?? "USER"}
                   </span>
@@ -172,7 +219,7 @@ export default function Sidebar({ collapsed, onToggle }) {
             href="/login"
             className={cn(
               "flex items-center gap-[9px] px-[10px] py-[9px] rounded-lg w-full border border-[#e5e7eb] bg-[#f9fafb] cursor-pointer text-sm font-medium text-[#374151] no-underline transition-all hover:bg-gray-100 hover:text-[#1a1d23]",
-              collapsed && "justify-center px-0"
+              collapsed && "justify-center px-0",
             )}
             id="sidebar-login-btn"
             data-testid="sidebar-login-btn"
