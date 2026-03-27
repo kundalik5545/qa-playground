@@ -135,6 +135,33 @@ export const practiceElementFaqs = {
     },
   ],
 
+  "alerts-dialogs": [
+    {
+      q: "How do I handle a browser alert dialog in Selenium WebDriver?",
+      a: "After triggering an alert, switch to it with driver.switchTo().alert(). Then call .accept() to click OK, .dismiss() to click Cancel, or .getText() to read the message. Example: Alert alert = driver.switchTo().alert(); String message = alert.getText(); alert.accept(). Always switch to the alert before any other interaction — attempting to click page elements while an alert is open throws UnhandledAlertException.",
+    },
+    {
+      q: "How do I handle browser alert dialogs in Playwright?",
+      a: "Register a dialog handler before the action that triggers the alert: page.on('dialog', dialog => dialog.accept()). For confirm dialogs, use dialog.dismiss() to click Cancel. For prompt dialogs, pass a value: dialog.accept('my input'). Read the message with dialog.message(). The handler must be registered before the trigger — Playwright auto-dismisses unhandled dialogs.",
+    },
+    {
+      q: "How do I accept and dismiss a confirm dialog in Selenium WebDriver?",
+      a: "Switch to the alert and call accept() for OK or dismiss() for Cancel: Alert confirm = driver.switchTo().alert(); confirm.accept(). To assert the result, check the page state after dismissal — on this practice page the result shows 'Accepted' or 'Dismissed' below the trigger button. In Playwright: page.on('dialog', d => d.dismiss()).",
+    },
+    {
+      q: "How do I enter text in a prompt dialog using Selenium or Playwright?",
+      a: "In Selenium: Alert prompt = driver.switchTo().alert(); prompt.sendKeys('my input'); prompt.accept(). In Playwright: page.on('dialog', async dialog => { await dialog.accept('my input'); }). The text is passed to sendKeys() in Selenium or as an argument to dialog.accept() in Playwright. Calling dismiss() on a prompt cancels it without capturing any input.",
+    },
+    {
+      q: "How do I test toast notifications in Selenium or Playwright automation?",
+      a: "Toast notifications are regular DOM elements that appear temporarily. In Selenium, add an explicit wait: wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector('.toast'))). In Playwright, use await expect(page.locator('.toast')).toBeVisible(). Assert the message text, then optionally wait for it to disappear: await expect(locator).not.toBeVisible(). Use data-testid attributes to make toast locators stable.",
+    },
+    {
+      q: "How do I close a modal dialog (sweet alert or custom modal) in automation testing?",
+      a: "Modal dialogs are custom HTML elements, not browser-native dialogs — do not use driver.switchTo().alert() for them. In Selenium: driver.findElement(By.cssSelector('[data-testid=\"modal-close-btn\"]')).click(). In Playwright: await page.click('[data-testid=\"modal-close-btn\"]'). You can also press Escape: page.keyboard.press('Escape'). Assert the modal is gone with element.isDisplayed() returning false or expect(locator).not.toBeVisible().",
+    },
+  ],
+
   links: [
     {
       q: "How do I click a link and verify it navigates to the correct URL in Selenium WebDriver?",

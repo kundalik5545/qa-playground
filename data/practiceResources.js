@@ -53,7 +53,7 @@ export const practiceResources = {
     difficulty: "Beginner",
     difficultyColor: "green",
     timeMin: 10,
-    scenarioCount: 3,
+    scenarioCount: 6,
     youtubeUrl: "",
     relatedElements: ["tabs-windows"],
   },

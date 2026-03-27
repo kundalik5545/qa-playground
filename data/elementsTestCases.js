@@ -111,6 +111,120 @@ export const dropdownTC = [
   },
 ];
 
+// ─── Alerts & Dialogs ────────────────────────────────────────────────────────
+
+export const alertTC = [
+  {
+    TestId: "TC01",
+    TestCaseName: "Accept a simple browser alert and verify it closes",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "Set up an alert listener before clicking: page.on('dialog', d => d.accept()) in Playwright",
+      "Click the 'Simple Alert' button using data-testid='btn-simple-alert'",
+      "In Selenium: driver.switchTo().alert().accept()",
+      "Assert the alert is dismissed and the page remains interactive",
+    ],
+  },
+  {
+    TestId: "TC02",
+    TestCaseName: "Get text from a simple browser alert before accepting",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "In Playwright: page.on('dialog', async d => { expect(d.message()).toBe('Welcome to QA PlayGround!'); await d.accept(); })",
+      "Click the 'Simple Alert' button",
+      "In Selenium: String alertText = driver.switchTo().alert().getText(); assert alertText.equals('Welcome to QA PlayGround!')",
+      "Accept the alert after reading the text",
+    ],
+  },
+  {
+    TestId: "TC03",
+    TestCaseName: "Accept a confirm dialog and verify accepted state",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "In Playwright: page.on('dialog', d => d.accept())",
+      "Click the 'Confirm Alert' button using data-testid='btn-confirm-alert'",
+      "In Selenium: driver.switchTo().alert().accept()",
+      "Assert the result display shows 'Accepted'",
+    ],
+  },
+  {
+    TestId: "TC04",
+    TestCaseName: "Dismiss a confirm dialog and verify dismissed state",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "In Playwright: page.on('dialog', d => d.dismiss())",
+      "Click the 'Confirm Alert' button",
+      "In Selenium: driver.switchTo().alert().dismiss()",
+      "Assert the result display shows 'Dismissed'",
+    ],
+  },
+  {
+    TestId: "TC05",
+    TestCaseName: "Enter text in a prompt dialog and accept it",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "In Playwright: page.on('dialog', d => d.accept('John Doe'))",
+      "Click the 'Prompt Alert' button using data-testid='btn-prompt-alert'",
+      "In Selenium: Alert prompt = driver.switchTo().alert(); prompt.sendKeys('John Doe'); prompt.accept()",
+      "Assert the prompt result display shows 'Your name is - John Doe'",
+    ],
+  },
+  {
+    TestId: "TC06",
+    TestCaseName: "Dismiss a prompt dialog and verify no input is captured",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "In Playwright: page.on('dialog', d => d.dismiss())",
+      "Click the 'Prompt Alert' button",
+      "In Selenium: driver.switchTo().alert().dismiss()",
+      "Assert the prompt result display is empty or not visible",
+    ],
+  },
+  {
+    TestId: "TC07",
+    TestCaseName: "Verify toast notification appears after triggering",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "Click the 'Toast Alert' button using data-testid='btn-toast-alert'",
+      "Wait for the toast element to appear in the DOM",
+      "In Playwright: await expect(page.locator('[data-sonner-toast]')).toBeVisible()",
+      "Assert the toast text contains 'This is simple toast'",
+    ],
+  },
+  {
+    TestId: "TC08",
+    TestCaseName: "Close a modal/sweet alert using the Cancel button",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "Click the 'Sweet Alert' button using data-testid='btn-modal-alert'",
+      "Wait for the modal dialog to appear",
+      "Click the 'You Are!' cancel button inside the modal",
+      "Assert the modal is no longer visible",
+    ],
+  },
+  {
+    TestId: "TC09",
+    TestCaseName: "Close an advanced dialog using the Close button",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "Click the 'Share' button using data-testid='btn-dialog-share'",
+      "Wait for the dialog to open and assert the link input is visible",
+      "Assert the input value contains 'qaplayground.com/practice/alerts-dialogs'",
+      "Click the 'Close' button and assert the dialog is dismissed",
+    ],
+  },
+  {
+    TestId: "TC10",
+    TestCaseName: "Verify alerts page loads without errors",
+    steps: [
+      "Navigate to /practice/alerts-dialogs",
+      "Assert HTTP 200 response",
+      "Assert no JS console errors are present",
+      "Assert all 6 alert trigger buttons are visible in the DOM",
+    ],
+  },
+];
+
 // ─── Radio & Checkbox ────────────────────────────────────────────────────────
 
 export const radioBoxTC = [
