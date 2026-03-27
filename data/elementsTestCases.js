@@ -1,3 +1,116 @@
+// ─── Dropdowns / Select ──────────────────────────────────────────────────────
+
+export const dropdownTC = [
+  {
+    TestId: "TC01",
+    TestCaseName: "Select 'Apple' from fruit dropdown by visible text",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the fruit dropdown using id='dropdown-fruit' or data-testid='dropdown-fruit'",
+      "In Selenium: wrap with Select class → selectByVisibleText('Apple')",
+      "In Playwright: use page.selectOption('#dropdown-fruit', { label: 'Apple' })",
+      "Assert the dropdown now shows 'Apple' as the selected value",
+    ],
+  },
+  {
+    TestId: "TC02",
+    TestCaseName: "Select 'India' from country dropdown by value attribute",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the country dropdown using id='dropdown-country' or data-testid='dropdown-country'",
+      "In Selenium: wrap with Select class → selectByValue('india')",
+      "In Playwright: use page.selectOption('#dropdown-country', 'india')",
+      "Assert the selected option text is 'India'",
+    ],
+  },
+  {
+    TestId: "TC03",
+    TestCaseName: "Verify selected value is displayed after selection",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Select 'Banana' from the fruit dropdown",
+      "Locate the result display element below the dropdown (data-testid='result-fruit')",
+      "Assert the result element text contains 'Banana'",
+    ],
+  },
+  {
+    TestId: "TC04",
+    TestCaseName: "Get all available options from the programming language dropdown",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the language dropdown using data-testid='dropdown-language'",
+      "In Selenium: Select.getOptions() — assert size is 3",
+      "In Playwright: page.locator('#dropdown-language option').allInnerTexts()",
+      "Assert the returned list contains: Python, Java, JavaScript",
+    ],
+  },
+  {
+    TestId: "TC05",
+    TestCaseName: "Select the last option from the programming language dropdown",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the language dropdown using data-testid='dropdown-language'",
+      "In Selenium: get all options with getOptions(); click the last one",
+      "In Playwright: const opts = await page.locator('#dropdown-language option').all(); await opts[opts.length - 1].click()",
+      "Assert the last option ('JavaScript') is now selected",
+    ],
+  },
+  {
+    TestId: "TC06",
+    TestCaseName: "Multi-select: select multiple superheroes using CTRL+click",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the multi-select element using data-testid='dropdown-heroes'",
+      "In Selenium: Select heroes = new Select(element); heroes.selectByVisibleText('Ant-Man'); heroes.selectByVisibleText('Batman')",
+      "In Playwright: page.selectOption('#dropdown-heroes', ['ant-man', 'batman'])",
+      "Assert getAllSelectedOptions() returns 2 items: Ant-Man and Batman",
+    ],
+  },
+  {
+    TestId: "TC07",
+    TestCaseName: "Multi-select: deselect a previously selected option",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Select 'Ant-Man' and 'Aquaman' from the heroes multi-select",
+      "In Selenium: Select.deselectByVisibleText('Ant-Man')",
+      "In Playwright: hold Ctrl and click 'Ant-Man' again to deselect, or re-selectOption with only 'aquaman'",
+      "Assert getAllSelectedOptions() now contains only 'Aquaman'",
+    ],
+  },
+  {
+    TestId: "TC08",
+    TestCaseName: "Verify default placeholder text before any selection",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the fruit dropdown before interacting with it",
+      "Assert the trigger/placeholder text reads 'Select Fruit'",
+      "In Playwright: await expect(page.locator('[data-testid=\"dropdown-fruit\"]')).toHaveText('Select Fruit')",
+    ],
+  },
+  {
+    TestId: "TC09",
+    TestCaseName: "Verify a dropdown is enabled and interactable",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the country dropdown using data-testid='dropdown-country'",
+      "In Selenium: assert element.isEnabled() returns true",
+      "In Playwright: assert await page.isDisabled('[data-testid=\"dropdown-country\"]') returns false",
+      "Attempt to select an option and assert it succeeds without error",
+    ],
+  },
+  {
+    TestId: "TC10",
+    TestCaseName: "Verify the total count of options in the country dropdown",
+    steps: [
+      "Navigate to /practice/dropdowns",
+      "Locate the country dropdown using data-testid='dropdown-country'",
+      "In Selenium: assert Select.getOptions().size() equals 4",
+      "In Playwright: await expect(page.locator('#dropdown-country option')).toHaveCount(4)",
+      "Assert all four country names are present: India, USA, UK, Argentina",
+    ],
+  },
+];
+
 // ─── Radio & Checkbox ────────────────────────────────────────────────────────
 
 export const radioBoxTC = [

@@ -33,6 +33,7 @@ import {
 import Link from "next/link";
 import { practiceResources, difficultyStyles } from "@/data/practiceResources";
 import { formsTC } from "@/data/formsTestCases";
+import NextElementCard from "./NextElementCard";
 
 const SLUG = "forms";
 
@@ -587,7 +588,7 @@ const FormsPage = () => {
           </Card>
         </section>
 
-        {/* What You'll Learn card */}
+        {/* What You'll Learn + Up Next sidebar */}
         <div className="shrink-0 w-64 md:w-72">
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between p-3 pb-2 border-b space-y-0">
@@ -659,6 +660,8 @@ const FormsPage = () => {
               )}
             </CardFooter>
           </Card>
+
+          <NextElementCard currentSlug={SLUG} />
         </div>
       </div>
 

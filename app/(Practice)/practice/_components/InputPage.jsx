@@ -26,6 +26,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { inputFieldTC } from "@/data/elementsTestCases";
+import NextElementCard from "./NextElementCard";
 import { practiceResources, difficultyStyles } from "@/data/practiceResources";
 
 const techMethods = {
@@ -226,7 +227,7 @@ const InputPage = () => {
           </Card>
         </section>
 
-        {/* What You'll Learn card */}
+        {/* What You'll Learn + Up Next sidebar */}
         <div className="shrink-0 w-64 md:w-72">
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between p-3 pb-2 border-b space-y-0">
@@ -298,6 +299,8 @@ const InputPage = () => {
               )}
             </CardFooter>
           </Card>
+
+          <NextElementCard currentSlug={SLUG} />
         </div>
       </div>
 

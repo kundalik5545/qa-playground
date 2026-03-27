@@ -23,6 +23,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { practiceResources, difficultyStyles } from "@/data/practiceResources";
 import { buttonTC } from "@/data/elementsTestCases";
+import NextElementCard from "./NextElementCard";
 
 const SLUG = "buttons";
 
@@ -315,7 +316,7 @@ const ButtonPage = () => {
           </Card>
         </section>
 
-        {/* What You'll Learn card */}
+        {/* What You'll Learn + Up Next sidebar */}
         <div className="shrink-0 w-64 md:w-72">
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between p-3 pb-2 border-b space-y-0">
@@ -387,6 +388,8 @@ const ButtonPage = () => {
               )}
             </CardFooter>
           </Card>
+
+          <NextElementCard currentSlug={SLUG} />
         </div>
       </div>
 

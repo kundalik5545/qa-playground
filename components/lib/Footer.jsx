@@ -7,7 +7,7 @@ import {
   FaTelegram,
   FaLinkedin,
 } from "react-icons/fa";
-import { LayoutGrid, CreditCard, BookOpen, Chrome } from "lucide-react";
+import { LayoutGrid, CreditCard, BookOpen, Chrome, Wrench } from "lucide-react";
 
 const platformLinks = [
   {
@@ -33,6 +33,14 @@ const platformLinks = [
     badge: "New",
     badgeClass:
       "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
+  },
+  {
+    href: "/qa-tools",
+    label: "QA Tools",
+    icon: <Wrench className="h-3.5 w-3.5" />,
+    badge: "Free",
+    badgeClass:
+      "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
   },
   {
     href: "https://chromewebstore.google.com/detail/jhgkhnokloeklnagbkgkgcfphafifefg?utm_source=item-share-cb",

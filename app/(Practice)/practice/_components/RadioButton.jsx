@@ -23,6 +23,7 @@ import Link from "next/link";
 import { Checkbox } from "@/components/ui/checkbox";
 import { practiceResources, difficultyStyles } from "@/data/practiceResources";
 import { radioBoxTC } from "@/data/elementsTestCases";
+import NextElementCard from "./NextElementCard";
 
 const SLUG = "radio-checkbox";
 
@@ -331,7 +332,7 @@ const RadioButtonPage = () => {
           </Card>
         </section>
 
-        {/* What You'll Learn card */}
+        {/* What You'll Learn + Up Next sidebar */}
         <div className="shrink-0 w-64 md:w-72">
           <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between p-3 pb-2 border-b space-y-0">
@@ -403,6 +404,8 @@ const RadioButtonPage = () => {
               )}
             </CardFooter>
           </Card>
+
+          <NextElementCard currentSlug={SLUG} />
         </div>
       </div>
 

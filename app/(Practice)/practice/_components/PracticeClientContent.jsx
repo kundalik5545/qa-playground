@@ -10,108 +10,14 @@ import {
 } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import { practiceElements } from "@/data/practiceElements";
 
-const allElements = [
-  {
-    title: "Input Fields",
-    logo: "/mainicons/edit.svg",
-    Description: "Interact with different types of input fields",
-    footerTitle: "Practice Now",
-    link: "/practice/input-fields",
-  },
-  {
-    title: "Buttons",
-    logo: "/mainicons/buttons.svg",
-    Description: "Click, double-click, right-click, and disabled buttons",
-    footerTitle: "Practice Now",
-    link: "/practice/buttons",
-  },
-  {
-    title: "Forms",
-    logo: "/mainicons/sign-form.svg",
-    Description: "Fill and submit forms with validation scenarios",
-    footerTitle: "Practice Now",
-    link: "/practice/forms",
-  },
-  {
-    title: "Dropdowns",
-    logo: "/mainicons/select.svg",
-    Description: "Handle single and multi-option dropdown selections",
-    footerTitle: "Practice Now",
-    link: "/practice/dropdowns",
-  },
-  {
-    title: "Data Table",
-    logo: "/mainicons/simtable.svg",
-    Description: "Practice reading, sorting, and filtering table data",
-    footerTitle: "Practice Now",
-    link: "/practice/data-table",
-  },
-  {
-    title: "Alerts & Dialogs",
-    logo: "/mainicons/alert.svg",
-    Description: "Handle browser alerts, confirms, and prompt dialogs",
-    footerTitle: "Practice Now",
-    link: "/practice/alerts-dialogs",
-  },
-  {
-    title: "Radio & Checkbox",
-    logo: "/mainicons/radio.svg",
-    Description: "Toggle radio buttons and checkboxes in different states",
-    footerTitle: "Practice Now",
-    link: "/practice/radio-checkbox",
-  },
-  {
-    title: "Date Picker",
-    logo: "/mainicons/calendar.svg",
-    Description: "Interact with date pickers and time selection elements",
-    footerTitle: "Practice Now",
-    link: "/practice/date-picker",
-  },
-  {
-    title: "Links",
-    logo: "/mainicons/edit.svg",
-    Description: "Interact with different types of links and navigation",
-    footerTitle: "Practice Now",
-    link: "/practice/links",
-  },
-  {
-    title: "Tabs & Windows",
-    logo: "/mainicons/window.svg",
-    Description: "Switch between browser tabs and pop-up windows",
-    footerTitle: "Practice Now",
-    link: "/practice/tabs-windows",
-  },
-  {
-    title: "Dynamic Waits",
-    logo: "/mainicons/waits.svg",
-    Description: "Practice explicit and implicit waits for dynamic content",
-    footerTitle: "Practice Now",
-    link: "/practice/dynamic-waits",
-  },
-  {
-    title: "Multi Select",
-    logo: "/mainicons/alert.svg",
-    Description: "Practice selecting multiple items from lists and dropdowns",
-    footerTitle: "Practice Now",
-    link: "/practice/multi-select",
-  },
-  {
-    title: "File Upload",
-    logo: "/mainicons/download.svg",
-    Description: "Practice file upload and download automation scenarios",
-    footerTitle: "Practice Now",
-    link: "/practice/file-upload",
-  },
-  {
-    title: "Bank App",
-    logo: "/mainicons/edit.svg",
-    Description: "End-to-end POM practice with a realistic bank demo app",
-    footerTitle: "Start Practice",
-    link: "/bank",
-    isBankDemo: true,
-  },
-];
+// Derive link from slug or externalLink
+const allElements = practiceElements.map((el) => ({
+  ...el,
+  Description: el.description,
+  link: el.externalLink ?? `/practice/${el.slug}`,
+}));
 
 export default function PracticeClientContent() {
   const [search, setSearch] = useState("");

@@ -18,6 +18,8 @@ import { basicDetails } from "@/data/BasicSetting";
 import { Calendar, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { practiceElementFaqs } from "@/data/practiceElementFaqs";
+import PracticeElementFAQ from "../_components/PracticeElementFAQ";
 
 // Practice Components
 import ElementsPage from "../_components/ElementsPage";
@@ -93,11 +95,11 @@ export async function generateMetadata({ params }) {
 }
 
 // Build JSON-LD for practice (non-blog) pages
-function buildJsonLd(slug, data) {
+function buildJsonLd(slug, data, faqs = []) {
   const pageUrl = `${basicDetails.websiteURL}/practice/${slug}`;
   const elementName = data.title || slug;
 
-  return [
+  const schemas = [
     {
       "@context": "https://schema.org",
       "@type": "LearningResource",
@@ -123,6 +125,20 @@ function buildJsonLd(slug, data) {
       ],
     },
   ];
+
+  if (faqs.length > 0) {
+    schemas.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: faqs.map((item) => ({
+        "@type": "Question",
+        name: item.q,
+        acceptedAnswer: { "@type": "Answer", text: item.a },
+      })),
+    });
+  }
+
+  return schemas;
 }
 
 const PracticePage = async ({ params }) => {
@@ -157,6 +173,7 @@ const PracticePage = async ({ params }) => {
 
     const DynamicComponent = componentMapping[slug] || null;
     const isPracticePage = data?.isBlog !== "Yes";
+    const faqs = practiceElementFaqs[slug] ?? [];
 
     return (
       <div className="container mx-auto px-4 lg:px-8">
@@ -166,7 +183,7 @@ const PracticePage = async ({ params }) => {
             id={`practice-${slug}-jsonld`}
             type="application/ld+json"
             dangerouslySetInnerHTML={{
-              __html: JSON.stringify(buildJsonLd(slug, data)),
+              __html: JSON.stringify(buildJsonLd(slug, data, faqs)),
             }}
           />
         )}
@@ -246,6 +263,9 @@ const PracticePage = async ({ params }) => {
         <article className="prose dark:prose-invert max-w-5xl mx-auto">
           <div dangerouslySetInnerHTML={{ __html: htmlContent }} />
         </article>
+
+        {/* FAQ section — only for practice pages with FAQ data */}
+        {isPracticePage && <PracticeElementFAQ faqs={faqs} />}
       </div>
     );
   } catch (error) {

@@ -5,8 +5,7 @@ import PracticeClientContent from "./_components/PracticeClientContent";
 export const revalidate = 3600;
 
 export const metadata = {
-  title:
-    "Practice Elements | QA Playground – Selenium, Playwright & Cypress",
+  title: "Practice Elements | QA Playground – Selenium, Playwright & Cypress",
   description:
     "Explore 14+ hands-on practice elements including Buttons, Forms, Tables, Alerts, File Upload, and more. Perfect for Selenium, Playwright, and Cypress automation engineers.",
   keywords: [
@@ -27,8 +26,7 @@ export const metadata = {
   openGraph: {
     type: "website",
     url: "https://www.qaplayground.com/practice",
-    title:
-      "Practice Elements | QA Playground – Selenium, Playwright & Cypress",
+    title: "Practice Elements | QA Playground – Selenium, Playwright & Cypress",
     description:
       "Explore 14+ hands-on practice elements including Buttons, Forms, Tables, Alerts, File Upload, and more. Perfect for Selenium, Playwright, and Cypress automation engineers.",
     images: [
@@ -44,8 +42,7 @@ export const metadata = {
     card: "summary_large_image",
     site: "@qaplayground",
     url: "https://www.qaplayground.com/practice",
-    title:
-      "Practice Elements | QA Playground – Selenium, Playwright & Cypress",
+    title: "Practice Elements | QA Playground – Selenium, Playwright & Cypress",
     description:
       "Explore 14+ hands-on practice elements including Buttons, Forms, Tables, Alerts, File Upload, and more. Perfect for Selenium, Playwright, and Cypress automation engineers.",
     images: ["/og-image.png"],

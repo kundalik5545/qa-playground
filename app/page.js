@@ -122,44 +122,44 @@ const jsonLd = {
 
 const faqItems = [
   {
-    q: "What is QA Playground?",
-    a: "QA Playground is a free, purpose-built practice platform for QA automation engineers. It provides 22+ interactive UI elements, a simulated banking app, and a learning tracker — all designed to help you master Selenium, Playwright, and Cypress.",
+    q: "What is QA Playground and who is it built for?",
+    a: "QA Playground is a free, purpose-built automation testing practice website for QA engineers at any level. It offers 22+ interactive UI elements — inputs, tables, drag-and-drop, shadow DOM, alerts, file upload, and more — plus a full Bank Demo App and Study Tracker. Whether you're a beginner learning Selenium for the first time or an experienced engineer sharpening your Playwright or Cypress skills, everything here is designed to mirror real-world testability challenges.",
   },
   {
-    q: "Is QA Playground completely free?",
-    a: "Yes! All practice elements, the Bank Demo app, and the Study Tracker are 100% free with no credit card required.",
+    q: "Which UI elements can I practice automation testing on?",
+    a: "QA Playground includes 22 practice elements: text inputs, buttons (click, double-click, right-click), dropdowns, radio buttons, checkboxes, alerts and dialogs, iFrames, new-window and tab switching, drag-and-drop, sortable lists, sliders, simple and advanced data tables, date pickers, file upload and download, shadow DOM, multi-select, dynamic waits, and more. Each element is built with testability in mind — with id, data-testid, and data-action attributes — so your Selenium WebDriver or Playwright locators work exactly as expected.",
   },
   {
-    q: "Do I need to create an account?",
-    a: "No account is required to practice automation. An optional login is available only if you want to sync your Study Tracker progress across devices.",
+    q: "Is QA Playground completely free to use for Selenium, Playwright, and Cypress practice?",
+    a: "Yes — 100% free, no credit card, no paywall. All 22 practice elements, the Bank Demo App for end-to-end testing practice, the QA Study Tracker, and QA Tools like the JSON to File Converter are all free. An optional account lets you sync your Study Tracker progress across devices, but it is never required.",
   },
   {
-    q: "Which automation frameworks can I practise with?",
-    a: "QA Playground supports Selenium (Java/Python/JS), Playwright (JS/TS/Python), and Cypress (JavaScript/TypeScript). All elements are framework-agnostic.",
+    q: "What is the Bank Demo App and how does it help with end-to-end test automation?",
+    a: "The Bank Demo App is a fully simulated banking application with login (admin / admin123), a dashboard, accounts CRUD, and transaction management with filtering. It is purpose-built for practicing end-to-end automation frameworks — build a full Page Object Model test suite covering login flows, account creation, balance updates, and transaction filtering, all on a stable, predictable UI with proper test attributes.",
   },
   {
-    q: "What is the Bank Demo App?",
-    a: "The Bank Demo is a fully simulated banking application with login, accounts, dashboard, and transaction management — perfect for building and testing end-to-end automation frameworks.",
+    q: "Can I practice Shadow DOM, drag-and-drop, iFrame, and dynamic waits with Selenium WebDriver?",
+    a: "Yes. QA Playground includes dedicated practice pages for Shadow DOM elements, drag-and-drop and sortable lists, iFrame handling, multi-window and tab switching, explicit/implicit wait scenarios, and dynamic alerts — the exact elements that trip up most Selenium WebDriver and Playwright beginners. Every scenario is repeatable, so you can run tests as many times as needed.",
   },
   {
-    q: "What is the QA Study Tracker?",
-    a: "The Study Tracker is your personal learning dashboard covering Manual Testing, Automation Testing, API Testing, and Playwright syllabi. It tracks topic completion, progress charts, notes, and daily activity — stored locally in your browser.",
+    q: "How does the QA Study Tracker help me learn automation testing step by step?",
+    a: "The QA Study Tracker is a personal learning dashboard with structured syllabi for Manual Testing, Selenium Automation, API Testing, and Playwright. Track topic completion, log daily study sessions, save articles and videos as resources, and view your progress with charts. You can also import AI-generated syllabi or export your own — making it a flexible companion for a self-paced QA automation learning roadmap.",
   },
   {
-    q: "What are QA Capture and QA Playground Clipper?",
-    a: "These are free browser extensions that enhance your QA workflow. QA Capture lets you record and screenshot test sessions, while QA Playground Clipper lets you save practice scenarios directly from your browser.",
+    q: "Which automation frameworks does QA Playground support?",
+    a: "All practice elements and the Bank Demo App are fully framework-agnostic. You can use Selenium WebDriver (Java, Python, or JavaScript), Playwright (JavaScript, TypeScript, or Python), or Cypress (JavaScript/TypeScript). Elements expose standard HTML attributes so locator strategies — CSS selectors, XPath, getByRole, getByTestId — all work correctly across frameworks.",
   },
   {
-    q: "Can I use this for QA job interview preparation?",
-    a: "Absolutely! The platform includes logic programs, automation test case challenges, and real-world UI scenarios that mirror common QA interview tasks.",
+    q: "Can I use QA Playground to prepare for a QA automation engineer job interview?",
+    a: "Yes. The platform is used by QA engineers specifically for interview preparation. The practice elements cover scenarios commonly tested in technical QA interviews — handling dynamic tables, writing Page Object Model code, dealing with pop-ups and shadow DOM, and creating stable, maintainable test suites. The blog and learn sections also include automation concepts, logic programs, and QA interview question guides.",
   },
   {
-    q: "Is my progress data private and secure?",
-    a: "Yes. All your data is stored locally in your browser — nothing is sent to external servers unless you opt in to the sync feature.",
+    q: "Do I need to install anything to practice Selenium or Playwright on QA Playground?",
+    a: "No installation needed on QA Playground itself — the practice site runs entirely in your browser. You write and run your Selenium, Playwright, or Cypress scripts locally on your machine, pointed at https://www.qaplayground.com. This mirrors a real professional workflow: a running app, your local test project, and a CI/CD pipeline if you want to extend the practice.",
   },
   {
-    q: "How do I report a bug or request a new feature?",
-    a: "Use the Contact Us page or reach out on our YouTube channel. We actively review all feedback and update the platform regularly.",
+    q: "How is my progress and test data stored? Is it private?",
+    a: "All Study Tracker data — syllabus progress, daily logs, saved resources — is stored in your browser's localStorage by default. Nothing is sent to external servers without your explicit choice. If you create a free account and opt in to sync, data is stored in a secure PostgreSQL database tied to your account. The Bank Demo App also stores account and transaction data locally in your browser, so it resets if you clear your browser data.",
   },
 ];
 
