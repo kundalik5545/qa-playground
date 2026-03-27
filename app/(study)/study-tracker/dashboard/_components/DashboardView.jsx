@@ -19,6 +19,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { ArrowBigUp } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { ArrowBigDown } from "lucide-react";
 
 Chart.register(...registerables);
 
@@ -427,28 +430,20 @@ export default function DashboardView({
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              size="sm"
-              onClick={onExport}
-              className="bg-blue-600 hover:bg-blue-700  dark:text-white text-[0.82rem]"
-            >
-              ⬇ Export
+            <Button size="sm" onClick={onExport} variant="exportBtn">
+              <ArrowBigUp /> Export
             </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onImport}
-              className="text-[0.82rem] dark:text-white"
-            >
-              ⬆ Import
+            <Button size="sm" variant="importBtn" onClick={onImport}>
+              <ArrowBigDown /> Import
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button
                   size="sm"
-                  className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-[0.82rem]"
+                  variant="clearBtn"
+                  onClick={(e) => e.preventDefault()}
                 >
-                  🗑 Clear All
+                  <Trash2 /> Clear Data
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>

@@ -38,7 +38,7 @@ import {
   pickJSONFile,
   computeHabitEndDate,
 } from "@/lib/studyTrackerStorage";
-import { formatTimeSlot } from "./TimeSlotPicker";
+import { buildTimeSlot } from "./TimeSlotPicker";
 import { useTracker } from "@/app/(study)/study-tracker/_components/StudyTrackerProvider";
 
 import { LIGHT_MODE_STYLE } from "./_constants";
@@ -46,6 +46,10 @@ import DateNavigator from "./DateNavigator";
 import TaskList from "./TaskList";
 import AnalyticsPanel from "./analytics/AnalyticsPanel";
 import HabitsTab from "./habbits/HabitsTab";
+import { Import } from "lucide-react";
+import { ArrowBigUp } from "lucide-react";
+import { ArrowBigDown } from "lucide-react";
+import { Trash2 } from "lucide-react";
 
 export default function DailyTrackerView({ state, updateState, showToast }) {
   const { user } = useTracker();
@@ -68,9 +72,6 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
     fromHour: "",
     fromMin: "00",
     fromPeriod: "AM",
-    toHour: "",
-    toMin: "00",
-    toPeriod: "AM",
   });
 
   // ── Task handlers ──────────────────────────────────────────────────────────
@@ -129,15 +130,13 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
         ? habitForm.endDate || null
         : computeHabitEndDate(habitForm.startDate, habitForm.duration);
 
-    // Derive timeSlot formatted string from the picker parts
-    const timeSlot = formatTimeSlot({
-      fromHour: habitForm.fromHour,
-      fromMin: habitForm.fromMin,
-      fromPeriod: habitForm.fromPeriod,
-      toHour: habitForm.toHour,
-      toMin: habitForm.toMin,
-      toPeriod: habitForm.toPeriod,
-    });
+    // Derive timeSlot: auto-compute "To" from From + timeMin
+    const timeSlot = buildTimeSlot(
+      habitForm.fromHour,
+      habitForm.fromMin,
+      habitForm.fromPeriod,
+      parseInt(habitForm.time),
+    );
 
     const habit = {
       id: "h-" + Date.now(),
@@ -159,9 +158,6 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
       fromHour: "",
       fromMin: "00",
       fromPeriod: "AM",
-      toHour: "",
-      toMin: "00",
-      toPeriod: "AM",
     }));
     showToast(`Habit "${habit.title}" created!`);
   };
@@ -272,12 +268,13 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
           </div>
           <div className="flex gap-2">
             <Button size="sm" variant="exportBtn" onClick={exportTasks}>
-              ⬇ Export Tasks
+              <ArrowBigUp /> Export
             </Button>
             <Button size="sm" variant="importBtn" onClick={importTasks}>
-              ⬆ Import Tasks
+              <ArrowBigDown /> Import
             </Button>
             <Button size="sm" variant="clearBtn" onClick={clearAllData}>
+              <Trash2 />
               Clear Data
             </Button>
           </div>

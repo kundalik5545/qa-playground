@@ -13,7 +13,7 @@
 
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import TimeSlotPicker, { formatTimeSlot, parseTimeSlot } from "../TimeSlotPicker";
+import TimeSlotPicker, { buildTimeSlot, computeToTime, parseTimeSlot } from "../TimeSlotPicker";
 
 const CELL_INPUT =
   "w-full border border-[#e9eaed] rounded-[6px] px-2 py-[5px] font-[inherit] text-[0.8rem] text-[#374151] outline-none focus:border-blue-500 transition-colors bg-white";
@@ -26,14 +26,17 @@ export default function HabitList({ state, onUpdateHabit, onDeleteHabit }) {
   const habits = state.habits || [];
 
   function startEdit(habit) {
-    const slotParts = parseTimeSlot(habit.timeSlot ?? "");
+    // parseTimeSlot only returns from* — To is always re-derived from From + timeMin
+    const { fromHour, fromMin, fromPeriod } = parseTimeSlot(habit.timeSlot ?? "");
     setEditId(habit.id);
     setEditValues({
       title: habit.title,
       timeMin: habit.timeMin ?? "",
       startDate: habit.startDate ?? "",
       endDate: habit.endDate ?? "",
-      ...slotParts,
+      fromHour,
+      fromMin,
+      fromPeriod,
     });
     setEditErrors({});
   }
@@ -53,14 +56,13 @@ export default function HabitList({ state, onUpdateHabit, onDeleteHabit }) {
       return;
     }
 
-    const timeSlot = formatTimeSlot({
-      fromHour:   editValues.fromHour,
-      fromMin:    editValues.fromMin,
-      fromPeriod: editValues.fromPeriod,
-      toHour:     editValues.toHour,
-      toMin:      editValues.toMin,
-      toPeriod:   editValues.toPeriod,
-    });
+    // Build timeSlot: auto-compute To from From + timeMin
+    const timeSlot = buildTimeSlot(
+      editValues.fromHour,
+      editValues.fromMin,
+      editValues.fromPeriod,
+      parseInt(editValues.timeMin),
+    );
 
     onUpdateHabit({
       ...habit,
@@ -139,19 +141,28 @@ export default function HabitList({ state, onUpdateHabit, onDeleteHabit }) {
                       )}
                     </td>
 
-                    {/* Time Slot edit — shadcn Select picker */}
+                    {/* Time Slot edit — From only; To is auto-computed */}
                     <td className="px-2 py-2 align-top">
-                      <TimeSlotPicker
-                        fromHour={editValues.fromHour}
-                        fromMin={editValues.fromMin}
-                        fromPeriod={editValues.fromPeriod}
-                        toHour={editValues.toHour}
-                        toMin={editValues.toMin}
-                        toPeriod={editValues.toPeriod}
-                        onChange={(parts) =>
-                          setEditValues((v) => ({ ...v, ...parts }))
-                        }
-                      />
+                      {(() => {
+                        const toData = computeToTime(
+                          editValues.fromHour,
+                          editValues.fromMin,
+                          editValues.fromPeriod,
+                          parseInt(editValues.timeMin),
+                        );
+                        return (
+                          <TimeSlotPicker
+                            fromHour={editValues.fromHour}
+                            fromMin={editValues.fromMin}
+                            fromPeriod={editValues.fromPeriod}
+                            computedTo={toData?.str ?? ""}
+                            disabled={!editValues.timeMin || Number(editValues.timeMin) <= 0}
+                            onChange={(parts) =>
+                              setEditValues((v) => ({ ...v, ...parts }))
+                            }
+                          />
+                        );
+                      })()}
                     </td>
 
                     {/* Time Min edit */}
