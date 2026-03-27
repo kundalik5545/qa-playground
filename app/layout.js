@@ -59,7 +59,16 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head></head>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://cloud.umami.is"
+          crossOrigin="anonymous"
+        />
+        <link rel="prefetch" href="/practice" />
+        <link rel="prefetch" href="/bank" />
+      </head>
 
       <body className={inter.className}>
         <ThemeProvider
@@ -68,13 +77,20 @@ export default function RootLayout({ children }) {
           enableSystem
           disableTransitionOnChange
         >
-          {/* Head tag */}
+          {/* Skip to main content — accessibility */}
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:bg-white focus:text-black focus:px-4 focus:py-2 focus:rounded-md focus:shadow-lg"
+          >
+            Skip to content
+          </a>
 
           {/* Header/Navbar */}
           <Header />
 
           {/* Main Content */}
           <main
+            id="main-content"
             className="container mx-auto py-3 max-w-7xl min-h-screen"
             role="main"
           >

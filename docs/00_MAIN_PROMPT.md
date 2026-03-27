@@ -1,16 +1,16 @@
 # MAIN Prompt
 
-Go through `19_DAILY_TRACKER_IMPROVEMENTS.md` file under `docs` folder and understand all requirment or changes. Then create a Tasks under `docs/tasks` folder.
+Go through `20_HOME_PAGE_UI_IMPROVMENTS.md` file under `docs` folder and understand all requirment or changes. Then create a Tasks under `docs/tasks` folder.
 
 ## Rules
 
 - Ask questions only if required info is missing.
 - Read requirements doc → create tasks → execute → update progress as you go.
-- Naming convention for .md file in docs and tasks folder -> examples `19_DAILY_TRACKER_IMPROVEMENTS.md` for docs file and for task file `19_DAILY_TRACKER_IMPROVEMENTS_TASKS.md`
+- Naming convention for .md file in docs and tasks folder -> examples `20_HOME_PAGE_UI_IMPROVMENTS.md` for docs file and for task file `20_HOME_PAGE_UI_IMPROVMENTS_TASKS.md`
 - Use check box to mark tasks completion so user can know what done and what not.
 - Update progress as you work.
-- When all tasks done → add lessons to `docs/learning/LESSONS_LEARNED.md`.
 - Update `public/github/branches-progress.md` with latest branch
+- When all tasks done → add lessons to `docs/learning/LESSONS_LEARNED.md`.
 
 # GIT Commit
 

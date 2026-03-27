@@ -54,13 +54,18 @@ const Header = () => {
           </span>
         </Link>
 
-        {/* Mobile Mode Toggle */}
-        <div className="block md:hidden">
+        {/* Mobile right side: mode toggle + hamburger */}
+        <div className="flex items-center gap-2 lg:hidden">
           <ModeToggle />
+          <SheetOpen>
+            <button
+              aria-label="Open navigation menu"
+              className="rounded-md p-1 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <Menu size={26} aria-hidden="true" />
+            </button>
+          </SheetOpen>
         </div>
-        <SheetOpen>
-          <Menu className="lg:hidden cursor-pointer" size={28} />
-        </SheetOpen>
 
         {/* Desktop Navigation */}
         <nav

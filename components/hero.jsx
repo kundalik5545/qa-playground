@@ -11,8 +11,8 @@ const HeroSection = () => {
     >
       <div className="container mx-auto text-center flex flex-col items-center">
         <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
-          Master Automation Testing With
-          <span className="gradient-subTitle pl-5 text-4xl md:text-7xl font-bold leading-tight mb-6">
+          Master Automation Testing With{" "}
+          <span className="gradient-subTitle pl-2 text-4xl md:text-7xl font-bold leading-tight mb-6">
             QA PlayGround
           </span>
         </h1>
@@ -48,13 +48,13 @@ const HeroSection = () => {
           </Link>
         </div>
 
-        {/* Buy Me A Coffee Button */}
-        <div className="mt-8">
+        {/* Buy Me A Coffee — subtle text link, de-emphasised from primary CTAs */}
+        <div className="mt-6">
           <a
             href="https://www.buymeacoffee.com/randomcoders"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FFDD00] text-black font-semibold text-sm hover:bg-[#f0cc00] transition-colors"
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
           >
             ☕ Buy me a coffee
           </a>

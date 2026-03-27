@@ -2,6 +2,12 @@ import HeroSection from "@/components/hero";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import Link from "next/link";
 import {
   statsData,
@@ -17,12 +23,16 @@ import {
   BarChart3,
   BookMarked,
   ClipboardList,
+  Chrome,
+  ExternalLink,
+  Plug,
 } from "lucide-react";
 
 export const metadata = {
   title: "QA Playground — Practice Selenium, Playwright & Cypress",
   description:
-    "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker. Practice Selenium, Playwright, and Cypress for free.",
+    "Free QA automation testing playground with 22+ UI elements, Bank Demo & Study Tracker. Practice Selenium, Playwright, and Cypress — free.",
+  authors: [{ name: "Kundalik Jadhav" }],
   alternates: {
     canonical: "https://www.qaplayground.com",
   },
@@ -43,10 +53,10 @@ export const metadata = {
     url: "https://www.qaplayground.com",
     title: "QA Playground — Practice Selenium, Playwright & Cypress",
     description:
-      "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker. Practice Selenium, Playwright, and Cypress for free.",
+      "Free QA automation testing playground with 22+ UI elements, Bank Demo & Study Tracker. Practice Selenium, Playwright, and Cypress — free.",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://www.qaplayground.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "QA Playground — Practice Selenium, Playwright & Cypress",
@@ -58,40 +68,112 @@ export const metadata = {
     site: "@qaplayground",
     title: "QA Playground — Practice Selenium, Playwright & Cypress",
     description:
-      "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker.",
-    images: ["/og-image.png"],
+      "Free QA automation testing playground with 22+ UI elements, Bank Demo & Study Tracker. Practice Selenium, Playwright, and Cypress — free.",
+    images: ["https://www.qaplayground.com/og-image.png"],
   },
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
-  "@type": "WebSite",
-  name: "QA Playground",
-  url: "https://www.qaplayground.com",
-  description:
-    "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker for Selenium, Playwright, and Cypress practice.",
-  potentialAction: {
-    "@type": "SearchAction",
-    target: "https://www.qaplayground.com/practice",
-    "query-input": "required name=search_term_string",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      name: "QA Playground",
+      url: "https://www.qaplayground.com",
+      description:
+        "Free QA automation testing playground with 22+ interactive UI elements, Bank Demo app, and QA Study Tracker for Selenium, Playwright, and Cypress practice.",
+      potentialAction: {
+        "@type": "SearchAction",
+        target: "https://www.qaplayground.com/practice",
+        "query-input": "required name=search_term_string",
+      },
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "QA PlayGround",
+      operatingSystem: "Web",
+      applicationCategory: "EducationalApplication",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: "4.5",
+        reviewCount: "127",
+      },
+      description:
+        "A purpose-built practice platform for QA automation engineers to learn Selenium, Playwright, and Cypress through hands-on interactive elements.",
+    },
+    {
+      "@type": "Organization",
+      name: "QA Playground",
+      url: "https://www.qaplayground.com",
+      logo: "https://www.qaplayground.com/mainicons/edit.svg",
+      sameAs: [
+        "https://www.youtube.com/@qaplayground",
+        "https://twitter.com/qaplayground",
+        "https://github.com/kundalik5545/qatesting",
+      ],
+    },
+  ],
+};
+
+const faqItems = [
+  {
+    q: "What is QA Playground?",
+    a: "QA Playground is a free, purpose-built practice platform for QA automation engineers. It provides 22+ interactive UI elements, a simulated banking app, and a learning tracker — all designed to help you master Selenium, Playwright, and Cypress.",
   },
+  {
+    q: "Is QA Playground completely free?",
+    a: "Yes! All practice elements, the Bank Demo app, and the Study Tracker are 100% free with no credit card required.",
+  },
+  {
+    q: "Do I need to create an account?",
+    a: "No account is required to practice automation. An optional login is available only if you want to sync your Study Tracker progress across devices.",
+  },
+  {
+    q: "Which automation frameworks can I practise with?",
+    a: "QA Playground supports Selenium (Java/Python/JS), Playwright (JS/TS/Python), and Cypress (JavaScript/TypeScript). All elements are framework-agnostic.",
+  },
+  {
+    q: "What is the Bank Demo App?",
+    a: "The Bank Demo is a fully simulated banking application with login, accounts, dashboard, and transaction management — perfect for building and testing end-to-end automation frameworks.",
+  },
+  {
+    q: "What is the QA Study Tracker?",
+    a: "The Study Tracker is your personal learning dashboard covering Manual Testing, Automation Testing, API Testing, and Playwright syllabi. It tracks topic completion, progress charts, notes, and daily activity — stored locally in your browser.",
+  },
+  {
+    q: "What are QA Capture and QA Playground Clipper?",
+    a: "These are free browser extensions that enhance your QA workflow. QA Capture lets you record and screenshot test sessions, while QA Playground Clipper lets you save practice scenarios directly from your browser.",
+  },
+  {
+    q: "Can I use this for QA job interview preparation?",
+    a: "Absolutely! The platform includes logic programs, automation test case challenges, and real-world UI scenarios that mirror common QA interview tasks.",
+  },
+  {
+    q: "Is my progress data private and secure?",
+    a: "Yes. All your data is stored locally in your browser — nothing is sent to external servers unless you opt in to the sync feature.",
+  },
+  {
+    q: "How do I report a bug or request a new feature?",
+    a: "Use the Contact Us page or reach out on our YouTube channel. We actively review all feedback and update the platform regularly.",
+  },
+];
+
+const faqJsonLd = {
   "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "QA PlayGround",
-  operatingSystem: "Web",
-  applicationCategory: "EducationalApplication",
-  offers: {
-    "@type": "Offer",
-    price: "0",
-    priceCurrency: "USD",
-  },
-  aggregateRating: {
-    "@type": "AggregateRating",
-    ratingValue: "4.5",
-    reviewCount: "10000",
-  },
-  description:
-    "A purpose-built practice platform for QA automation engineers to learn Selenium, Playwright, and Cypress through hands-on interactive elements.",
+  "@type": "FAQPage",
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.q,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: item.a,
+    },
+  })),
 };
 
 const studyTrackerSyllabi = [
@@ -163,7 +245,7 @@ const LandingPage = () => {
       <section aria-label="Main platform features" className="py-14 px-4">
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold gradient-title mb-3">
-            Free Resources to Level Up Your QA Automation Caree
+            Free Resources to Level Up Your QA Automation Career
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
             Three powerful tools in one platform — practice automation, simulate
@@ -305,7 +387,7 @@ const LandingPage = () => {
                   size="lg"
                   className="bg-purple-600 hover:bg-purple-700 text-white px-8"
                 >
-                  Open Study Tracker
+                  Start Tracking Now
                 </Button>
               </Link>
             </div>
@@ -350,60 +432,104 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* Quick Access — Tutorials & Logic */}
+      {/* Browser Extensions Section */}
       <section
-        aria-label="Learning resources and tutorials"
-        className="py-12 px-4"
+        aria-label="Browser extensions for QA engineers"
+        className="py-12 px-4 bg-slate-50 dark:bg-slate-900/40"
       >
-        <h2 className="text-2xl font-bold text-center mb-8">
-          More Learning Resources
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-          <Card className="p-6 shadow-lg rounded-xl text-center">
-            <CardContent>
-              <h3 className="text-xl font-semibold">Free Tutorials</h3>
-              <p className="text-muted-foreground mt-2">
-                Free courses on software testing and automation development.
-              </p>
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Link href="/learn/courses" prefetch={false}>
-                  <Button variant="default" className="rounded-full px-5">
-                    Explore Free Courses
-                  </Button>
-                </Link>
-                <Link
-                  href="https://github.com/kundalik5545/QA_PlayGround_Automation_Framework"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" className="rounded-full px-5">
-                    Automation Framework
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 mb-3">
+              <Plug className="h-5 w-5 text-indigo-600" aria-hidden="true" />
+              <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">
+                Browser Extensions
+              </span>
+            </div>
+            <h2 className="text-2xl font-bold mb-2">
+              Power Up Your QA Workflow
+            </h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Free browser extensions built for automation testers — capture
+              screenshots, record test sessions, and clip practice scenarios
+              right from your browser.
+            </p>
+          </div>
 
-          <Card className="p-6 shadow-lg rounded-xl text-center">
-            <CardContent>
-              <h3 className="text-xl font-semibold">Practice Logic</h3>
-              <p className="text-muted-foreground mt-2">
-                Solve real QA interview questions and logic programs.
-              </p>
-              <div className="mt-4 flex flex-wrap justify-center gap-2">
-                <Link href="/learn/automation-test-cases" prefetch={false}>
-                  <Button variant="default" className="rounded-full px-5">
-                    Practice Automation TC
-                  </Button>
-                </Link>
-                <Link href="/learn/logical-programs-list-to-crack-interviews" prefetch={false}>
-                  <Button variant="outline" className="rounded-full px-5">
-                    Logical Programs
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* QA Capture */}
+            <a
+              href="https://chromewebstore.google.com/detail/jhgkhnokloeklnagbkgkgcfphafifefg?utm_source=item-share-cb"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Install QA Capture Chrome extension"
+              className="block"
+            >
+              <Card className="p-6 shadow hover:shadow-md transition-shadow rounded-xl h-full group border-t-4 border-t-emerald-500">
+                <CardContent className="pt-0 flex flex-col h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
+                      <Chrome className="h-6 w-6 text-white" aria-hidden="true" />
+                    </div>
+                    <Badge className="bg-emerald-500 text-white text-xs">
+                      New
+                    </Badge>
+                  </div>
+                  <h3 className="font-semibold text-lg mb-1.5">QA Capture</h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                    Capture screenshots continuously and export as HTML, Markdown,
+                    PDF, and more — right from your browser during test sessions.
+                  </p>
+                  <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      Add to Chrome
+                    </span>
+                    <ExternalLink
+                      className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </a>
+
+            {/* QA Playground Clipper */}
+            <a
+              href="https://chromewebstore.google.com/detail/jegdkegbomfbmhhimfjgacdblcoodfpd?utm_source=item-share-cb"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Install QA Playground Clipper Chrome extension"
+              className="block"
+            >
+              <Card className="p-6 shadow hover:shadow-md transition-shadow rounded-xl h-full group border-t-4 border-t-blue-500">
+                <CardContent className="pt-0 flex flex-col h-full">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                      <Chrome className="h-6 w-6 text-white" aria-hidden="true" />
+                    </div>
+                    <Badge className="bg-blue-500 text-white text-xs">
+                      New
+                    </Badge>
+                  </div>
+                  <h3 className="font-semibold text-lg mb-1.5">
+                    QA Playground Clipper
+                  </h3>
+                  <p className="text-sm text-muted-foreground leading-relaxed flex-1">
+                    Clip and save practice scenarios, articles, and resources
+                    directly to your QA workflow — one click from any page.
+                  </p>
+                  <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
+                    <span className="text-xs font-semibold text-blue-600 dark:text-blue-400">
+                      Add to Chrome
+                    </span>
+                    <ExternalLink
+                      className="h-3.5 w-3.5 text-muted-foreground group-hover:text-foreground transition-colors"
+                      aria-hidden="true"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            </a>
+          </div>
         </div>
       </section>
 
@@ -420,11 +546,11 @@ const LandingPage = () => {
             Every element is purpose-built for automation testing. No
             distractions — just clean, testable UI.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
             {featuresData.map((f, i) => (
-              <Link key={i} href={f.to} prefetch={false} aria-label={`Practice ${f.title}`}>
-                <Card className="p-5 shadow hover:shadow-md transition-shadow rounded-xl h-full">
-                  <CardContent className="pt-0">
+              <Link key={i} href={f.to} prefetch={false} aria-label={`Practice ${f.title}`} className="h-full">
+                <Card className="p-5 shadow hover:shadow-md transition-shadow rounded-xl h-full group">
+                  <CardContent className="pt-0 flex flex-col h-full">
                     <div className="flex items-start justify-between mb-4">
                       <div aria-hidden="true">{f.icon}</div>
                       {f.badge && (
@@ -436,9 +562,24 @@ const LandingPage = () => {
                       )}
                     </div>
                     <h3 className="font-semibold mb-1.5">{f.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed flex-1">
                       {f.description}
                     </p>
+                    {/* Scenario count + difficulty */}
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                      <span className="text-xs text-muted-foreground">
+                        {f.count} scenarios
+                      </span>
+                      <span
+                        className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${f.difficultyClass}`}
+                      >
+                        {f.difficulty}
+                      </span>
+                    </div>
+                    {/* Hover CTA */}
+                    <span className="mt-2 text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                      Practice →
+                    </span>
                   </CardContent>
                 </Card>
               </Link>
@@ -524,6 +665,46 @@ const LandingPage = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section
+        aria-label="Frequently asked questions"
+        className="py-14 px-4"
+      >
+        {/* FAQPage JSON-LD */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold mb-2">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-muted-foreground">
+              Everything you need to know about QA Playground
+            </p>
+          </div>
+
+          <Accordion type="single" collapsible className="w-full space-y-2">
+            {faqItems.map((item, i) => (
+              <AccordionItem
+                key={i}
+                value={`faq-${i}`}
+                className="border border-border rounded-lg px-4"
+              >
+                <AccordionTrigger className="text-sm font-medium text-left hover:no-underline py-4">
+                  {item.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-muted-foreground pb-4">
+                  {item.a}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </div>
       </section>
 

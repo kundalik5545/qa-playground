@@ -1,7 +1,13 @@
 import Link from "next/link";
 import { basicDetails, allUrls } from "@/data/BasicSetting";
-import { FaYoutube, FaGithub, FaTwitter, FaTelegram } from "react-icons/fa";
-import { LayoutGrid, CreditCard, BookOpen } from "lucide-react";
+import {
+  FaYoutube,
+  FaGithub,
+  FaTwitter,
+  FaTelegram,
+  FaLinkedin,
+} from "react-icons/fa";
+import { LayoutGrid, CreditCard, BookOpen, Chrome } from "lucide-react";
 
 const platformLinks = [
   {
@@ -27,6 +33,24 @@ const platformLinks = [
     badge: "New",
     badgeClass:
       "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
+  },
+  {
+    href: "https://chromewebstore.google.com/detail/jhgkhnokloeklnagbkgkgcfphafifefg?utm_source=item-share-cb",
+    label: "QA Capture",
+    icon: <Chrome className="h-3.5 w-3.5" />,
+    badge: "Extension",
+    badgeClass:
+      "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400",
+    external: true,
+  },
+  {
+    href: "https://chromewebstore.google.com/detail/jegdkegbomfbmhhimfjgacdblcoodfpd?utm_source=item-share-cb",
+    label: "QA Playground Clipper",
+    icon: <Chrome className="h-3.5 w-3.5" />,
+    badge: "Extension",
+    badgeClass:
+      "bg-blue-50 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400",
+    external: true,
   },
 ];
 
@@ -55,11 +79,16 @@ const socialLinks = [
     icon: <FaYoutube size={18} />,
     label: "YouTube",
   },
-  // {
-  //   href: "https://github.com/kundalik5545/qatesting",
-  //   icon: <FaGithub size={18} />,
-  //   label: "GitHub",
-  // },
+  {
+    href: "https://github.com/kundalik5545/qatesting",
+    icon: <FaGithub size={18} />,
+    label: "GitHub",
+  },
+  {
+    href: "https://www.linkedin.com/in/kundalik-jadhav",
+    icon: <FaLinkedin size={18} />,
+    label: "LinkedIn",
+  },
   {
     href: `https://twitter.com/intent/tweet?url=${encodeURIComponent(basicDetails.websiteURL)}`,
     icon: <FaTwitter size={18} />,
@@ -77,6 +106,8 @@ const Footer = () => {
     <footer aria-label="Site footer">
       <div className="container mx-auto px-4 pt-4 pb-2 max-w-7xl">
         {/* Main grid */}
+        {/* sr-only H3 bridges the heading level gap (page H2 → footer H4) */}
+        <h3 className="sr-only">Footer Navigation</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-8 md:gap-10 pb-10 border-b border-border">
           {/* Column 1 — Brand */}
           <div className="col-span-1 sm:col-span-3 md:col-span-1 flex flex-col gap-3">
@@ -139,6 +170,8 @@ const Footer = () => {
                   key={link.href}
                   href={link.href}
                   prefetch={false}
+                  target={link.external ? "_blank" : undefined}
+                  rel={link.external ? "noopener noreferrer" : undefined}
                   className="flex items-start gap-2 text-sm text-foreground/80 hover:text-foreground transition-colors group"
                 >
                   {link.icon && (

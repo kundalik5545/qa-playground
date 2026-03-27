@@ -40,6 +40,10 @@ export const featuresData = [
     title: "Practice Web Elements",
     description:
       "22+ interactive UI elements — inputs, buttons, tables, drag-drop, shadow DOM, and more. Each element is designed for Selenium, Playwright, and Cypress automation practice.",
+    count: "22+",
+    difficulty: "Beginner",
+    difficultyClass:
+      "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300",
   },
   {
     icon: <Receipt className="h-7 w-7 text-blue-600" />,
@@ -50,6 +54,10 @@ export const featuresData = [
     title: "Forms & Inputs",
     description:
       "Practice automating text inputs, textareas, checkboxes, radio buttons, and form validation scenarios commonly found in real-world applications.",
+    count: "10+",
+    difficulty: "Beginner",
+    difficultyClass:
+      "bg-green-50 text-green-700 dark:bg-green-950/40 dark:text-green-300",
   },
   {
     icon: <Megaphone className="h-7 w-7 text-amber-600" />,
@@ -60,6 +68,10 @@ export const featuresData = [
     title: "Alerts & Windows",
     description:
       "Handle browser alerts, confirm dialogs, prompt boxes, and multi-window/tab switching — essential skills for any automation engineer.",
+    count: "8+",
+    difficulty: "Intermediate",
+    difficultyClass:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
   },
   {
     icon: <LayoutDashboard className="h-7 w-7 text-teal-600" />,
@@ -70,6 +82,10 @@ export const featuresData = [
     title: "Bank Demo App",
     description:
       "A full simulated banking application with login, accounts, dashboard, and transaction management — ideal for end-to-end automation test suites.",
+    count: "15+",
+    difficulty: "Intermediate",
+    difficultyClass:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
   },
   {
     icon: <Zap className="h-7 w-7 text-violet-600" />,
@@ -80,6 +96,10 @@ export const featuresData = [
     title: "Interactions & Waits",
     description:
       "Practice drag-and-drop, sliders, iFrames, shadow DOM, explicit and implicit waits — complex scenarios that mirror real-world automation challenges.",
+    count: "12+",
+    difficulty: "Advanced",
+    difficultyClass:
+      "bg-violet-50 text-violet-700 dark:bg-violet-950/40 dark:text-violet-300",
   },
   {
     icon: <TableProperties className="h-7 w-7 text-teal-600" />,
@@ -90,6 +110,10 @@ export const featuresData = [
     title: "Tables & Data",
     description:
       "Automate simple and advanced data tables with sorting, filtering, and pagination — a must-have skill for enterprise QA automation engineers.",
+    count: "6+",
+    difficulty: "Intermediate",
+    difficultyClass:
+      "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300",
   },
 ];
 
@@ -120,21 +144,21 @@ export const testimonialsData = [
   {
     name: "Sarah Johnson",
     role: "Senior Automation Lead",
-    image: "https://randomuser.me/api/portraits/women/75.jpg",
+    image: "/avatars/sarah-johnson.svg",
     quote:
       "This website is a game-changer! The hands-on practice with Selenium and API testing helped me bridge the gap between theory and real-world applications.",
   },
   {
     name: "Michael Chen",
     role: "Senior Automation Analyst",
-    image: "https://randomuser.me/api/portraits/men/75.jpg",
+    image: "/avatars/michael-chen.svg",
     quote:
       "The interface is super easy to use, and the challenges are practical and engaging. Highly recommended for anyone looking to excel in automation testing.",
   },
   {
     name: "Anna Clerk",
     role: "Senior Automation Tester",
-    image: "https://randomuser.me/api/portraits/women/74.jpg",
+    image: "/avatars/anna-clerk.svg",
     quote:
       "I love how everything is so organized and user-friendly. The website covers everything from Selenium to API testing, with real-world exercises that mimic industry challenges.",
   },
