@@ -17,3 +17,7 @@ Go through `16_LOGIN_UI_IMPROVMENT.md` file under `docs` folder and understand a
 fix: UI issues fix for blog page cards; check docs - `16_LOGIN_UI_IMPROVMENT.md` & task - `16_LOGIN_UI_IMPROVMENT_TASKS.md`
 
 ## UI Inspection Prompt
+
+## Daily tacker UI issues - 27 march 2026
+
+Fix the UI issue on daily tracker page. For screen small than XL arrange analytics tab below the view tabs for adding daily and recurring task. Also remove dark & light mode support for them keep them in light mode always.

@@ -141,7 +141,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
   const timeCls   = "w-16 border border-[#e9eaed] rounded-[7px] px-2 py-[6px] font-[inherit] text-[0.82rem] text-[#374151] outline-none focus:border-blue-600 transition-colors";
 
   return (
-    <div>
+    <div style={{ colorScheme: "light", "--background": "0 0% 100%", "--foreground": "222.2 47.4% 11.2%", "--card": "0 0% 100%", "--card-foreground": "222.2 47.4% 11.2%", "--muted": "210 40% 96.1%", "--muted-foreground": "215.4 16.3% 46.9%", "--border": "214.3 31.8% 91.4%", "--primary": "222.2 47.4% 11.2%", "--primary-foreground": "210 40% 98%", "--secondary": "210 40% 96.1%", "--secondary-foreground": "222.2 47.4% 11.2%" }}>
       {/* Header */}
       <div className="mb-[22px]">
         <div className="flex items-center justify-between flex-wrap gap-3">
@@ -165,7 +165,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
         {/* ── TASKS TAB ── */}
         <TabsContent value="tasks" className="mt-4">
-          <div className="grid grid-cols-2 gap-[18px] items-start">
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-[18px] items-start">
             {/* Left: date strip + task list */}
             <div>
               {/* Date nav bar */}
@@ -497,7 +497,7 @@ function HabitsView({ state, habitForm, setHabitForm, onAddHabit, onDeleteHabit 
 
   return (
     <div>
-      <div className="grid grid-cols-2 gap-[18px] mb-[18px] items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-[18px] mb-[18px] items-start">
         {/* New habit form */}
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-5">
           <h3 className={cn(chartTitle, "mb-[14px]")}>➕ New Recurring Habit</h3>
@@ -592,7 +592,7 @@ function HabitsView({ state, habitForm, setHabitForm, onAddHabit, onDeleteHabit 
       </div>
 
       {/* Habit charts */}
-      <div className="grid grid-cols-2 gap-[14px]">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-[14px]">
         <div className={chartCard}><h3 className={chartTitle}>Habit Completion Rates</h3><canvas ref={barRef} height={160} /></div>
         <div className={chartCard}><h3 className={chartTitle}>Habits This Week</h3><canvas ref={weekRef} height={160} /></div>
       </div>
