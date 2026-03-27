@@ -3,58 +3,70 @@
 /**
  * AnalyticsPanel
  * ---------------
- * The right-side analytics column shown alongside the task list.
+ * Full-width analytics section shown below the task list.
  *
  * Responsibilities:
  *  - Computes per-period stats (done count, total count, time, completion %)
  *  - Renders 4 summary stat cards
  *  - Renders Weekly / Monthly toggle
- *  - Passes pre-computed arrays to the three chart sub-components
+ *  - Renders Completion Rate line chart
+ *  - Renders Habit Tracker matrix (moved here from the Habits tab)
  *
  * Props:
- *  - state         object  — full tracker state from studyTrackerStorage
- *  - selectedDate  string  — YYYY-MM-DD, used for the time-allocation doughnut
+ *  - state         object    — full tracker state from studyTrackerStorage
+ *  - updateState   function  — passed through to HabitMatrix for toggling
  *  - filterMode    "weekly" | "monthly"
  *  - setFilterMode function
  */
 
+import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { formatMinutes, habitAppliesOnDate } from "@/lib/studyTrackerStorage";
+import {
+  formatMinutes,
+  habitAppliesOnDate,
+  getTodayStr,
+} from "@/lib/studyTrackerStorage";
 import CompletionRateChart from "../charts/CompletionRateChart";
-import TimeAllocationChart from "../charts/TimeAllocationChart";
-import TasksPerDayChart from "../charts/TasksPerDayChart";
+import HabitMatrix from "../habbits/HabitMatrix";
 
-export default function AnalyticsPanel({
-  state,
-  selectedDate,
-  filterMode,
-  setFilterMode,
-}) {
-  const days = filterMode === "weekly" ? 7 : 30;
+export default function AnalyticsPanel({ state, updateState, selectedDate }) {
+  const [viewMode, setViewMode] = useState("month");
 
-  // ── Build per-day arrays for the line + bar charts ────────────────────────
+  // ── Build the date range for the current view ─────────────────────────────
+  const dateRange =
+    viewMode === "day"
+      ? [selectedDate]
+      : Array.from({ length: viewMode === "week" ? 7 : 30 }, (_, i, _arr) => {
+          const len = viewMode === "week" ? 7 : 30;
+          const d = new Date();
+          d.setDate(d.getDate() - (len - 1 - i));
+          return d.toISOString().slice(0, 10);
+        });
+
+  // ── Build per-day arrays for the chart + stat cards ───────────────────────
   const labels = [];
   const completed = [];
   const totals = [];
+  let periodTimeMin = 0;
 
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const str = d.toISOString().slice(0, 10);
-
+  for (const str of dateRange) {
+    const d = new Date(str + "T00:00:00");
     labels.push(
-      filterMode === "weekly"
-        ? d.toLocaleDateString("en-US", { weekday: "short" })
-        : d.getDate().toString(),
+      viewMode === "month"
+        ? d.getDate().toString()
+        : d.toLocaleDateString("en-US", { weekday: "short" }),
     );
 
     const tasks = state.daily[str] || [];
     const habits = state.habits.filter((h) => habitAppliesOnDate(h, str));
-    completed.push(
-      tasks.filter((t) => t.done).length +
-        habits.filter((h) => state.habitLog[str]?.[h.id]).length,
-    );
+    const doneTasks = tasks.filter((t) => t.done);
+    const doneHabits = habits.filter((h) => state.habitLog[str]?.[h.id]);
+
+    completed.push(doneTasks.length + doneHabits.length);
     totals.push(tasks.length + habits.length);
+    periodTimeMin +=
+      doneTasks.reduce((s, t) => s + (t.timeMin || 0), 0) +
+      doneHabits.reduce((s, h) => s + (h.timeMin || 0), 0);
   }
 
   /** Completion % per day — null means no items that day (chart spans gap) */
@@ -69,20 +81,6 @@ export default function AnalyticsPanel({
     ? Math.round((periodDone / periodTotal) * 100)
     : 0;
 
-  let periodTimeMin = 0;
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    const str = d.toISOString().slice(0, 10);
-    const tasks = state.daily[str] || [];
-    const habits = state.habits.filter((h) => habitAppliesOnDate(h, str));
-    periodTimeMin +=
-      tasks.filter((t) => t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
-      habits
-        .filter((h) => state.habitLog[str]?.[h.id])
-        .reduce((s, h) => s + (h.timeMin || 0), 0);
-  }
-
   const statCards = [
     { val: periodDone, lbl: "Items Done" },
     { val: periodTotal, lbl: "Total Items" },
@@ -90,38 +88,24 @@ export default function AnalyticsPanel({
     { val: formatMinutes(periodTimeMin), lbl: "Time Done" },
   ];
 
-  // ── Time-allocation data for the selected day (doughnut chart) ───────────
-  const selTasks = state.daily[selectedDate] || [];
-  const selHabits = state.habits.filter((h) =>
-    habitAppliesOnDate(h, selectedDate),
-  );
-  const selDoneMin =
-    selTasks.filter((t) => t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
-    selHabits
-      .filter((h) => state.habitLog[selectedDate]?.[h.id])
-      .reduce((s, h) => s + (h.timeMin || 0), 0);
-  const selRemainingMin =
-    selTasks.filter((t) => !t.done).reduce((s, t) => s + (t.timeMin || 0), 0) +
-    selHabits
-      .filter((h) => !state.habitLog[selectedDate]?.[h.id])
-      .reduce((s, h) => s + (h.timeMin || 0), 0);
-
   return (
     <div className="bg-white border border-[#e9eaed] rounded-xl p-4">
-      {/* Section header + Weekly/Monthly toggle */}
+      {/* Section header + Day/Week/Month toggle */}
       <div className="flex justify-between items-center mb-3 flex-wrap gap-[7px]">
         <h3 className="text-sm font-semibold text-[#374151] mb-0 mt-0">
           Analytics
         </h3>
         <div className="flex gap-[2px] bg-gray-100 p-[3px] rounded-lg">
-          {["weekly", "monthly"].map((mode) => (
+          {["day", "week", "month"].map((mode) => (
             <button
               key={mode}
               className={cn(
-                "border-none bg-transparent rounded-[6px] px-3 py-1 font-[inherit] text-[0.78rem] font-medium text-gray-500 cursor-pointer transition-all",
-                filterMode === mode && "bg-white text-[#1f2937] shadow-sm",
+                "border-none rounded-[6px] px-3 py-1 font-[inherit] text-[0.78rem] font-medium cursor-pointer transition-all",
+                viewMode === mode
+                  ? "bg-blue-600 text-white"
+                  : "bg-transparent text-gray-500 hover:bg-gray-100",
               )}
-              onClick={() => setFilterMode(mode)}
+              onClick={() => setViewMode(mode)}
             >
               {mode.charAt(0).toUpperCase() + mode.slice(1)}
             </button>
@@ -146,24 +130,71 @@ export default function AnalyticsPanel({
         ))}
       </div>
 
+      {/* Habit Tracker matrix */}
+      <HabitMatrix
+        state={state}
+        updateState={updateState}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+      />
+
       {/* Completion rate line chart */}
       <CompletionRateChart
         labels={labels}
         ratePct={ratePct}
-        filterMode={filterMode}
+        viewMode={viewMode}
       />
 
-      {/* Time-allocation doughnut + Tasks-per-day bar chart side by side */}
-      <div className="grid grid-cols-2 gap-[10px] mt-[10px]">
-        <TimeAllocationChart
-          doneMinutes={selDoneMin}
-          remainingMinutes={selRemainingMin}
-        />
-        <TasksPerDayChart
-          labels={labels}
-          completed={completed}
-          totals={totals}
-        />
+      {/* Habit Progress section */}
+      <div className="mt-4">
+        <h3 className="text-sm font-semibold text-[#374151] mb-3">
+          Habit Progress
+        </h3>
+        {state.habits.length === 0 ? (
+          <p className="text-sm text-gray-400">No habits yet.</p>
+        ) : (
+          <div className="flex flex-col gap-1">
+            {state.habits.map((habit) => {
+              const today = getTodayStr();
+              const applicable = dateRange.filter(
+                (d) => d <= today && habitAppliesOnDate(habit, d),
+              );
+              const done = applicable.filter(
+                (d) => state.habitLog[d]?.[habit.id],
+              ).length;
+              const total = applicable.length;
+              const pct = total ? Math.round((done / total) * 100) : 0;
+
+              return (
+                <div
+                  key={habit.id}
+                  className="flex items-center gap-3 py-2 border-b border-gray-50 last:border-0"
+                >
+                  <div className="text-sm font-medium text-gray-800 w-40 truncate shrink-0">
+                    {habit.title}
+                  </div>
+                  {habit.timeSlot && (
+                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full shrink-0">
+                      {habit.timeSlot}
+                    </span>
+                  )}
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-full rounded-full transition-[width] duration-500",
+                        pct === 100 ? "bg-green-500" : "bg-purple-600",
+                      )}
+                      style={{ width: pct + "%" }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-500 w-12 text-right font-mono shrink-0">
+                    {done}/{total}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

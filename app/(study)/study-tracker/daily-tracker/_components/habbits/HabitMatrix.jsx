@@ -25,8 +25,7 @@ import {
 } from "@/lib/studyTrackerStorage";
 import { CHECK_SVG } from "../_constants";
 
-export default function HabitMatrix({ state, updateState }) {
-  const [viewMode, setViewMode] = useState("week");
+export default function HabitMatrix({ state, updateState, viewMode, setViewMode }) {
   const [anchorDate, setAnchorDate] = useState(getTodayStr());
 
   const today = getTodayStr();
@@ -72,15 +71,6 @@ export default function HabitMatrix({ state, updateState }) {
     const dayLog = { ...(state.habitLog[date] || {}) };
     dayLog[habitId] = !dayLog[habitId];
     updateState("habitLog", { ...state.habitLog, [date]: dayLog });
-  }
-
-  /** Calculate done / total for a habit over the visible period (past + today) */
-  function getHabitProgress(habit) {
-    const applicable = dates.filter(
-      (d) => d <= today && habitAppliesOnDate(habit, d),
-    );
-    const done = applicable.filter((d) => state.habitLog[d]?.[habit.id]).length;
-    return { done, total: applicable.length };
   }
 
   /** Class for the view-mode toggle buttons */
@@ -227,21 +217,11 @@ export default function HabitMatrix({ state, updateState }) {
                   );
                 })}
 
-                {/* Progress column header */}
-                <th
-                  className="text-center pb-2 px-2 text-[0.72rem] font-semibold text-gray-500 uppercase whitespace-nowrap"
-                  style={{ minWidth: 80 }}
-                >
-                  Progress
-                </th>
               </tr>
             </thead>
 
             <tbody>
               {state.habits.map((habit) => {
-                const { done, total } = getHabitProgress(habit);
-                const pct = total ? Math.round((done / total) * 100) : 0;
-
                 return (
                   <tr
                     key={habit.id}
@@ -298,23 +278,6 @@ export default function HabitMatrix({ state, updateState }) {
                       );
                     })}
 
-                    {/* Progress bar + done/total */}
-                    <td className="px-2 py-[8px]">
-                      <div className="min-w-[60px]">
-                        <div className="h-[5px] bg-[#f0f1f4] rounded-full overflow-hidden mb-[3px]">
-                          <div
-                            className={cn(
-                              "h-full rounded-full transition-[width] duration-500",
-                              pct === 100 ? "bg-green-500" : "bg-purple-700",
-                            )}
-                            style={{ width: pct + "%" }}
-                          />
-                        </div>
-                        <div className="text-[0.65rem] font-mono text-gray-400 text-center">
-                          {done}/{total}
-                        </div>
-                      </div>
-                    </td>
                   </tr>
                 );
               })}

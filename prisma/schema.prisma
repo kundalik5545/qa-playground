@@ -181,6 +181,7 @@ model Habit {
   customDays Int[]
   startDate  String
   endDate    String?
+  timeSlot   String?
   active     Boolean    @default(true)
   createdAt  DateTime   @default(now())
   updatedAt  DateTime   @updatedAt

@@ -59,7 +59,7 @@ export default function DateNavigator({ state, selectedDate, onSelectDate }) {
   };
 
   return (
-    <div className="flex items-center gap-[10px] bg-white border border-[#e9eaed] rounded-xl px-3 py-[9px] mb-3">
+    <div className="flex items-center gap-[10px] bg-white border border-[#e9eaed] rounded-xl px-3 py-[9px] mb-3 max-w-4xl mx-auto w-full">
       {/* Date strip with prev/next arrows */}
       <div className="flex items-center gap-[5px] flex-1 min-w-0 overflow-hidden">
         {/* Previous week */}
@@ -83,7 +83,7 @@ export default function DateNavigator({ state, selectedDate, onSelectDate }) {
               <div
                 key={date}
                 className={cn(
-                  "flex flex-col items-center py-[5px] rounded-lg cursor-pointer transition-all flex-1 min-w-0 border-2 border-transparent hover:bg-gray-100",
+                  "flex flex-col items-center py-[5px] rounded-lg cursor-pointer transition-all flex-1 min-w-[60px] max-w-[80px] border-2 border-transparent hover:bg-gray-100",
                   isSelected && "bg-[#eff2ff] border-blue-600",
                 )}
                 onClick={() => onSelectDate(date)}

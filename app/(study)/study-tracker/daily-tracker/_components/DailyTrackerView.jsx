@@ -38,6 +38,8 @@ import {
   pickJSONFile,
   computeHabitEndDate,
 } from "@/lib/studyTrackerStorage";
+import { formatTimeSlot } from "./TimeSlotPicker";
+import { useTracker } from "@/app/(study)/study-tracker/_components/StudyTrackerProvider";
 
 import { LIGHT_MODE_STYLE } from "./_constants";
 import DateNavigator from "./DateNavigator";
@@ -46,10 +48,11 @@ import AnalyticsPanel from "./analytics/AnalyticsPanel";
 import HabitsTab from "./habbits/HabitsTab";
 
 export default function DailyTrackerView({ state, updateState, showToast }) {
+  const { user } = useTracker();
+
   // ── UI state ───────────────────────────────────────────────────────────────
   const [view, setView] = useState("tasks");
   const [selectedDate, setSelectedDate] = useState(getTodayStr());
-  const [filterMode, setFilterMode] = useState("weekly");
 
   // ── Add-task form state ────────────────────────────────────────────────────
   const [newTaskTitle, setNewTaskTitle] = useState("");
@@ -59,11 +62,15 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
   const [habitForm, setHabitForm] = useState({
     title: "",
     time: "",
-    recurrence: "daily",
-    customDays: [],
     duration: "1month",
     startDate: getTodayStr(),
     endDate: "",
+    fromHour: "",
+    fromMin: "00",
+    fromPeriod: "AM",
+    toHour: "",
+    toMin: "00",
+    toPeriod: "AM",
   });
 
   // ── Task handlers ──────────────────────────────────────────────────────────
@@ -105,6 +112,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
   // ── Habit handlers ─────────────────────────────────────────────────────────
 
   /** Toggle a recurring habit's done state for the selected date */
+  // formatTimeTo12h is no longer needed — formatTimeSlot from TimeSlotPicker handles it
   const toggleHabit = (habitId) => {
     const dayLog = { ...(state.habitLog[selectedDate] || {}) };
     dayLog[habitId] = !dayLog[habitId];
@@ -114,43 +122,103 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
   /** Create a new recurring habit from the form state */
   const addHabit = () => {
     if (!habitForm.title.trim()) return;
-    if (habitForm.recurrence === "custom" && !habitForm.customDays.length) {
-      showToast("Select at least one day", true);
-      return;
-    }
 
-    // Resolve the end date: null = indefinite, custom string, or computed
-    let endDate;
-    if (habitForm.duration === "indefinite") {
-      endDate = null;
-    } else if (habitForm.duration === "custom") {
-      endDate = habitForm.endDate || null;
-    } else {
-      endDate = computeHabitEndDate(habitForm.startDate, habitForm.duration);
-    }
+    // Resolve end date: custom string or computed from duration
+    const endDate =
+      habitForm.duration === "custom"
+        ? habitForm.endDate || null
+        : computeHabitEndDate(habitForm.startDate, habitForm.duration);
+
+    // Derive timeSlot formatted string from the picker parts
+    const timeSlot = formatTimeSlot({
+      fromHour: habitForm.fromHour,
+      fromMin: habitForm.fromMin,
+      fromPeriod: habitForm.fromPeriod,
+      toHour: habitForm.toHour,
+      toMin: habitForm.toMin,
+      toPeriod: habitForm.toPeriod,
+    });
 
     const habit = {
       id: "h-" + Date.now(),
       title: habitForm.title.trim(),
       timeMin: parseInt(habitForm.time) || 0,
-      recurrence: habitForm.recurrence,
-      customDays: [...habitForm.customDays],
+      recurrence: "daily",
+      customDays: [],
       startDate: habitForm.startDate,
       endDate,
+      timeSlot: timeSlot || null,
       active: true,
     };
 
     updateState("habits", [...state.habits, habit]);
-    setHabitForm((f) => ({ ...f, title: "", time: "" }));
+    setHabitForm((f) => ({
+      ...f,
+      title: "",
+      time: "",
+      fromHour: "",
+      fromMin: "00",
+      fromPeriod: "AM",
+      toHour: "",
+      toMin: "00",
+      toPeriod: "AM",
+    }));
     showToast(`Habit "${habit.title}" created!`);
   };
 
-  /** Remove a habit by its list index */
-  const deleteHabit = (index) => {
+  /** Update an existing habit (localStorage + DB if logged in) */
+  const updateHabit = (updatedHabit) => {
     updateState(
       "habits",
-      state.habits.filter((_, i) => i !== index),
+      state.habits.map((h) => (h.id === updatedHabit.id ? updatedHabit : h)),
     );
+    if (user) {
+      fetch("/api/tracker/habits", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ habit: updatedHabit }),
+      }).catch((err) => console.error("[tracker] update habit failed", err));
+    }
+    showToast(`Habit "${updatedHabit.title}" updated!`);
+  };
+
+  /** Remove a habit by its ID (localStorage + DB if logged in) */
+  const deleteHabit = (habitId) => {
+    updateState(
+      "habits",
+      state.habits.filter((h) => h.id !== habitId),
+    );
+    if (user) {
+      fetch("/api/tracker/habits", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ habitId }),
+      }).catch((err) => console.error("[tracker] delete habit failed", err));
+    }
+    showToast("Habit deleted");
+  };
+
+  // ── Clear all daily data ────────────────────────────────────────────────────
+
+  const clearAllData = () => {
+    if (
+      !window.confirm(
+        "This will permanently delete all your daily tasks, habits, and habit logs. Are you sure?",
+      )
+    )
+      return;
+
+    updateState("daily", {});
+    updateState("habits", []);
+    updateState("habitLog", {});
+
+    if (user) {
+      fetch("/api/tracker/clear", { method: "DELETE" }).catch((err) =>
+        console.error("[tracker] clear daily data failed", err),
+      );
+    }
+
+    showToast("All daily tracker data cleared");
   };
 
   // ── Import / Export ────────────────────────────────────────────────────────
@@ -190,7 +258,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
   return (
     // Force light mode regardless of the site-wide dark/light theme
-    <div style={LIGHT_MODE_STYLE}>
+    <div style={LIGHT_MODE_STYLE} className="max-w-[1280px]">
       {/* Page header */}
       <div className="mb-[22px]">
         <div className="flex items-center justify-between flex-wrap gap-3">
@@ -203,15 +271,14 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button
-              size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              onClick={exportTasks}
-            >
+            <Button size="sm" variant="exportBtn" onClick={exportTasks}>
               ⬇ Export Tasks
             </Button>
-            <Button size="sm" variant="outline" onClick={importTasks}>
+            <Button size="sm" variant="importBtn" onClick={importTasks}>
               ⬆ Import Tasks
+            </Button>
+            <Button size="sm" variant="clearBtn" onClick={clearAllData}>
+              Clear Data
             </Button>
           </div>
         </div>
@@ -226,8 +293,8 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
         {/* ── Tasks tab ── */}
         <TabsContent value="tasks" className="mt-4">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-[18px] items-start">
-            {/* Left column: date strip + task panel */}
+          <div className="flex flex-col gap-[18px]">
+            {/* Date strip + task panel — natural width, not stretched */}
             <div>
               <DateNavigator
                 state={state}
@@ -248,12 +315,11 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
               />
             </div>
 
-            {/* Right column: analytics charts */}
+            {/* Analytics panel — full width below the task card */}
             <AnalyticsPanel
               state={state}
+              updateState={updateState}
               selectedDate={selectedDate}
-              filterMode={filterMode}
-              setFilterMode={setFilterMode}
             />
           </div>
         </TabsContent>
@@ -261,11 +327,12 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
         {/* ── Habits tab ── */}
         <TabsContent value="habits" className="mt-4">
           <HabitsTab
-            state={state}
-            updateState={updateState}
             habitForm={habitForm}
             setHabitForm={setHabitForm}
             onAddHabit={addHabit}
+            onCancel={() => setView("tasks")}
+            state={state}
+            onUpdateHabit={updateHabit}
             onDeleteHabit={deleteHabit}
           />
         </TabsContent>

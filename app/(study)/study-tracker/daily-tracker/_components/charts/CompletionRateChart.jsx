@@ -17,7 +17,7 @@ import { Chart } from "./_chartSetup";
 import { CARD_CLS, CARD_TITLE_CLS } from "../_constants";
 import { cn } from "@/lib/utils";
 
-export default function CompletionRateChart({ labels, ratePct, filterMode }) {
+export default function CompletionRateChart({ labels, ratePct, viewMode }) {
   const canvasRef = useRef(null);
   const chartRef = useRef(null);
 
@@ -76,14 +76,14 @@ export default function CompletionRateChart({ labels, ratePct, filterMode }) {
   }, [labels, ratePct]);
 
   return (
-    <div className={cn(CARD_CLS, "mb-[10px]")}>
+    <div className={cn(CARD_CLS, "mb-[10px] mt-4")}>
       <h3 className={CARD_TITLE_CLS}>
         Completion Rate{" "}
         <span className="text-[0.73rem] font-normal text-gray-400 ml-[5px]">
-          ({filterMode === "weekly" ? "last 7 days" : "last 30 days"})
+          ({viewMode === "day" ? "today" : viewMode === "week" ? "last 7 days" : "last 30 days"})
         </span>
       </h3>
-      <canvas ref={canvasRef} height={140} />
+      <canvas ref={canvasRef} height={100} />
     </div>
   );
 }
