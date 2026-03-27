@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { useTracker } from "./StudyTrackerProvider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,6 +46,7 @@ import {
   Check,
   KeyRound,
 } from "lucide-react";
+import { useTracker } from "../../_components/StudyTrackerProvider";
 
 const RESOURCE_TYPES = [
   "ARTICLE",
@@ -69,13 +69,13 @@ const TYPE_LABELS = {
 };
 
 const TYPE_COLORS = {
-  ARTICLE:       { bg: "#eff6ff", color: "#2563eb" },
-  VIDEO:         { bg: "#fef2f2", color: "#dc2626" },
-  COURSE:        { bg: "#f0fdf4", color: "#16a34a" },
-  BOOK:          { bg: "#fffbeb", color: "#d97706" },
-  TOOL:          { bg: "#faf5ff", color: "#9333ea" },
+  ARTICLE: { bg: "#eff6ff", color: "#2563eb" },
+  VIDEO: { bg: "#fef2f2", color: "#dc2626" },
+  COURSE: { bg: "#f0fdf4", color: "#16a34a" },
+  BOOK: { bg: "#fffbeb", color: "#d97706" },
+  TOOL: { bg: "#faf5ff", color: "#9333ea" },
   DOCUMENTATION: { bg: "#f0f9ff", color: "#0284c7" },
-  OTHER:         { bg: "#f9fafb", color: "#6b7280" },
+  OTHER: { bg: "#f9fafb", color: "#6b7280" },
 };
 
 const EMPTY_FORM = {
@@ -90,28 +90,28 @@ const EMPTY_FORM = {
 export default function ResourcesView({ showToast }) {
   const { user, sessionPending: isPending } = useTracker();
 
-  const [resources, setResources]   = useState([]);
-  const [loading, setLoading]       = useState(false);
-  const [viewMode, setViewMode]     = useState("card"); // "table" | "card"
+  const [resources, setResources] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [viewMode, setViewMode] = useState("card"); // "table" | "card"
 
   // Filters
-  const [search, setSearch]         = useState("");
+  const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("ALL");
-  const [filterTag, setFilterTag]   = useState("");
+  const [filterTag, setFilterTag] = useState("");
 
   // Dialog
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingId, setEditingId]   = useState(null);
-  const [form, setForm]             = useState(EMPTY_FORM);
-  const [saving, setSaving]         = useState(false);
-  const [tagInput, setTagInput]     = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [tagInput, setTagInput] = useState("");
 
   // API Keys panel
-  const [keysOpen, setKeysOpen]     = useState(false);
-  const [apiKeys, setApiKeys]       = useState([]);
+  const [keysOpen, setKeysOpen] = useState(false);
+  const [apiKeys, setApiKeys] = useState([]);
   const [keysLoading, setKeysLoading] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
-  const [copiedKey, setCopiedKey]   = useState(null);
+  const [copiedKey, setCopiedKey] = useState(null);
 
   const isLoggedIn = !!user;
 
@@ -157,11 +157,11 @@ export default function ResourcesView({ showToast }) {
     setEditingId(r.id);
     setForm({
       resourceType: r.resourceType,
-      title:        r.title,
-      url:          r.url,
-      description:  r.description || "",
-      tags:         r.tags.map((t) => t.toLowerCase()),
-      image:        r.image || "",
+      title: r.title,
+      url: r.url,
+      description: r.description || "",
+      tags: r.tags.map((t) => t.toLowerCase()),
+      image: r.image || "",
     });
     setTagInput("");
     setDialogOpen(true);
@@ -197,11 +197,11 @@ export default function ResourcesView({ showToast }) {
     try {
       const payload = {
         resourceType: form.resourceType,
-        title:        form.title.trim(),
-        url:          form.url.trim(),
-        description:  form.description.trim() || null,
-        tags:         form.tags.map((t) => t.toLowerCase()),
-        image:        form.image.trim() || null,
+        title: form.title.trim(),
+        url: form.url.trim(),
+        description: form.description.trim() || null,
+        tags: form.tags.map((t) => t.toLowerCase()),
+        image: form.image.trim() || null,
       };
       const res = editingId
         ? await fetch(`/api/resources/${editingId}`, {
@@ -275,7 +275,9 @@ export default function ResourcesView({ showToast }) {
   };
 
   // Collect all unique tags for filter suggestions
-  const allTags = [...new Set(resources.flatMap((r) => r.tags.map((t) => t.toLowerCase())))].sort();
+  const allTags = [
+    ...new Set(resources.flatMap((r) => r.tags.map((t) => t.toLowerCase()))),
+  ].sort();
 
   // ── Not logged in ──────────────────────────────────────────────────────────
   if (!isPending && !isLoggedIn) {
@@ -283,9 +285,12 @@ export default function ResourcesView({ showToast }) {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center max-w-[360px] bg-white border border-[#e9eaed] rounded-2xl px-10 py-10">
           <div className="text-[3rem] mb-4">🔒</div>
-          <h2 className="text-lg font-semibold text-[#1f2937] mb-2">Sign in to access Resources</h2>
+          <h2 className="text-lg font-semibold text-[#1f2937] mb-2">
+            Sign in to access Resources
+          </h2>
           <p className="text-sm text-gray-500 mb-6 leading-relaxed">
-            Save articles, videos, courses and tools you&apos;re learning from. Log in to get started.
+            Save articles, videos, courses and tools you&apos;re learning from.
+            Log in to get started.
           </p>
           <a
             href="/login"
@@ -322,8 +327,11 @@ export default function ResourcesView({ showToast }) {
           <Button
             size="sm"
             variant="outline"
-            className="gap-1.5"
-            onClick={() => { setKeysOpen(true); fetchApiKeys(); }}
+            className="gap-1.5 dark:text-white"
+            onClick={() => {
+              setKeysOpen(true);
+              fetchApiKeys();
+            }}
             id="manage-api-keys-btn"
             data-testid="manage-api-keys-btn"
           >
@@ -346,7 +354,10 @@ export default function ResourcesView({ showToast }) {
       {/* ── FILTERS ── */}
       <div className="flex items-center gap-3 mb-5 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search
+            size={14}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+          />
           <input
             className="w-full border border-[#e9eaed] rounded-lg pl-8 pr-8 py-2 text-sm text-[#374151] bg-white outline-none focus:border-blue-600 transition-colors"
             placeholder="Search title or description…"
@@ -374,7 +385,9 @@ export default function ResourcesView({ showToast }) {
         >
           <option value="ALL">All Types</option>
           {RESOURCE_TYPES.map((t) => (
-            <option key={t} value={t}>{TYPE_LABELS[t]}</option>
+            <option key={t} value={t}>
+              {TYPE_LABELS[t]}
+            </option>
           ))}
         </select>
 
@@ -388,7 +401,9 @@ export default function ResourcesView({ showToast }) {
           >
             <option value="">All Tags</option>
             {allTags.map((t) => (
-              <option key={t} value={t}>{t}</option>
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
           </select>
         )}
@@ -397,7 +412,8 @@ export default function ResourcesView({ showToast }) {
           <button
             className={cn(
               "px-3 py-[7px] bg-white border-none cursor-pointer text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors flex items-center",
-              viewMode === "table" && "bg-[#eff2ff] text-blue-600 hover:bg-[#eff2ff] hover:text-blue-600"
+              viewMode === "table" &&
+                "bg-[#eff2ff] text-blue-600 hover:bg-[#eff2ff] hover:text-blue-600",
             )}
             onClick={() => setViewMode("table")}
             title="Table view"
@@ -409,7 +425,8 @@ export default function ResourcesView({ showToast }) {
           <button
             className={cn(
               "px-3 py-[7px] bg-white border-none cursor-pointer text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors flex items-center border-l border-[#e9eaed]",
-              viewMode === "card" && "bg-[#eff2ff] text-blue-600 hover:bg-[#eff2ff] hover:text-blue-600"
+              viewMode === "card" &&
+                "bg-[#eff2ff] text-blue-600 hover:bg-[#eff2ff] hover:text-blue-600",
             )}
             onClick={() => setViewMode("card")}
             title="Card view"
@@ -429,8 +446,12 @@ export default function ResourcesView({ showToast }) {
       ) : resources.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 text-center">
           <div className="text-[3rem] mb-3">📚</div>
-          <p className="text-base font-semibold text-[#1f2937] mb-1">No resources yet</p>
-          <p className="text-sm text-gray-500">Add your first resource to get started.</p>
+          <p className="text-base font-semibold text-[#1f2937] mb-1">
+            No resources yet
+          </p>
+          <p className="text-sm text-gray-500">
+            Add your first resource to get started.
+          </p>
         </div>
       ) : viewMode === "table" ? (
         <div className="overflow-x-auto rounded-xl border border-[#e9eaed] bg-white">
@@ -441,10 +462,18 @@ export default function ResourcesView({ showToast }) {
           >
             <thead>
               <tr className="border-b border-[#e9eaed] bg-[#f8f9fc]">
-                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Type</th>
-                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide">Title</th>
-                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide">Tags</th>
-                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">Added</th>
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
+                  Type
+                </th>
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide">
+                  Title
+                </th>
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide">
+                  Tags
+                </th>
+                <th className="text-left px-4 py-3 text-[0.75rem] font-semibold text-gray-500 uppercase tracking-wide whitespace-nowrap">
+                  Added
+                </th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -472,10 +501,15 @@ export default function ResourcesView({ showToast }) {
                       data-testid={`resource-title-${r.id}`}
                     >
                       {r.title}
-                      <ExternalLink size={11} className="text-gray-400 flex-shrink-0" />
+                      <ExternalLink
+                        size={11}
+                        className="text-gray-400 flex-shrink-0"
+                      />
                     </a>
                     {r.description && (
-                      <p className="text-[0.77rem] text-gray-500 mt-[3px] m-0 line-clamp-1">{r.description}</p>
+                      <p className="text-[0.77rem] text-gray-500 mt-[3px] m-0 line-clamp-1">
+                        {r.description}
+                      </p>
                     )}
                   </td>
                   <td className="px-4 py-3">
@@ -517,14 +551,19 @@ export default function ResourcesView({ showToast }) {
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                           <AlertDialogHeader>
-                            <AlertDialogTitle>Delete resource?</AlertDialogTitle>
+                            <AlertDialogTitle>
+                              Delete resource?
+                            </AlertDialogTitle>
                             <AlertDialogDescription>
-                              &ldquo;{r.title}&rdquo; will be permanently deleted.
+                              &ldquo;{r.title}&rdquo; will be permanently
+                              deleted.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDelete(r.id)}>
+                            <AlertDialogAction
+                              onClick={() => handleDelete(r.id)}
+                            >
                               Delete
                             </AlertDialogAction>
                           </AlertDialogFooter>
@@ -551,7 +590,11 @@ export default function ResourcesView({ showToast }) {
             >
               {r.image && (
                 <div className="h-[160px] overflow-hidden bg-gray-100">
-                  <img src={r.image} alt={r.title} className="w-full h-full object-cover" />
+                  <img
+                    src={r.image}
+                    alt={r.title}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
               )}
               <div className="p-4 flex flex-col gap-2 flex-1">
@@ -609,7 +652,9 @@ export default function ResourcesView({ showToast }) {
                   <ExternalLink size={12} />
                 </a>
                 {r.description && (
-                  <p className="text-[0.77rem] text-gray-500 line-clamp-2 m-0">{r.description}</p>
+                  <p className="text-[0.77rem] text-gray-500 line-clamp-2 m-0">
+                    {r.description}
+                  </p>
                 )}
                 {r.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1">
@@ -636,9 +681,15 @@ export default function ResourcesView({ showToast }) {
 
       {/* ── ADD / EDIT DIALOG ── */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-lg" id="resource-dialog" data-testid="resource-dialog">
+        <DialogContent
+          className="sm:max-w-lg"
+          id="resource-dialog"
+          data-testid="resource-dialog"
+        >
           <DialogHeader>
-            <DialogTitle>{editingId ? "Edit Resource" : "Add Resource"}</DialogTitle>
+            <DialogTitle>
+              {editingId ? "Edit Resource" : "Add Resource"}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
@@ -646,14 +697,18 @@ export default function ResourcesView({ showToast }) {
               <Label htmlFor="res-type">Type *</Label>
               <Select
                 value={form.resourceType}
-                onValueChange={(v) => setForm((f) => ({ ...f, resourceType: v }))}
+                onValueChange={(v) =>
+                  setForm((f) => ({ ...f, resourceType: v }))
+                }
               >
                 <SelectTrigger id="res-type" data-testid="res-type-select">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
                   {RESOURCE_TYPES.map((t) => (
-                    <SelectItem key={t} value={t}>{TYPE_LABELS[t]}</SelectItem>
+                    <SelectItem key={t} value={t}>
+                      {TYPE_LABELS[t]}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -666,7 +721,9 @@ export default function ResourcesView({ showToast }) {
                 data-testid="res-title-input"
                 placeholder="Resource title"
                 value={form.title}
-                onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, title: e.target.value }))
+                }
               />
             </div>
 
@@ -678,7 +735,9 @@ export default function ResourcesView({ showToast }) {
                 type="url"
                 placeholder="https://..."
                 value={form.url}
-                onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, url: e.target.value }))
+                }
               />
             </div>
 
@@ -690,7 +749,9 @@ export default function ResourcesView({ showToast }) {
                 placeholder="Brief description…"
                 rows={3}
                 value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, description: e.target.value }))
+                }
               />
             </div>
 
@@ -737,11 +798,20 @@ export default function ResourcesView({ showToast }) {
                   Add
                 </Button>
               </div>
-              {allTags.filter((t) => !form.tags.includes(t) && t.includes(tagInput.toLowerCase())).length > 0 && (
+              {allTags.filter(
+                (t) =>
+                  !form.tags.includes(t) && t.includes(tagInput.toLowerCase()),
+              ).length > 0 && (
                 <div className="flex flex-wrap items-center gap-1 mt-1">
-                  <span className="text-[0.72rem] text-gray-500">Suggestions:</span>
+                  <span className="text-[0.72rem] text-gray-500">
+                    Suggestions:
+                  </span>
                   {allTags
-                    .filter((t) => !form.tags.includes(t) && (!tagInput || t.includes(tagInput.toLowerCase())))
+                    .filter(
+                      (t) =>
+                        !form.tags.includes(t) &&
+                        (!tagInput || t.includes(tagInput.toLowerCase())),
+                    )
                     .slice(0, 8)
                     .map((t) => (
                       <button
@@ -766,7 +836,9 @@ export default function ResourcesView({ showToast }) {
                 type="url"
                 placeholder="https://..."
                 value={form.image}
-                onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                onChange={(e) =>
+                  setForm((f) => ({ ...f, image: e.target.value }))
+                }
               />
             </div>
           </div>
@@ -790,7 +862,11 @@ export default function ResourcesView({ showToast }) {
 
       {/* ── API KEYS DIALOG ── */}
       <Dialog open={keysOpen} onOpenChange={setKeysOpen}>
-        <DialogContent className="sm:max-w-lg" id="api-keys-dialog" data-testid="api-keys-dialog">
+        <DialogContent
+          className="sm:max-w-lg"
+          id="api-keys-dialog"
+          data-testid="api-keys-dialog"
+        >
           <DialogHeader>
             <DialogTitle>API Keys — Chrome Extension</DialogTitle>
           </DialogHeader>
@@ -866,12 +942,15 @@ export default function ResourcesView({ showToast }) {
                       <AlertDialogHeader>
                         <AlertDialogTitle>Revoke key?</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Any extension using &ldquo;{k.name}&rdquo; will stop working.
+                          Any extension using &ldquo;{k.name}&rdquo; will stop
+                          working.
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                         <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleDeleteKey(k.id)}>
+                        <AlertDialogAction
+                          onClick={() => handleDeleteKey(k.id)}
+                        >
                           Revoke
                         </AlertDialogAction>
                       </AlertDialogFooter>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTracker } from "../_components/StudyTrackerProvider";
-import ResourcesView from "../_components/ResourcesView";
+import ResourcesView from "./_components/ResourcesView";
 
 export default function ResourcesPage() {
   const { showToast } = useTracker();

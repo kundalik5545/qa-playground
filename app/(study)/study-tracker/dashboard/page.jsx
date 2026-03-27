@@ -2,11 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useTracker } from "../_components/StudyTrackerProvider";
-import DashboardView from "../_components/DashboardView";
+import DashboardView from "./_components/DashboardView";
 
 export default function DashboardPage() {
-  const { state, allStats, handleExport, handleImport, handleClearAll, showToast } =
-    useTracker();
+  const {
+    state,
+    allStats,
+    handleExport,
+    handleImport,
+    handleClearAll,
+    showToast,
+  } = useTracker();
   const router = useRouter();
 
   if (!state) return null;
@@ -14,8 +20,8 @@ export default function DashboardPage() {
   const navigate = (tabId) => {
     const routes = {
       dashboard: "/study-tracker/dashboard",
-      daily:     "/study-tracker/daily-tracker",
-      syllabi:   "/study-tracker/syllabus",
+      daily: "/study-tracker/daily-tracker",
+      syllabi: "/study-tracker/syllabus",
       resources: "/study-tracker/resources",
     };
     router.push(routes[tabId] ?? `/study-tracker/syllabus/${tabId}`);

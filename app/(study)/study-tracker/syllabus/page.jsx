@@ -1,7 +1,7 @@
 "use client";
 
 import { useTracker } from "../_components/StudyTrackerProvider";
-import SyllabusManagerView from "../_components/SyllabusManagerView";
+import SyllabusManagerView from "./_components/SyllabusManagerView";
 
 export default function SyllabusPage() {
   const { state, updateState, showToast } = useTracker();

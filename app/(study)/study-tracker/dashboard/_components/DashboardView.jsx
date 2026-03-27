@@ -30,22 +30,25 @@ export default function DashboardView({
   onClearAll,
   onNavigate,
 }) {
-  const pieRef        = useRef(null); // Today's Tasks doughnut
-  const overallRef    = useRef(null); // Overall Progress doughnut
-  const lineRef       = useRef(null); // Topics Completed line
-  const barRef        = useRef(null); // Progress by Syllabus bar
-  const doughnutRef   = useRef(null); // Completion Breakdown doughnut
-  const taskChartRef  = useRef(null); // Daily Task Completion % line
-  const charts        = useRef({});
+  const pieRef = useRef(null); // Today's Tasks doughnut
+  const overallRef = useRef(null); // Overall Progress doughnut
+  const lineRef = useRef(null); // Topics Completed line
+  const barRef = useRef(null); // Progress by Syllabus bar
+  const doughnutRef = useRef(null); // Completion Breakdown doughnut
+  const taskChartRef = useRef(null); // Daily Task Completion % line
+  const charts = useRef({});
 
-  const today      = getTodayStr();
-  const todayTasks = useMemo(() => state.daily[today] || [], [state.daily, today]);
+  const today = getTodayStr();
+  const todayTasks = useMemo(
+    () => state.daily[today] || [],
+    [state.daily, today],
+  );
   const todayTaskDone = todayTasks.filter((t) => t.done).length;
 
   // Scope effect to only the state keys charts actually read
-  const syllabi  = state.syllabi;
+  const syllabi = state.syllabi;
   const progress = state.progress;
-  const daily    = state.daily;
+  const daily = state.daily;
 
   useEffect(() => {
     destroyAll();
@@ -54,32 +57,40 @@ export default function DashboardView({
   }, [syllabi, progress, daily]);
 
   function destroyAll() {
-    Object.values(charts.current).forEach((c) => { try { c.destroy(); } catch (_) {} });
+    Object.values(charts.current).forEach((c) => {
+      try {
+        c.destroy();
+      } catch (_) {}
+    });
     charts.current = {};
   }
 
   function renderCharts() {
-    const syllabusIds    = Object.keys(syllabi);
+    const syllabusIds = Object.keys(syllabi);
     const syllabusLabels = syllabusIds.map((id) => syllabi[id].label);
     const syllabusColors = syllabusIds.map((id) => syllabi[id].color);
-    const sylStats       = syllabusIds.map((id) => getSyllabusStats(syllabi, progress, id));
-    const days           = getLast14Days();
-    const todayTasksNow  = daily[today] || [];
-    const doneTasks      = todayTasksNow.filter((t) => t.done).length;
+    const sylStats = syllabusIds.map((id) =>
+      getSyllabusStats(syllabi, progress, id),
+    );
+    const days = getLast14Days();
+    const todayTasksNow = daily[today] || [];
+    const doneTasks = todayTasksNow.filter((t) => t.done).length;
 
     // ── Today's Tasks doughnut ──
     if (pieRef.current) {
-      const total     = todayTasksNow.length;
+      const total = todayTasksNow.length;
       const remaining = Math.max(total - doneTasks, 0);
       charts.current.pie = new Chart(pieRef.current, {
         type: "doughnut",
         data: {
           labels: ["Done", "Remaining"],
-          datasets: [{
-            data: [doneTasks, remaining || (doneTasks ? 0 : 1)],
-            backgroundColor: ["#10b981", "#e5e7eb"],
-            borderWidth: 0,
-          }],
+          datasets: [
+            {
+              data: [doneTasks, remaining || (doneTasks ? 0 : 1)],
+              backgroundColor: ["#10b981", "#e5e7eb"],
+              borderWidth: 0,
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -88,7 +99,11 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
+              labels: {
+                font: { family: "Inter, sans-serif", size: 12 },
+                boxWidth: 12,
+                padding: 14,
+              },
             },
             title: {
               display: true,
@@ -109,11 +124,13 @@ export default function DashboardView({
         type: "doughnut",
         data: {
           labels: ["Completed", "Remaining"],
-          datasets: [{
-            data: [done, Math.max(total - done, 0) || (done ? 0 : 1)],
-            backgroundColor: ["#2563eb", "#e5e7eb"],
-            borderWidth: 0,
-          }],
+          datasets: [
+            {
+              data: [done, Math.max(total - done, 0) || (done ? 0 : 1)],
+              backgroundColor: ["#2563eb", "#e5e7eb"],
+              borderWidth: 0,
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -122,7 +139,11 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
+              labels: {
+                font: { family: "Inter, sans-serif", size: 12 },
+                boxWidth: 12,
+                padding: 14,
+              },
             },
             title: {
               display: true,
@@ -139,7 +160,7 @@ export default function DashboardView({
     // ── Topics completed line (last 14 days) ──
     if (lineRef.current) {
       const datasets = syllabusIds.map((id) => {
-        const syl  = syllabi[id];
+        const syl = syllabi[id];
         const data = days.map((day) => {
           let count = 0;
           for (const sec of syl.sections)
@@ -169,7 +190,11 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: { font: { family: "Inter, sans-serif", size: 11 }, boxWidth: 12, padding: 14 },
+              labels: {
+                font: { family: "Inter, sans-serif", size: 11 },
+                boxWidth: 12,
+                padding: 14,
+              },
             },
           },
           scales: {
@@ -236,7 +261,8 @@ export default function DashboardView({
               callbacks: {
                 label: (item) => {
                   const s = sylStats[item.dataIndex];
-                  if (item.datasetIndex === 0) return ` Completed: ${s.done} (${s.pct}%)`;
+                  if (item.datasetIndex === 0)
+                    return ` Completed: ${s.done} (${s.pct}%)`;
                   return ` Remaining: ${Math.max(s.total - s.done, 0)}`;
                 },
               },
@@ -245,7 +271,12 @@ export default function DashboardView({
           scales: {
             x: {
               stacked: true,
-              ticks: { font: { family: "Inter", size: 12 }, maxRotation: 40, minRotation: 30, autoSkip: false },
+              ticks: {
+                font: { family: "Inter", size: 12 },
+                maxRotation: 40,
+                minRotation: 30,
+                autoSkip: false,
+              },
               grid: { display: false },
             },
             y: {
@@ -265,12 +296,14 @@ export default function DashboardView({
         type: "doughnut",
         data: {
           labels: syllabusLabels,
-          datasets: [{
-            data: sylStats.map((s) => s.done || 0),
-            backgroundColor: syllabusColors,
-            borderWidth: 2,
-            borderColor: "#fff",
-          }],
+          datasets: [
+            {
+              data: sylStats.map((s) => s.done || 0),
+              backgroundColor: syllabusColors,
+              borderWidth: 2,
+              borderColor: "#fff",
+            },
+          ],
         },
         options: {
           responsive: true,
@@ -278,7 +311,11 @@ export default function DashboardView({
           plugins: {
             legend: {
               position: "bottom",
-              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
+              labels: {
+                font: { family: "Inter, sans-serif", size: 12 },
+                boxWidth: 12,
+                padding: 14,
+              },
             },
           },
         },
@@ -289,40 +326,52 @@ export default function DashboardView({
     if (taskChartRef.current) {
       const taskData = days.map((day) => {
         const tasks = daily[day] || [];
-        const done  = tasks.filter((t) => t.done).length;
+        const done = tasks.filter((t) => t.done).length;
         const total = tasks.length;
-        return { pct: total > 0 ? Math.round((done / total) * 100) : null, done, total };
+        return {
+          pct: total > 0 ? Math.round((done / total) * 100) : null,
+          done,
+          total,
+        };
       });
       charts.current.taskChart = new Chart(taskChartRef.current, {
         type: "line",
         data: {
           labels: days.map((d) => d.slice(5)),
-          datasets: [{
-            label: "Completion %",
-            data: taskData.map((d) => d.pct),
-            borderColor: "#f59e0b",
-            backgroundColor: "#f59e0b22",
-            borderWidth: 2.5,
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            pointBackgroundColor: "#f59e0b",
-            fill: true,
-            tension: 0.35,
-            spanGaps: true,
-          }],
+          datasets: [
+            {
+              label: "Completion %",
+              data: taskData.map((d) => d.pct),
+              borderColor: "#f59e0b",
+              backgroundColor: "#f59e0b22",
+              borderWidth: 2.5,
+              pointRadius: 4,
+              pointHoverRadius: 6,
+              pointBackgroundColor: "#f59e0b",
+              fill: true,
+              tension: 0.35,
+              spanGaps: true,
+            },
+          ],
         },
         options: {
           responsive: true,
           plugins: {
             legend: {
               position: "bottom",
-              labels: { font: { family: "Inter, sans-serif", size: 12 }, boxWidth: 12, padding: 14 },
+              labels: {
+                font: { family: "Inter, sans-serif", size: 12 },
+                boxWidth: 12,
+                padding: 14,
+              },
             },
             tooltip: {
               callbacks: {
                 label: (item) => {
                   const d = taskData[item.dataIndex];
-                  return d.total ? `${d.pct}% (${d.done}/${d.total} tasks)` : "No tasks";
+                  return d.total
+                    ? `${d.pct}% (${d.done}/${d.total} tasks)`
+                    : "No tasks";
                 },
               },
             },
@@ -336,7 +385,11 @@ export default function DashboardView({
               beginAtZero: true,
               min: 0,
               max: 100,
-              ticks: { stepSize: 10, font: { family: "Inter" }, callback: (v) => v + "%" },
+              ticks: {
+                stepSize: 10,
+                font: { family: "Inter" },
+                callback: (v) => v + "%",
+              },
               grid: { color: "#f3f4f6" },
             },
           },
@@ -374,15 +427,27 @@ export default function DashboardView({
             </p>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" onClick={onExport} className="bg-blue-600 hover:bg-blue-700 text-white text-[0.82rem]">
+            <Button
+              size="sm"
+              onClick={onExport}
+              className="bg-blue-600 hover:bg-blue-700  dark:text-white text-[0.82rem]"
+            >
               ⬇ Export
             </Button>
-            <Button size="sm" variant="outline" onClick={onImport} className="text-[0.82rem]">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onImport}
+              className="text-[0.82rem] dark:text-white"
+            >
               ⬆ Import
             </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button size="sm" className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-[0.82rem]">
+                <Button
+                  size="sm"
+                  className="bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-[0.82rem]"
+                >
                   🗑 Clear All
                 </Button>
               </AlertDialogTrigger>
@@ -390,7 +455,9 @@ export default function DashboardView({
                 <AlertDialogHeader>
                   <AlertDialogTitle>Clear all data?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This will permanently delete all your progress, tasks, habits, and custom syllabi, and reset everything back to the default state. This action cannot be undone.
+                    This will permanently delete all your progress, tasks,
+                    habits, and custom syllabi, and reset everything back to the
+                    default state. This action cannot be undone.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -436,7 +503,9 @@ export default function DashboardView({
       {/* Row 1: Today's Tasks doughnut + Daily Task Completion % line */}
       <div className="grid grid-cols-[1fr_2fr] gap-[14px] mb-[14px]">
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
-          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Today's Tasks</h3>
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
+            Today's Tasks
+          </h3>
           <div className="max-w-[260px] mx-auto">
             <canvas ref={pieRef} />
           </div>
@@ -444,7 +513,9 @@ export default function DashboardView({
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
           <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
             Daily Task Completion %{" "}
-            <span className="text-[0.73rem] font-normal text-gray-400 ml-[5px]">(last 14 days)</span>
+            <span className="text-[0.73rem] font-normal text-gray-400 ml-[5px]">
+              (last 14 days)
+            </span>
           </h3>
           <canvas ref={taskChartRef} height={110} />
         </div>
@@ -453,7 +524,9 @@ export default function DashboardView({
       {/* Row 2: Overall Progress doughnut + Topics Completed line */}
       <div className="grid grid-cols-[1fr_2fr] gap-[14px] mb-[14px]">
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
-          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Overall Progress</h3>
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
+            Overall Progress
+          </h3>
           <div className="max-w-[260px] mx-auto">
             <canvas ref={overallRef} />
           </div>
@@ -461,7 +534,9 @@ export default function DashboardView({
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
           <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
             Topics Completed{" "}
-            <span className="text-[0.73rem] font-normal text-gray-400 ml-[5px]">(last 14 days)</span>
+            <span className="text-[0.73rem] font-normal text-gray-400 ml-[5px]">
+              (last 14 days)
+            </span>
           </h3>
           <canvas ref={lineRef} height={110} />
         </div>
@@ -470,11 +545,15 @@ export default function DashboardView({
       {/* Row 3: Progress by Syllabus + Completion Breakdown */}
       <div className="grid grid-cols-[2fr_1fr] gap-[14px] mb-[14px]">
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
-          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Progress by Syllabus</h3>
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
+            Progress by Syllabus
+          </h3>
           <canvas ref={barRef} height={100} />
         </div>
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
-          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Completion Breakdown</h3>
+          <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
+            Completion Breakdown
+          </h3>
           <div className="max-w-[260px] mx-auto">
             <canvas ref={doughnutRef} />
           </div>
@@ -483,7 +562,9 @@ export default function DashboardView({
 
       {/* Recent activity */}
       <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px] mt-[14px]">
-        <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">Recent Activity</h3>
+        <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
+          Recent Activity
+        </h3>
         {recentLog.length === 0 ? (
           <div className="text-gray-400 text-[0.86rem] text-center py-[18px]">
             No activity yet. Start checking off topics!
@@ -497,7 +578,10 @@ export default function DashboardView({
               month: "short",
             });
             return (
-              <div key={date} className="flex flex-nowrap items-center gap-3 py-[9px] border-b border-gray-100 last:border-b-0">
+              <div
+                key={date}
+                className="flex flex-nowrap items-center gap-3 py-[9px] border-b border-gray-100 last:border-b-0"
+              >
                 <span className="text-[0.76rem] font-semibold text-gray-500 min-w-[96px] flex-shrink-0">
                   {label}
                 </span>
@@ -509,7 +593,10 @@ export default function DashboardView({
                       <span
                         key={i}
                         className="text-[0.72rem] font-medium px-[10px] py-[3px] rounded-full whitespace-nowrap"
-                        style={{ background: syl.color + "18", color: syl.color }}
+                        style={{
+                          background: syl.color + "18",
+                          color: syl.color,
+                        }}
                       >
                         {syl.icon} +{entry.count} in {syl.label}
                       </span>
@@ -536,7 +623,10 @@ function OverviewCard({ icon, label, pct, sub, color, onClick }) {
       <div className="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-[0.8px] mb-[3px]">
         {label}
       </div>
-      <div className="text-[1.9rem] font-bold tracking-[-1px] leading-[1.1] mb-[3px] font-mono" style={{ color }}>
+      <div
+        className="text-[1.9rem] font-bold tracking-[-1px] leading-[1.1] mb-[3px] font-mono"
+        style={{ color }}
+      >
         {pct}%
       </div>
       <div className="text-[0.73rem] text-gray-400 mb-[10px]">{sub}</div>
