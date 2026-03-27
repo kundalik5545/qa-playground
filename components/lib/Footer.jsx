@@ -28,21 +28,13 @@ const platformLinks = [
     badgeClass:
       "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
   },
-  {
-    href: "/blog",
-    label: "Blog & Tutorials",
-    icon: null,
-    badge: null,
-  },
 ];
 
 const learnLinks = [
-  { href: "/learn/courses", label: "Free Courses" },
-  { href: "/learn/automation-test-cases", label: "Automation Test Cases" },
-  {
-    href: "/learn/logical-programs-list-to-crack-interviews",
-    label: "Logical Programs",
-  },
+  { href: "/practice", label: "Practice Elements" },
+  { href: "/blog", label: "Blog & Tutorials" },
+  { href: "/qa-tools", label: "Free QA Tools" },
+  { href: "/study-tracker/ai-syllabus-prompt", label: "AI Syllabus Generator" },
   {
     href: "https://github.com/kundalik5545/QA_PlayGround_Automation_Framework",
     label: "Automation Framework",
@@ -85,9 +77,9 @@ const Footer = () => {
     <footer aria-label="Site footer">
       <div className="container mx-auto px-4 pt-4 pb-2 max-w-7xl">
         {/* Main grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 pb-10 border-b border-border">
+        <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-8 md:gap-10 pb-10 border-b border-border">
           {/* Column 1 — Brand */}
-          <div className="col-span-2 md:col-span-1 flex flex-col gap-3">
+          <div className="col-span-1 sm:col-span-3 md:col-span-1 flex flex-col gap-3">
             <Link href="/" className="inline-flex items-center gap-2 group">
               <span className="gradient-subTitle text-xl font-bold">
                 QA PlayGround
@@ -147,21 +139,23 @@ const Footer = () => {
                   key={link.href}
                   href={link.href}
                   prefetch={false}
-                  className="flex items-center gap-2 text-sm text-foreground/80 hover:text-foreground transition-colors group"
+                  className="flex items-start gap-2 text-sm text-foreground/80 hover:text-foreground transition-colors group"
                 >
                   {link.icon && (
-                    <span className="text-muted-foreground group-hover:text-foreground transition-colors">
+                    <span className="text-muted-foreground group-hover:text-foreground transition-colors mt-0.5 flex-shrink-0">
                       {link.icon}
                     </span>
                   )}
-                  <span>{link.label}</span>
-                  {link.badge && (
-                    <span
-                      className={`ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${link.badgeClass}`}
-                    >
-                      {link.badge}
-                    </span>
-                  )}
+                  <span className="flex flex-wrap items-center gap-1.5">
+                    {link.label}
+                    {link.badge && (
+                      <span
+                        className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full flex-shrink-0 ${link.badgeClass}`}
+                      >
+                        {link.badge}
+                      </span>
+                    )}
+                  </span>
                 </Link>
               ))}
             </nav>
@@ -208,10 +202,13 @@ const Footer = () => {
 
             <div className="mt-4 pt-4 border-t border-border">
               <p className="text-xs text-muted-foreground">
-                No login required.
+                *No account required. Creating a login is entirely optional and
+                is only necessary if you wish to sync your progress in the Study
+                Tracker.
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                All data stored locally in your browser.
+                *Your data is stored locally within your browser for maximum
+                privacy.
               </p>
             </div>
           </div>
@@ -231,7 +228,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="text-[#f18b42] hover:text-[#e07b35] transition-colors font-medium"
             >
-              Random Coders
+              Kundalik Jadhav
             </Link>
           </span>
         </div>

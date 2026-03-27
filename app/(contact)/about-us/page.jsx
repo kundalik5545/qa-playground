@@ -1,19 +1,10 @@
 import { basicDetails } from "@/data/BasicSetting";
 import React from "react";
 
-// export const metadata = {
-//   title: "About - QA PlayGround",
-//   description:
-//     "QA Testing Playground is a hub for automation testers to practice and enhance their skills. Join our community to explore, contribute, and collaborate.",
-//   alternates: {
-//     canonical: `${basicDetails.websiteURL}/about-us`,
-//   },
-// };
-
 export const metadata = {
-  title: "About - QA PlayGround",
+  title: "About Us | QA Playground",
   description:
-    "QA Testing Playground is the leading platform for automation testers to practice skills, access 50+ exercises, join 10k+ community members, and master Selenium, Cypress & Playwright testing frameworks.",
+    "QA Playground is a purpose-built platform for automation testers to practice Selenium, Playwright, and Cypress through 22+ interactive elements, a Bank Demo app, and a Study Tracker.",
   keywords: [
     "automation testing",
     "QA testing playground",
@@ -28,27 +19,18 @@ export const metadata = {
     canonical: `${basicDetails.websiteURL}/about-us`,
   },
   openGraph: {
-    title: "About QA PlayGround - Premier Automation Testing Hub",
+    title: "About Us | QA Playground",
     description:
-      "Join 10k+ automation testers practicing skills with 50+ exercises. Master Selenium, Cypress & Playwright testing frameworks.",
+      "A purpose-built platform for automation testers to practice Selenium, Playwright, and Cypress. Explore 22+ interactive elements, a Bank Demo app, and a QA Study Tracker.",
     url: `${basicDetails.websiteURL}/about-us`,
     siteName: basicDetails.websiteName,
     type: "website",
-    images: [
-      {
-        url: `${basicDetails.websiteURL}/og-about.jpg`,
-        width: 1200,
-        height: 630,
-        alt: "QA PlayGround About Us",
-      },
-    ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "About QA PlayGround - Premier Automation Testing Hub",
+    card: "summary",
+    title: "About Us | QA Playground",
     description:
-      "Join 10k+ automation testers practicing skills with 50+ exercises.",
-    images: [`${basicDetails.websiteURL}/twitter-about.jpg`],
+      "A purpose-built platform for automation testers to practice Selenium, Playwright, and Cypress.",
   },
   robots: {
     index: true,
@@ -70,7 +52,7 @@ const AboutPage = () => {
         <h1 className="text-3xl font-bold mb-4">About Us</h1>
         <blockquote className="italic">
           <p className="text-lg mb-4">
-            <strong>{basicDetails.websiteName}</strong> - 🛠️ Practice, learn,
+            <strong>{basicDetails.websiteName}</strong> — 🛠️ Practice, learn,
             and excel in automation testing!
           </p>
           <p className="mb-4">
@@ -80,13 +62,12 @@ const AboutPage = () => {
             challenge for your skill level.
           </p>
           <p className="mb-4">
-            Join our <strong>community guide</strong>, where contributors can
-            discover projects, connect with like-minded testers, and enhance
-            their automation skills. Stay updated with best practices,
-            tutorials, and hands-on projects to sharpen your expertise.
+            Join our <strong>community</strong>, where contributors can discover
+            projects, connect with like-minded testers, and grow their
+            automation skills. Stay updated with best practices, tutorials, and
+            hands-on projects to sharpen your expertise.
           </p>
-          <p>By -</p>
-          <p>{basicDetails.websiteName}</p>
+          <p className="pt-3">— {basicDetails.websiteName}</p>
         </blockquote>
       </div>
     </>

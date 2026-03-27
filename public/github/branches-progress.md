@@ -1,4 +1,6 @@
-# Guthub branch progress
+# GitHub Branch Progress
+
+**Repo:** [kundalik5545/qatesting](https://github.com/kundalik5545/qatesting)
 
 ## Sequence and purpose of branches
 
@@ -11,7 +13,9 @@
 - fix/network-issues
 - fix/blog-page-ui-issues — blog card UI fixes, posts-per-page variable, Tailwind dynamic class lookup map
 - fix/practice-page-ui-issues — SEO metadata, JSON-LD, canonical/og:url, H1 fix, card accessibility (aria-label, aria-hidden), invalid Link>Button nesting removed, nav aria-label, card hover effects, CTA labels standardized, 5 descriptions rewritten, POM Bank Demo badge; search bar + card reorder/rename; InputPage bugs fixed (label/id mismatch, name attrs, data-testid), hero section, disabled/readonly badges, insight card expanded, Playwright append code fix, [slug] breadcrumb + JSON-LD LearningResource, footer h3→h4; 10 slugs renamed + 301 redirects; created data/practiceResources.js (central registry for difficulty/time/youtubeUrl per element), refactored elementsTestCases.js (added steps to all TCs, fixed linksTC wrong data, removed unused text_boxTC), wired InputPage.jsx to practiceResources
-- fix/login-ui-improvement ✅ — Login & Signup UI/UX + security overhaul (22/22 tasks): page bg gradient, soft card shadow, purple border, 44px inputs (dark mode styled), h1 semantic heading, subtitle contrast, button transitions + ArrowRight, icon glow ring, spacing rhythm, "Forgot Password?" link, "Remember Me" checkbox, confirm password field, password strength bar (4-level), show/hide password toggles, aria-describedby + aria-invalid, generic error messages (SEC-10), autocomplete="username", security headers in next.config.mjs (X-Frame-Options, HSTS, nosniff, Referrer-Policy, Permissions-Policy), page-specific metadata layouts, dark mode card + input refinements
+- fix/login-ui-improvement ✅ — Login & Signup UI/UX + security overhaul (22/22 tasks)
+- feat/habit-matrix ✅ — Recurring Habits tab redesign (20/20 tasks): removed Chart.js bar charts from HabitsView; added HabitMatrix component — interactive date-grid with Day/Week/Month view modes, per-habit checkbox rows using habitAppliesOnDate, clickable past/today cells, non-clickable future cells, blue ring on today, per-row 5px progress bar (purple → green at 100%), horizontal scroll for month view (28–31 cols), empty state
+- fix/ui-issue-all-pages 🔄 *(current)* — Study Tracker UI fixes: sidebar collapse toggle with auto-collapse on screens <lg, logout dropdown overflow fix (moved scroll to inner div, popup opens right of sidebar when collapsed), daily tracker dark mode removed (CSS var override to force light mode), analytics grid responsive (grid-cols-1 xl:grid-cols-2), HabitMatrix integrated, resolved UI button issues across all study-tracker pages
 
 ## Fonts used in study-tracker
 

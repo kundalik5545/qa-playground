@@ -19,6 +19,8 @@ Add new lessons at the top of the relevant section (newest first).
 
 | #   | Title                                                                | Section           | Date       |
 | --- | -------------------------------------------------------------------- | ----------------- | ---------- |
+| 022 | `overflow-y-auto` on a Flex Parent Clips Absolute Dropdowns          | UI / Styling      | 2026-03-27 |
+| 021 | CSS Variables Override Pattern for Forced Light Mode in Dark-Mode App | UI / Styling     | 2026-03-27 |
 | 020 | `replace_all` on className Won't Catch Variants With Extra Classes   | UI / Styling      | 2026-03-26 |
 | 019 | Security Headers Belong in `next.config.mjs` `headers()`, Not Pages  | Next.js / Vercel  | 2026-03-26 |
 | 018 | Metadata in a `"use client"` Page — Put It in a Sibling `layout.js`  | Next.js / Vercel  | 2026-03-26 |
@@ -40,6 +42,75 @@ Add new lessons at the top of the relevant section (newest first).
 | 002 | Prisma 7 + pnpm — `@prisma/client-runtime-utils` Not Found on Vercel | Database / Prisma | 2026-03-25 |
 | 001 | better-auth `useSession` Hitting `/get-session` Continuously         | Authentication    | 2026-03-25 |
 | 000 | RSC Prefetch Requests Flooding Edge Functions                        | Next.js / Vercel  | 2026-03-25 |
+
+---
+
+## UI / Styling
+
+---
+
+### Lesson 022 — `overflow-y-auto` on a Flex Parent Clips Absolute Dropdowns
+
+**Date:** 2026-03-27
+
+#### What Happened
+
+The Study Tracker sidebar footer had a profile dropdown (`position: absolute; bottom: calc(100% + 6px)`) inside a `<nav>` element that had `overflow-y: auto`. The dropdown was visually cut off — only the bottom portion showed because the nav's scroll container clipped anything that overflowed upward beyond the nav bounds.
+
+#### Why It Happens
+
+CSS `overflow: auto` (or `scroll`) creates a new **scroll/clip boundary**. Any absolutely positioned descendant that paints outside this boundary is clipped, even if it's visually "above" the container. This applies regardless of `z-index`.
+
+#### Fix
+
+Move the scrollable content to an **inner wrapper** with `overflow-y: auto` and `flex: 1; min-height: 0`. Keep the footer as a sibling `flex-shrink-0` element outside the scroll wrapper. The outer container (nav) becomes the positioning context without any overflow clipping.
+
+```jsx
+<nav className="flex flex-col h-full"> {/* no overflow here */}
+  <div className="flex-1 min-h-0 overflow-y-auto">  {/* scroll here */}
+    <ul>...</ul>
+  </div>
+  <div className="flex-shrink-0 relative">  {/* footer — dropdown can overflow freely */}
+    {/* absolute dropdown renders correctly */}
+  </div>
+</nav>
+```
+
+#### Additional Fix
+
+When the sidebar is collapsed (64px wide), `left-0 right-0` constrained the dropdown to 64px. Fixed by switching to `left: "100%"; marginLeft: 8; minWidth: 200` in collapsed mode so it pops out to the right of the sidebar.
+
+---
+
+### Lesson 021 — CSS Variables Override Pattern for Forced Light Mode
+
+**Date:** 2026-03-27
+
+#### What Happened
+
+A component in the Study Tracker (Daily Tracker page) needed to stay in light mode always, regardless of the site-wide dark/light theme toggle. shadcn/ui uses CSS variables (`--background`, `--foreground`, `--muted`, etc.) on `:root` for light and `.dark` for dark. Simply adding `bg-white` classes wasn't enough — shadcn Tabs, inputs, and other components still flipped to dark mode.
+
+#### Fix
+
+Override the CSS variables inline on the root container element of the component subtree. Any descendant that reads these vars (including shadcn primitives) will see the light-mode values:
+
+```jsx
+<div style={{
+  colorScheme: "light",
+  "--background": "0 0% 100%",
+  "--foreground": "222.2 47.4% 11.2%",
+  "--muted": "210 40% 96.1%",
+  "--muted-foreground": "215.4 16.3% 46.9%",
+  "--border": "214.3 31.8% 91.4%",
+  "--card": "0 0% 100%",
+  "--primary": "222.2 47.4% 11.2%",
+  "--secondary": "210 40% 96.1%",
+}}>
+  {/* All shadcn components here use light-mode vars */}
+</div>
+```
+
+The `colorScheme: "light"` also tells the browser to render native form controls (date inputs, scrollbars) in light mode.
 
 ---
 

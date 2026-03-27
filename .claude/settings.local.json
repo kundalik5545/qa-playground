@@ -39,7 +39,13 @@
       "Bash(mv alert.md alerts-dialogs.md)",
       "Bash(mv radio.md radio-checkbox.md)",
       "Bash(ls \"D:/new-playground/01_qa_playground/00_new-qa-playground/qa-playground/app/\\(Practice\\)/\")",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(wc -l \"d:/new-playground/01_qa_playground/00_new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/daily-tracker/_components/DailyTrackerView.jsx\")",
+      "Bash(find \"d:/new-playground/01_qa_playground/00_new-qa-playground/qa-playground/app/\\(study\\)/study-tracker\" -name \"*.css\" -type f)",
+      "Bash(ls -la \"d:/new-playground/01_qa_playground/00_new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/_components/\")",
+      "Bash(ls -la \"d:/new-playground/01_qa_playground/00_new-qa-playground/qa-playground/app/\\(study\\)/study-tracker/daily-tracker/\")",
+      "Bash(ls \"D:\\\\new-playground\\\\01_qa_playground\\\\00_new-qa-playground\\\\qa-playground\\\\app\\\\\\(Practice\\)\\\\learn\")",
+      "Bash(find D:new-playground01_qa_playground00_new-qa-playgroundqa-playgroundapp -path *qa-tools* -name page*)"
     ]
   }
 }

@@ -87,13 +87,13 @@ export default function RootLayout({ children }) {
           {/* Toaster Notifications */}
           <Toaster richColors position="bottom-center" />
 
-          {/* Vercel Analytics */}
-          <Analytics />
-
           {/* Footer */}
           <footer className="bg-[#F3F4F6] dark:bg-[#1F2227] p-1 pt-8">
             <Footer />
           </footer>
+
+          {/* Vercel Analytics */}
+          {/* <Analytics /> */}
         </ThemeProvider>
 
         {/* Umami Analytics */}
