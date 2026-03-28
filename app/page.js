@@ -296,7 +296,11 @@ const LandingPage = () => {
                 transaction management. Perfect for building and testing
                 end-to-end automation frameworks.
               </p>
-              <Link href="/bank" prefetch={false} aria-label="Open the Bank Demo application">
+              <Link
+                href="/bank"
+                prefetch={false}
+                aria-label="Open the Bank Demo application"
+              >
                 <Button className="w-full bg-teal-700 hover:bg-teal-800 text-white">
                   Open Bank App
                 </Button>
@@ -458,7 +462,7 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {/* QA Capture */}
             <a
-              href="https://chromewebstore.google.com/detail/jhgkhnokloeklnagbkgkgcfphafifefg?utm_source=item-share-cb"
+              href="/chrome/qa-capture"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Install QA Capture Chrome extension"
@@ -468,7 +472,10 @@ const LandingPage = () => {
                 <CardContent className="pt-0 flex flex-col h-full">
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                      <Chrome className="h-6 w-6 text-white" aria-hidden="true" />
+                      <Chrome
+                        className="h-6 w-6 text-white"
+                        aria-hidden="true"
+                      />
                     </div>
                     <Badge className="bg-emerald-500 text-white text-xs">
                       New
@@ -476,8 +483,9 @@ const LandingPage = () => {
                   </div>
                   <h3 className="font-semibold text-lg mb-1.5">QA Capture</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed flex-1">
-                    Capture screenshots continuously and export as HTML, Markdown,
-                    PDF, and more — right from your browser during test sessions.
+                    Capture screenshots continuously and export as HTML,
+                    Markdown, PDF, and more — right from your browser during
+                    test sessions.
                   </p>
                   <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
                     <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
@@ -494,7 +502,7 @@ const LandingPage = () => {
 
             {/* QA Playground Clipper */}
             <a
-              href="https://chromewebstore.google.com/detail/jegdkegbomfbmhhimfjgacdblcoodfpd?utm_source=item-share-cb"
+              href="/chrome/qa-clipper"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Install QA Playground Clipper Chrome extension"
@@ -504,7 +512,10 @@ const LandingPage = () => {
                 <CardContent className="pt-0 flex flex-col h-full">
                   <div className="flex items-start justify-between mb-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                      <Chrome className="h-6 w-6 text-white" aria-hidden="true" />
+                      <Chrome
+                        className="h-6 w-6 text-white"
+                        aria-hidden="true"
+                      />
                     </div>
                     <Badge className="bg-blue-500 text-white text-xs">
                       New
@@ -548,7 +559,13 @@ const LandingPage = () => {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 items-stretch">
             {featuresData.map((f, i) => (
-              <Link key={i} href={f.to} prefetch={false} aria-label={`Practice ${f.title}`} className="h-full">
+              <Link
+                key={i}
+                href={f.to}
+                prefetch={false}
+                aria-label={`Practice ${f.title}`}
+                className="h-full"
+              >
                 <Card className="p-5 shadow hover:shadow-md transition-shadow rounded-xl h-full group">
                   <CardContent className="pt-0 flex flex-col h-full">
                     <div className="flex items-start justify-between mb-4">
@@ -669,10 +686,7 @@ const LandingPage = () => {
       </section>
 
       {/* FAQ Section */}
-      <section
-        aria-label="Frequently asked questions"
-        className="py-14 px-4"
-      >
+      <section aria-label="Frequently asked questions" className="py-14 px-4">
         {/* FAQPage JSON-LD */}
         <script
           type="application/ld+json"
@@ -707,7 +721,6 @@ const LandingPage = () => {
           </Accordion>
         </div>
       </section>
-
     </div>
   );
 };

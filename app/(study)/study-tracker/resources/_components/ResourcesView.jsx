@@ -45,6 +45,10 @@ import {
   Copy,
   Check,
   KeyRound,
+  Camera,
+  Scissors,
+  Download,
+  Chrome,
 } from "lucide-react";
 import { useTracker } from "../../_components/StudyTrackerProvider";
 
@@ -315,6 +319,140 @@ export default function ResourcesView({ showToast }) {
 
   return (
     <div>
+      {/* ── CHROME EXTENSIONS BANNER ── */}
+      <div className="mb-6 rounded-2xl border border-[#e0e4f0] bg-gradient-to-br from-[#f0f4ff] to-[#faf5ff] overflow-hidden">
+        {/* Header row */}
+        <div className="flex items-center gap-2 px-5 pt-5 pb-3">
+          <div className="w-7 h-7 rounded-lg bg-blue-600 flex items-center justify-center flex-shrink-0">
+            <Chrome size={15} className="text-white" />
+          </div>
+          <span className="text-[0.72rem] font-bold uppercase tracking-widest text-blue-700">
+            QA Chrome Extensions
+          </span>
+          <span className="ml-auto text-[0.7rem] bg-blue-100 text-blue-600 font-semibold px-2 py-0.5 rounded-full">
+            Free
+          </span>
+        </div>
+
+        <p className="px-5 pb-4 text-[0.8rem] text-gray-500 leading-relaxed m-0">
+          Two browser extensions built for QA engineers — capture screenshots
+          and clip content directly from your browser.
+        </p>
+
+        {/* Extension cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-5 pb-5">
+          {/* QA Capture */}
+          <div className="bg-white rounded-xl border border-[#e9eaed] p-4 flex flex-col gap-3 hover:shadow-sm transition-shadow">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center flex-shrink-0">
+                <Camera size={18} className="text-blue-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-sm font-bold text-[#1f2937]">
+                    QA Capture
+                  </span>
+                  <span className="text-[0.65rem] font-bold uppercase tracking-wider bg-blue-50 text-blue-600 border border-blue-100 px-1.5 py-0.5 rounded-full">
+                    Screenshot
+                  </span>
+                </div>
+                <p className="text-[0.77rem] text-gray-500 m-0 mt-0.5 leading-relaxed">
+                  Capture screenshots continuously during testing. Name each
+                  step, then export the whole session as PDF, Markdown, or HTML.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature pills */}
+            <div className="flex flex-wrap gap-1.5">
+              {["Continuous capture", "Step naming", "PDF / MD / HTML", "Session history"].map(
+                (f) => (
+                  <span
+                    key={f}
+                    className="text-[0.67rem] bg-gray-50 border border-[#e9eaed] text-gray-500 px-2 py-0.5 rounded-full font-medium"
+                  >
+                    {f}
+                  </span>
+                )
+              )}
+            </div>
+
+            {/* CTAs */}
+            <div className="flex items-center gap-2 mt-auto pt-1">
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[0.78rem] font-semibold px-3 py-1.5 rounded-lg transition-colors no-underline"
+              >
+                <Download size={12} />
+                Install
+              </a>
+              <a
+                href="/chrome"
+                className="inline-flex items-center gap-1 text-[0.78rem] text-blue-600 hover:underline font-medium no-underline"
+              >
+                Learn more
+                <ExternalLink size={11} />
+              </a>
+            </div>
+          </div>
+
+          {/* QA Clipper */}
+          <div className="bg-white rounded-xl border border-[#e9eaed] p-4 flex flex-col gap-3 hover:shadow-sm transition-shadow">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center flex-shrink-0">
+                <Scissors size={18} className="text-violet-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="text-sm font-bold text-[#1f2937]">
+                    QA Clipper
+                  </span>
+                  <span className="text-[0.65rem] font-bold uppercase tracking-wider bg-violet-50 text-violet-600 border border-violet-100 px-1.5 py-0.5 rounded-full">
+                    Content Clip
+                  </span>
+                </div>
+                <p className="text-[0.77rem] text-gray-500 m-0 mt-0.5 leading-relaxed">
+                  Clip and save articles, docs, and resources from any webpage
+                  directly to your QA Playground resource library.
+                </p>
+              </div>
+            </div>
+
+            {/* Feature pills */}
+            <div className="flex flex-wrap gap-1.5">
+              {["One-click clip", "Auto-tag", "Save to library", "Works offline"].map(
+                (f) => (
+                  <span
+                    key={f}
+                    className="text-[0.67rem] bg-gray-50 border border-[#e9eaed] text-gray-500 px-2 py-0.5 rounded-full font-medium"
+                  >
+                    {f}
+                  </span>
+                )
+              )}
+            </div>
+
+            {/* CTAs */}
+            <div className="flex items-center gap-2 mt-auto pt-1">
+              <a
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 bg-violet-600 hover:bg-violet-700 text-white text-[0.78rem] font-semibold px-3 py-1.5 rounded-lg transition-colors no-underline"
+              >
+                <Download size={12} />
+                Install
+              </a>
+              <span className="text-[0.72rem] text-gray-400 font-medium">
+                Coming soon
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* ── TOP BAR ── */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-3">
