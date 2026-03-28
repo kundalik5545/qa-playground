@@ -9,7 +9,7 @@ export const basicDetails = {
 
 export const allUrls = {
   youtubeURL: "https://www.youtube.com/@qaplayground",
-  blogLink: "https://random-coders.vercel.app",
+  githubURL: "https://github.com/kundalik-dev",
 };
 
 export const socialHandles = {

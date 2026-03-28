@@ -133,18 +133,20 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
 
   return (
     <div className="max-w-[860px]">
-      {/* Header */}
-      <div className="mb-[22px]">
-        <div className="flex items-center justify-between flex-wrap gap-3">
+      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      <div className="mb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <h1 className="text-[1.75rem] font-bold tracking-[-0.7px] text-[#111827] m-0">
+            <h1 className="text-2xl sm:text-[1.75rem] font-bold tracking-[-0.7px] text-[#111827] m-0">
               Syllabus Manager
             </h1>
             <p className="text-gray-500 text-[0.9rem] mt-1 mb-0">
               Create, edit, and organise your study syllabi
             </p>
           </div>
-          <div className="flex gap-2 flex-wrap">
+
+          {/* Action buttons — 2-col grid on mobile, flex row on sm+ */}
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap gap-2">
             <Button
               size="sm"
               className="dark:text-white"
@@ -184,7 +186,7 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
             </Button>
             <Button
               size="sm"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              className="col-span-2 sm:col-span-1 bg-blue-600 hover:bg-blue-700 text-white"
               onClick={() => setShowNewForm((v) => !v)}
             >
               + New Syllabus
@@ -193,8 +195,8 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
         </div>
       </div>
 
-      {/* Tips banner */}
-      <div className="bg-[#fffbeb] border border-[#fcd34d] rounded-[10px] px-[14px] py-[11px] mb-[14px] flex gap-[10px]">
+      {/* ── Tips banner ─────────────────────────────────────────────────────── */}
+      <div className="bg-[#fffbeb] border border-[#fcd34d] rounded-[10px] px-3 sm:px-[14px] py-[11px] mb-[14px] flex gap-[10px]">
         <span className="text-base flex-shrink-0 mt-[1px]">💡</span>
         <div className="text-[0.8rem] text-[#78350f] leading-[1.6]">
           <div>
@@ -212,23 +214,20 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
           <div className="mt-1">
             <strong>Arrange:</strong> drag the{" "}
             <span className="font-bold tracking-[1px]">⠿</span> handle on any
-            card to reorder your syllabi however you like — the order is saved
-            automatically.
+            card to reorder your syllabi — the order is saved automatically.
           </div>
         </div>
       </div>
 
-      {/* New syllabus form */}
+      {/* ── New syllabus form ────────────────────────────────────────────────── */}
       {showNewForm && (
-        <div className="bg-white border-2 border-dashed border-[#c7d2fe] rounded-[14px] p-5 mb-[14px]">
+        <div className="bg-white border-2 border-dashed border-[#c7d2fe] rounded-[14px] p-4 sm:p-5 mb-[14px]">
           <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
             New Syllabus
           </h3>
-          <div className="flex gap-[10px] flex-wrap items-end">
-            <div
-              className="flex flex-col gap-1"
-              style={{ flex: 2, minWidth: 140 }}
-            >
+          <div className="flex flex-col gap-3">
+            {/* Name — full width */}
+            <div className="flex flex-col gap-1">
               <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
                 Name
               </span>
@@ -241,41 +240,46 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
                 }
               />
             </div>
-            <div className="flex flex-col gap-1 w-20">
-              <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
-                Icon
-              </span>
-              <input
-                className="w-full border border-[#e9eaed] rounded-lg px-[10px] py-[7px] font-[inherit] text-[1.2rem] text-center outline-none focus:border-blue-600 transition-colors bg-white"
-                maxLength={4}
-                value={newForm.icon}
-                onChange={(e) =>
-                  setNewForm((f) => ({ ...f, icon: e.target.value }))
-                }
-              />
-            </div>
-            <div className="flex flex-col gap-1">
-              <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
-                Color
-              </span>
-              <div className="flex gap-[5px] flex-wrap">
-                {COLORS.map((c) => (
-                  <div
-                    key={c}
-                    onClick={() => setNewForm((f) => ({ ...f, color: c }))}
-                    className="w-6 h-6 rounded-[6px] cursor-pointer transition-all"
-                    style={{
-                      background: c,
-                      border:
-                        newForm.color === c
-                          ? "3px solid #1f2937"
-                          : "2px solid transparent",
-                    }}
-                  />
-                ))}
+
+            {/* Icon + Color in a row */}
+            <div className="flex flex-wrap items-end gap-3">
+              <div className="flex flex-col gap-1 w-20">
+                <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
+                  Icon
+                </span>
+                <input
+                  className="w-full border border-[#e9eaed] rounded-lg px-[10px] py-[7px] font-[inherit] text-[1.2rem] text-center outline-none focus:border-blue-600 transition-colors bg-white"
+                  maxLength={4}
+                  value={newForm.icon}
+                  onChange={(e) =>
+                    setNewForm((f) => ({ ...f, icon: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
+                  Color
+                </span>
+                <div className="flex gap-[5px] flex-wrap">
+                  {COLORS.map((c) => (
+                    <div
+                      key={c}
+                      onClick={() => setNewForm((f) => ({ ...f, color: c }))}
+                      className="w-6 h-6 rounded-[6px] cursor-pointer transition-all"
+                      style={{
+                        background: c,
+                        border:
+                          newForm.color === c
+                            ? "3px solid #1f2937"
+                            : "2px solid transparent",
+                      }}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           </div>
+
           <div className="flex gap-2 mt-[14px]">
             <Button
               size="sm"
@@ -295,7 +299,7 @@ export default function SyllabusManagerView({ state, updateState, showToast }) {
         </div>
       )}
 
-      {/* Empty state */}
+      {/* ── Empty state ──────────────────────────────────────────────────────── */}
       {Object.keys(state.syllabi).length === 0 && (
         <div className="bg-white border-2 border-dashed border-[#e9eaed] rounded-[14px] p-9 text-center text-gray-400 text-[0.88rem]">
           No syllabi yet. Create one above!
@@ -361,7 +365,6 @@ function SyllabusList({
             dragIdx === idx && "opacity-45 scale-[0.98]",
           )}
         >
-          {/* Drop-above indicator */}
           {overIdx === idx && dragIdx !== null && dragIdx > idx && (
             <div className="h-[3px] rounded-full bg-blue-600 mx-1 mb-1" />
           )}
@@ -374,7 +377,6 @@ function SyllabusList({
             onDelete={() => deleteSyllabus(syl.id)}
             showToast={showToast}
           />
-          {/* Drop-below indicator */}
           {overIdx === idx && dragIdx !== null && dragIdx < idx && (
             <div className="h-[3px] rounded-full bg-blue-600 mx-1 mt-1" />
           )}
@@ -479,23 +481,24 @@ function SyllabusCard({
   return (
     <div className="bg-white border border-[#e9eaed] rounded-[14px] mb-[10px] overflow-hidden transition-shadow hover:shadow-[0_4px_18px_rgba(0,0,0,0.06)]">
       {/* Card header */}
-      <div className="flex items-center gap-[11px] px-[18px] py-[15px]">
+      <div className="flex flex-wrap items-center gap-x-[11px] gap-y-2 px-3 sm:px-[18px] py-3 sm:py-[15px]">
+        {/* Drag handle */}
         <span className="text-[1.1rem] text-gray-300 cursor-grab px-[2px] flex-shrink-0 select-none hover:text-gray-500 transition-colors leading-none active:cursor-grabbing">
           ⠿
         </span>
+        {/* Icon */}
         <span className="text-[1.4rem] flex-shrink-0">{syl.icon}</span>
+        {/* Title + subtitle */}
         <div className="flex-1 min-w-0">
-          <div
-            className="text-[0.97rem] font-bold"
-            style={{ color: syl.color }}
-          >
+          <div className="text-[0.97rem] font-bold truncate" style={{ color: syl.color }}>
             {syl.label}
           </div>
           <div className="text-[0.76rem] text-gray-400 mt-[2px]">
             {stats.total} topics · {syl.sections.length} sections
           </div>
         </div>
-        <div className="flex gap-[5px] flex-shrink-0 flex-wrap">
+        {/* Action buttons — wrap to new line on mobile via w-full sm:w-auto */}
+        <div className="flex gap-[5px] flex-wrap w-full sm:w-auto">
           <button className={mgr} onClick={onExport}>
             ⬇ Export
           </button>
@@ -510,14 +513,12 @@ function SyllabusCard({
 
       {/* Edit body */}
       {expanded && (
-        <div className="border-t border-[#f0f1f4] p-[18px]">
+        <div className="border-t border-[#f0f1f4] p-3 sm:p-[18px]">
           {/* Metadata form */}
-          <div className="bg-[#f8f9fc] border border-[#e9eaed] rounded-[10px] px-[15px] py-[13px] mb-[18px]">
-            <div className="flex gap-[10px] flex-wrap items-end">
-              <div
-                className="flex flex-col gap-1"
-                style={{ flex: 2, minWidth: 120 }}
-              >
+          <div className="bg-[#f8f9fc] border border-[#e9eaed] rounded-[10px] px-3 sm:px-[15px] py-3 sm:py-[13px] mb-[18px]">
+            <div className="flex flex-col gap-3">
+              {/* Name — full width */}
+              <div className="flex flex-col gap-1">
                 <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
                   Name
                 </span>
@@ -529,46 +530,50 @@ function SyllabusCard({
                   }
                 />
               </div>
-              <div className="flex flex-col gap-1 w-[72px]">
-                <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
-                  Icon
-                </span>
-                <input
-                  className="w-full border border-[#e9eaed] rounded-lg px-[9px] py-[6px] font-[inherit] text-[1.1rem] text-center outline-none focus:border-blue-600 transition-colors bg-white"
-                  maxLength={4}
-                  value={editMeta.icon}
-                  onChange={(e) =>
-                    setEditMeta((m) => ({ ...m, icon: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
-                  Color
-                </span>
-                <div className="flex gap-1 flex-wrap">
-                  {COLORS.map((c) => (
-                    <div
-                      key={c}
-                      onClick={() => setEditMeta((m) => ({ ...m, color: c }))}
-                      className="w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all"
-                      style={{
-                        background: c,
-                        border:
-                          editMeta.color === c
-                            ? "3px solid #1f2937"
-                            : "2px solid transparent",
-                      }}
-                    />
-                  ))}
+
+              {/* Icon + Color + Save in a row */}
+              <div className="flex flex-wrap items-end gap-3">
+                <div className="flex flex-col gap-1 w-[72px]">
+                  <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
+                    Icon
+                  </span>
+                  <input
+                    className="w-full border border-[#e9eaed] rounded-lg px-[9px] py-[6px] font-[inherit] text-[1.1rem] text-center outline-none focus:border-blue-600 transition-colors bg-white"
+                    maxLength={4}
+                    value={editMeta.icon}
+                    onChange={(e) =>
+                      setEditMeta((m) => ({ ...m, icon: e.target.value }))
+                    }
+                  />
                 </div>
+                <div className="flex flex-col gap-1">
+                  <span className="block text-[0.72rem] font-semibold text-gray-500 uppercase tracking-[0.5px]">
+                    Color
+                  </span>
+                  <div className="flex gap-1 flex-wrap">
+                    {COLORS.map((c) => (
+                      <div
+                        key={c}
+                        onClick={() => setEditMeta((m) => ({ ...m, color: c }))}
+                        className="w-[22px] h-[22px] rounded-[5px] cursor-pointer transition-all"
+                        style={{
+                          background: c,
+                          border:
+                            editMeta.color === c
+                              ? "3px solid #1f2937"
+                              : "2px solid transparent",
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <button
+                  className="border border-green-500 bg-green-500 text-white rounded-[7px] px-[10px] py-[5px] font-[inherit] text-[0.76rem] font-semibold cursor-pointer hover:bg-green-600 transition-all whitespace-nowrap"
+                  onClick={saveMeta}
+                >
+                  Save
+                </button>
               </div>
-              <button
-                className="border border-green-500 bg-green-500 text-white rounded-[7px] px-[10px] py-[5px] font-[inherit] text-[0.76rem] font-semibold cursor-pointer hover:bg-green-600 transition-all whitespace-nowrap"
-                onClick={saveMeta}
-              >
-                Save
-              </button>
             </div>
           </div>
 
@@ -593,7 +598,7 @@ function SyllabusCard({
           {/* Add section */}
           <div className="flex gap-[6px] mt-[10px] pt-[10px] border-t border-dashed border-[#e9eaed]">
             <input
-              className="flex-1 border border-[#e9eaed] rounded-lg px-[9px] py-[6px] font-[inherit] text-[0.82rem] text-[#374151] outline-none focus:border-blue-600 transition-colors bg-white"
+              className="flex-1 border border-[#e9eaed] rounded-lg px-[9px] py-[6px] font-[inherit] text-[0.82rem] text-[#374151] outline-none focus:border-blue-600 transition-colors bg-white min-w-0"
               placeholder="New section title…"
               value={newSecTitle}
               onChange={(e) => setNewSecTitle(e.target.value)}
@@ -624,14 +629,14 @@ function SectionEditor({
   return (
     <div className="border border-[#e9eaed] rounded-[10px] mb-[7px] overflow-hidden">
       <div className="flex items-center gap-[9px] px-[11px] py-2 bg-[#f8f9fc] border-b border-[#f0f1f4]">
-        <span className="flex-1 text-[0.86rem] font-semibold text-[#1f2937]">
+        <span className="flex-1 text-[0.86rem] font-semibold text-[#1f2937] min-w-0 truncate">
           {sec.title}
         </span>
-        <span className="text-[0.72rem] text-gray-400 font-mono">
+        <span className="text-[0.72rem] text-gray-400 font-mono whitespace-nowrap flex-shrink-0">
           {sec.topics.length} topics
         </span>
         <button
-          className="border border-[#e9eaed] bg-white rounded-[7px] px-2 py-[3px] font-[inherit] text-[0.72rem] font-semibold text-gray-500 cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all"
+          className="flex-shrink-0 border border-[#e9eaed] bg-white rounded-[7px] px-2 py-[3px] font-[inherit] text-[0.72rem] font-semibold text-gray-500 cursor-pointer hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all"
           onClick={onDeleteSection}
         >
           Delete
@@ -643,7 +648,7 @@ function SectionEditor({
             key={t.id}
             className="flex items-center gap-[7px] px-2 py-[5px] rounded-[7px] border border-[#f0f1f4] mb-1 bg-[#fafbfc]"
           >
-            <span className="flex-1 text-[0.82rem] text-[#374151]">
+            <span className="flex-1 text-[0.82rem] text-[#374151] min-w-0 break-words">
               {t.title}
             </span>
             <button
@@ -656,7 +661,7 @@ function SectionEditor({
         ))}
         <div className="flex gap-[5px] mt-[5px] pt-[6px] border-t border-dashed border-[#e9eaed]">
           <input
-            className="flex-1 border border-[#e9eaed] rounded-[7px] px-2 py-[5px] font-[inherit] text-[0.8rem] text-[#374151] outline-none focus:border-blue-600 transition-colors bg-white"
+            className="flex-1 border border-[#e9eaed] rounded-[7px] px-2 py-[5px] font-[inherit] text-[0.8rem] text-[#374151] outline-none focus:border-blue-600 transition-colors bg-white min-w-0"
             placeholder="New topic title…"
             value={newTopicTitle}
             onChange={(e) => setNewTopicTitle(e.target.value)}
@@ -668,7 +673,7 @@ function SectionEditor({
             }}
           />
           <button
-            className="border-none rounded-[7px] px-[10px] py-1 font-[inherit] text-[0.76rem] font-semibold text-white cursor-pointer hover:opacity-[0.88] transition-opacity whitespace-nowrap"
+            className="border-none rounded-[7px] px-[10px] py-1 font-[inherit] text-[0.76rem] font-semibold text-white cursor-pointer hover:opacity-[0.88] transition-opacity whitespace-nowrap flex-shrink-0"
             style={{ background: sylColor, borderColor: sylColor }}
             onClick={() => {
               onAddTopic(newTopicTitle);

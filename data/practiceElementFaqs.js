@@ -189,6 +189,36 @@ export const practiceElementFaqs = {
     },
   ],
 
+  "multi-select": [
+    {
+      q: "How do I select multiple options from a native HTML multi-select in Selenium?",
+      a: "Wrap the element with the Select class: Select select = new Select(driver.findElement(By.id('fruitMultiSelect'))). Then call selectByVisibleText() or selectByValue() for each option. To select non-contiguous options programmatically, use selectByVisibleText() repeatedly — Selenium handles the Ctrl+click internally. To get all selected options: select.getAllSelectedOptions().",
+    },
+    {
+      q: "How do I select multiple values in a multi-select with Playwright?",
+      a: "Use page.selectOption('selector', ['value1', 'value2', 'value3']) — pass an array of values, labels, or indices. Example: page.selectOption('#fruitMultiSelect', ['apple', 'banana']). To assert: await expect(page.locator('#fruitMultiSelect')).toHaveValues(['apple', 'banana']). This works only on native <select multiple> elements.",
+    },
+    {
+      q: "How do I automate checkbox-based multi-select components in Selenium or Playwright?",
+      a: "Checkboxes are individual input[type='checkbox'] elements — locate each by data-testid or id and call click() if not already checked. In Selenium: if (!checkbox.isSelected()) checkbox.click(). In Playwright: await page.check('[data-testid=\"tech-checkbox-react\"]') or await expect(locator).toBeChecked(). For chip/tag-based selects, treat each tag button as a clickable element.",
+    },
+  ],
+
+  "file-upload": [
+    {
+      q: "How do I upload a file using Selenium WebDriver?",
+      a: "Locate the file input (input[type='file']) and call sendKeys() with the absolute file path: driver.findElement(By.id('file-Upload')).sendKeys('/absolute/path/to/file.txt'). Do NOT click() the input first — sendKeys() handles the dialog automatically. On remote WebDriver, use setFileDetector: ((RemoteWebDriver) driver).setFileDetector(new LocalFileDetector()).",
+    },
+    {
+      q: "How do I upload a file in Playwright?",
+      a: "Use page.setInputFiles('selector', '/path/to/file.txt') or locator.setInputFiles(). You can also pass multiple files: page.setInputFiles('input[type=\"file\"]', ['file1.txt', 'file2.txt']). Playwright handles file dialogs automatically without needing to interact with OS-level dialogs. To clear a selection: page.setInputFiles('selector', []).",
+    },
+    {
+      q: "How do I verify a file download was triggered in Playwright?",
+      a: "Listen for the download event before clicking: const [download] = await Promise.all([page.waitForEvent('download'), page.click('[data-testid=\"btn-download-pdf\"]')]). Then use download.path() to get the local path or download.saveAs('./downloads/file.pdf'). In Selenium, configure ChromeOptions to set the download directory: options.addUserDataDir() or use the experimental prefs map.",
+    },
+  ],
+
   "dynamic-waits": [
     {
       q: "What is the difference between implicit wait and explicit wait in Selenium?",

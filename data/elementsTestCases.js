@@ -1084,6 +1084,69 @@ export const inputFieldTC = [
   },
 ];
 
+// ─── Multi-Select ─────────────────────────────────────────────────────────────
+
+export const multiSelectTC = [
+  {
+    TestId: "TC01",
+    TestCaseName: "Select multiple fruits using Ctrl+click in a native multi-select",
+    steps: [
+      "Navigate to /practice/multi-select",
+      "Locate the fruit multi-select using id='fruitMultiSelect' or data-testid='fruit-multi-select'",
+      "In Selenium: Select select = new Select(element); select.selectByVisibleText('Apple'); new Actions(driver).keyDown(Keys.CONTROL).click(driver.findElement(By.cssSelector('option[value=\"banana\"]'))).keyUp(Keys.CONTROL).perform()",
+      "In Playwright: page.selectOption('#fruitMultiSelect', ['apple', 'banana', 'grapes'])",
+      "Assert data-testid='fruit-selected-output' text contains 'apple' and 'banana'",
+    ],
+  },
+  {
+    TestId: "TC02",
+    TestCaseName: "Deselect a specific option from a pre-selected multi-select",
+    steps: [
+      "Navigate to /practice/multi-select",
+      "Locate the skills multi-select using data-testid='skills-multi-select'",
+      "Assert 'playwright' is pre-selected using getAllSelectedOptions()",
+      "In Selenium: Select.deselectByVisibleText('Playwright')",
+      "In Playwright: select only the remaining options — page.selectOption('#skillsMultiSelect', ['selenium', 'cypress'])",
+      "Assert data-testid='skills-selected-output' no longer contains 'playwright'",
+    ],
+  },
+  {
+    TestId: "TC03",
+    TestCaseName: "Select all countries using the Select All button",
+    steps: [
+      "Navigate to /practice/multi-select",
+      "Locate the 'Select All' button using data-testid='select-all-btn' and click it",
+      "Assert data-testid='country-count' text equals '6'",
+      "Click data-testid='deselect-all-btn'",
+      "Assert data-testid='country-count' text equals '0'",
+    ],
+  },
+  {
+    TestId: "TC04",
+    TestCaseName: "Check multiple checkboxes and verify selected output",
+    steps: [
+      "Navigate to /practice/multi-select",
+      "Locate checkboxes in data-testid='tech-checkbox-group'",
+      "Click data-testid='tech-checkbox-react' and data-testid='tech-checkbox-nextjs'",
+      "In Selenium: assert both checkboxes return isSelected() == true",
+      "In Playwright: await expect(page.locator('[data-testid=\"tech-checkbox-react\"]')).toBeChecked()",
+      "Assert data-testid='tech-selected-output' contains 'react' and 'nextjs'",
+    ],
+  },
+  {
+    TestId: "TC05",
+    TestCaseName: "Add a tag and then remove it from the chip-based multi-select",
+    steps: [
+      "Navigate to /practice/multi-select",
+      "Click data-testid='tag-option-selenium' to add the tag",
+      "Assert data-testid='tag-badge-selenium' is visible in the selected area",
+      "Assert data-testid='tag-count' text equals '1'",
+      "Click data-testid='remove-tag-selenium' to remove the tag",
+      "Assert data-testid='tag-count' text equals '0'",
+    ],
+  },
+];
+
 // ─── Dynamic Waits ────────────────────────────────────────────────────────────
 
 export const dynamicWaitsTC = [

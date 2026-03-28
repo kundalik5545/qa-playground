@@ -101,7 +101,7 @@ export const practiceResources = {
     difficulty: "Intermediate",
     difficultyColor: "yellow",
     timeMin: 12,
-    scenarioCount: 3,
+    scenarioCount: 5,
     youtubeUrl: "",
     relatedElements: ["dropdowns"],
   },

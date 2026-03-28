@@ -77,6 +77,7 @@ const learnLinks = [
 const companyLinks = [
   { href: "/about-us", label: "About Us" },
   { href: "/contact-us", label: "Contact Us" },
+  { href: "/raise-issue", label: "Raise an Issue" },
   { href: "/privacy-policy", label: "Privacy Policy" },
   { href: "/login", label: "Login" },
 ];
@@ -88,7 +89,7 @@ const socialLinks = [
     label: "YouTube",
   },
   {
-    href: "https://github.com/kundalik5545/qatesting",
+    href: "https://github.com/kundalik-dev",
     icon: <FaGithub size={18} />,
     label: "GitHub",
   },
@@ -264,7 +265,7 @@ const Footer = () => {
           <span>
             Built for QA Engineers by{" "}
             <Link
-              href={allUrls.blogLink}
+              href={allUrls.githubURL}
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#f18b42] hover:text-[#e07b35] transition-colors font-medium"

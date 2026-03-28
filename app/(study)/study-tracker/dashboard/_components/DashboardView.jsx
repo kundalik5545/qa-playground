@@ -471,7 +471,7 @@ export default function DashboardView({
       </div>
 
       {/* Syllabus overview cards */}
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3 mb-[22px]">
+      <div className="grid grid-cols-1 sm:grid-cols-4 xl:grid-cols-5 gap-3 mb-[22px]">
         <OverviewCard
           icon="🎯"
           label="Overall"
@@ -496,7 +496,7 @@ export default function DashboardView({
       </div>
 
       {/* Row 1: Today's Tasks doughnut + Daily Task Completion % line */}
-      <div className="grid grid-cols-[1fr_2fr] gap-[14px] mb-[14px]">
+      {/* <div className="grid grid-cols-[1fr_2fr] gap-[14px] mb-[14px]">
         <div className="bg-white border border-[#e9eaed] rounded-[14px] p-[18px_20px]">
           <h3 className="text-sm font-semibold text-[#374151] mb-[14px] mt-0">
             Today's Tasks
@@ -514,7 +514,7 @@ export default function DashboardView({
           </h3>
           <canvas ref={taskChartRef} height={110} />
         </div>
-      </div>
+      </div> */}
 
       {/* Row 2: Overall Progress doughnut + Topics Completed line */}
       <div className="grid grid-cols-[1fr_2fr] gap-[14px] mb-[14px]">
@@ -610,26 +610,40 @@ export default function DashboardView({
 function OverviewCard({ icon, label, pct, sub, color, onClick }) {
   return (
     <div
-      className="bg-white rounded-xl px-[14px] pt-4 pb-[14px] border border-[#e9eaed] border-t-[3px] cursor-pointer transition-all hover:shadow-[0_4px_18px_rgba(0,0,0,0.09)] hover:-translate-y-0.5"
-      style={{ borderTopColor: color }}
+      className="bg-white rounded-xl px-4 py-3 border border-[#e9eaed] border-l-[3px] cursor-pointer transition-all hover:shadow-[0_4px_18px_rgba(0,0,0,0.09)] hover:-translate-y-0.5"
+      style={{ borderLeftColor: color }}
       onClick={onClick}
     >
-      <div className="text-[1.6rem] mb-[10px]">{icon}</div>
-      <div className="text-[0.68rem] font-semibold text-gray-400 uppercase tracking-[0.8px] mb-[3px]">
-        {label}
-      </div>
-      <div
-        className="text-[1.9rem] font-bold tracking-[-1px] leading-[1.1] mb-[3px] font-mono"
-        style={{ color }}
-      >
-        {pct}%
-      </div>
-      <div className="text-[0.73rem] text-gray-400 mb-[10px]">{sub}</div>
-      <div className="h-1 bg-[#f0f1f4] rounded-full overflow-hidden">
+      <div className="flex items-center gap-3">
+        {/* Icon */}
         <div
-          className="h-full rounded-full transition-[width] duration-700"
-          style={{ width: `${pct}%`, background: color }}
-        />
+          className="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0"
+          style={{ background: color + "15" }}
+        >
+          {icon}
+        </div>
+
+        {/* Name · pct · bar · count */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center justify-between gap-2 mb-[6px]">
+            <span className="text-[0.82rem] font-semibold text-gray-600 truncate">
+              {label}
+            </span>
+            <span
+              className="text-[1.05rem] font-bold font-mono tracking-tight flex-shrink-0"
+              style={{ color }}
+            >
+              {pct}%
+            </span>
+          </div>
+          <div className="h-[5px] bg-[#f0f1f4] rounded-full overflow-hidden mb-[5px]">
+            <div
+              className="h-full rounded-full transition-[width] duration-700"
+              style={{ width: `${pct}%`, background: color }}
+            />
+          </div>
+          <div className="text-[0.72rem] text-gray-400">{sub}</div>
+        </div>
       </div>
     </div>
   );
