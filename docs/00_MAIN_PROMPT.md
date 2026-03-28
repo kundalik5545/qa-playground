@@ -1,12 +1,12 @@
 # MAIN Prompt
 
-Go through `20_HOME_PAGE_UI_IMPROVMENTS.md` file under `docs` folder and understand all requirment or changes. Then create a Tasks under `docs/tasks` folder.
+Go through `15_PRACTICE_COMPONENT_UI_STANDARD.md` file under `docs` folder and understand all requirment or changes. Then create a Tasks under `docs/tasks` folder.
 
 ## Rules
 
 - Ask questions only if required info is missing.
 - Read requirements doc → create tasks → execute → update progress as you go.
-- Naming convention for .md file in docs and tasks folder -> examples `20_HOME_PAGE_UI_IMPROVMENTS.md` for docs file and for task file `20_HOME_PAGE_UI_IMPROVMENTS_TASKS.md`
+- Naming convention for .md file in docs and tasks folder -> examples `15_PRACTICE_COMPONENT_UI_STANDARD.md` for docs file and for task file `15_PRACTICE_COMPONENT_UI_STANDARD_TASKS.md`
 - Use check box to mark tasks completion so user can know what done and what not.
 - Update progress as you work.
 - Update `public/github/branches-progress.md` with latest branch

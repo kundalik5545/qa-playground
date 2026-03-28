@@ -188,4 +188,72 @@ export const practiceElementFaqs = {
       a: "In Playwright, intercept the response directly: page.on('response', response => { if (response.url().includes('api/users')) expect(response.status()).toBe(201); }); In Selenium (Java), use RestAssured or Java's HttpURLConnection to make the request separately and assert the status code. The API Status Code Links section on this page triggers real HTTP requests you can intercept in your tests.",
     },
   ],
+
+  "dynamic-waits": [
+    {
+      q: "What is the difference between implicit wait and explicit wait in Selenium?",
+      a: "Implicit wait sets a global timeout for finding elements: driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10)). It applies to every findElement call. Explicit wait waits for a specific condition: new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.visibilityOf(element)). Explicit waits are preferred because they target exact conditions, making tests faster and more reliable. Never mix both in the same test — it causes unpredictable wait times.",
+    },
+    {
+      q: "How does Playwright handle waits differently from Selenium?",
+      a: "Playwright has built-in auto-waiting — before every action (click, fill, etc.) it waits for the element to be visible, stable, and enabled. You rarely need explicit waits. For specific conditions use: page.waitForSelector('selector', { state: 'visible' }), page.waitForTimeout(ms) (sparingly), or expect(locator).toBeVisible(). For network: page.waitForResponse() or page.waitForLoadState('networkidle').",
+    },
+    {
+      q: "How do I wait for a spinner or loading indicator to disappear in automation?",
+      a: "In Selenium: wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id('spinner'))). In Playwright: await page.waitForSelector('[data-testid=\"spinner\"]', { state: 'hidden' }) or await page.waitForSelector('[data-testid=\"spinner\"]', { state: 'detached' }). Always wait for the spinner to disappear before asserting page content — interacting while the page is loading leads to StaleElementReferenceException in Selenium or timing failures in Playwright.",
+    },
+  ],
+
+  "tabs-windows": [
+    {
+      q: "How do I switch between browser windows or tabs in Selenium WebDriver?",
+      a: "Use driver.getWindowHandles() to get a Set of all open window handles, then driver.switchTo().window(handle) to focus on a specific one. Always store the parent handle before opening new windows: String parent = driver.getWindowHandle(). After switching, call driver.switchTo().window(parent) to return. In Playwright, use context.pages() which returns an array of all open pages.",
+    },
+    {
+      q: "How do I wait for a new tab or popup to open in Playwright?",
+      a: "Use context.waitForEvent('page') alongside the click that triggers the new tab: const [newPage] = await Promise.all([context.waitForEvent('page'), page.click('selector')]). This ensures you capture the new page reference the moment it opens. Then call await newPage.waitForLoadState() before interacting with its content.",
+    },
+    {
+      q: "How do I close a specific tab and switch back to the parent in Selenium?",
+      a: "After switching to the child tab, call driver.close() to close only that tab. Then switch back to the parent: driver.switchTo().window(parentHandle). Never call driver.quit() here — that closes the entire browser. In Playwright, call newPage.close() on the page object and the original page remains active automatically.",
+    },
+  ],
+
+  "date-picker": [
+    {
+      q: "How do I fill a date input field using Selenium WebDriver?",
+      a: "Use sendKeys() with the date in YYYY-MM-DD format for <input type='date'> elements: element.sendKeys('2024-03-28'). If sendKeys doesn't work due to browser locale handling, use JavascriptExecutor: ((JavascriptExecutor) driver).executeScript(\"arguments[0].value='2024-03-28';\", element). Always verify the value with getAttribute('value') after setting it.",
+    },
+    {
+      q: "How do I set a date value in Playwright?",
+      a: "Use page.fill('selector', '2024-03-28') for <input type='date'> elements — Playwright automatically clears and fills the value. Alternatively use page.locator('selector').fill('2024-03-28'). To verify: await expect(page.locator('selector')).toHaveValue('2024-03-28'). The date must be in YYYY-MM-DD format regardless of the browser's display locale.",
+    },
+    {
+      q: "How do I verify that a date input enforces min and max date constraints in automation?",
+      a: "Read the min and max attributes: element.getAttribute('min') and element.getAttribute('max') in Selenium; page.getAttribute('selector', 'min') in Playwright. To assert the constraint is present: expect(locator).toHaveAttribute('min', '2024-01-01'). Note that HTML5 date constraints are enforced by the browser UI but not always by sendKeys — use getAttribute('validity') or check the value is clamped after input.",
+    },
+  ],
+
+  "data-table": [
+    {
+      q: "How do I read all rows from an HTML table in Selenium WebDriver?",
+      a: "Use driver.findElements(By.cssSelector('table tbody tr')) to get a list of all row elements. Then iterate over each row and call findElements(By.tagName('td')) to access individual cells. Example: List<WebElement> rows = driver.findElements(By.cssSelector('tbody tr')); for (WebElement row : rows) { List<WebElement> cells = row.findElements(By.tagName('td')); }",
+    },
+    {
+      q: "How do I locate a specific cell in an HTML table using XPath in Selenium?",
+      a: "Use XPath row/column indexing: driver.findElement(By.xpath('(//tbody/tr)[2]/td[3]')).getText() reads the 3rd cell of the 2nd row. To find a row by cell content: driver.findElement(By.xpath(\"//tbody/tr[td[text()='BookTitle']]\")). In Playwright: page.locator('tbody tr').nth(1).locator('td').nth(2).textContent().",
+    },
+    {
+      q: "How do I verify the number of rows in a data table in Playwright?",
+      a: "Use await expect(page.locator('tbody tr')).toHaveCount(10) to assert an exact count. For a minimum count assertion: const count = await page.locator('tbody tr').count(); expect(count).toBeGreaterThan(0). This is useful for verifying that an API-driven table has loaded its data before running further assertions.",
+    },
+    {
+      q: "How do I wait for a dynamically loaded table to finish rendering in automation?",
+      a: "In Playwright, use page.waitForSelector('tbody tr') which resolves when at least one row appears. In Selenium, use WebDriverWait: new WebDriverWait(driver, Duration.ofSeconds(10)).until(ExpectedConditions.presenceOfElementLocated(By.cssSelector('tbody tr'))). For API-driven tables like this one (fakerapi), always wait for a row to be present before asserting counts or cell values.",
+    },
+    {
+      q: "How do I filter table rows by text content in Playwright?",
+      a: "Use the filter option on a locator: page.locator('tbody tr').filter({ hasText: 'Fantasy' }) returns all rows containing the text 'Fantasy'. You can then assert the count or read specific cells from filtered rows. In Selenium, use XPath: driver.findElements(By.xpath(\"//tbody/tr[td[contains(text(),'Fantasy')]]\")).",
+    },
+  ],
 };

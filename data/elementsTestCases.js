@@ -1083,3 +1083,264 @@ export const inputFieldTC = [
     ],
   },
 ];
+
+// ─── Dynamic Waits ────────────────────────────────────────────────────────────
+
+export const dynamicWaitsTC = [
+  {
+    TestId: "TC01",
+    TestCaseName: "Wait for a delayed browser alert to appear and accept it",
+    steps: [
+      "Navigate to /practice/dynamic-waits",
+      "Locate the 'Trigger Delayed Alert' button using data-testid='btn-delayed-alert'",
+      "Click the button — an alert appears after a 2-second delay",
+      "In Selenium: WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5)); wait.until(ExpectedConditions.alertIsPresent()); driver.switchTo().alert().accept()",
+      "In Playwright: page.on('dialog', dialog => dialog.accept()); await page.click('[data-testid=\"btn-delayed-alert\"]')",
+      "Assert the alert was accepted without a timeout exception",
+    ],
+  },
+  {
+    TestId: "TC02",
+    TestCaseName: "Wait for a hidden element to become visible after a delay",
+    steps: [
+      "Navigate to /practice/dynamic-waits",
+      "Locate the 'Show Element' button using data-testid='btn-show-element'",
+      "Click the button — a text element appears after a 3-second delay",
+      "In Selenium: wait.until(ExpectedConditions.visibilityOfElementLocated(By.id('delayed-element')))",
+      "In Playwright: await page.waitForSelector('[data-testid=\"delayed-element\"]', { state: 'visible' })",
+      "Assert the element text is 'Element is now visible!' once it appears",
+    ],
+  },
+  {
+    TestId: "TC03",
+    TestCaseName: "Wait for a disabled button to become enabled",
+    steps: [
+      "Navigate to /practice/dynamic-waits",
+      "Locate the disabled button using data-testid='btn-enable-after-delay'",
+      "Assert the button is initially disabled using isEnabled() or toBeDisabled()",
+      "Click 'Activate Button' to start the countdown — button enables after 3 seconds",
+      "In Selenium: wait.until(ExpectedConditions.elementToBeClickable(By.id('btn-enable-after-delay')))",
+      "In Playwright: await expect(page.locator('[data-testid=\"btn-enable-after-delay\"]')).toBeEnabled()",
+    ],
+  },
+  {
+    TestId: "TC04",
+    TestCaseName: "Wait for loading text to change to a loaded state",
+    steps: [
+      "Navigate to /practice/dynamic-waits",
+      "Locate the 'Load Data' button using data-testid='btn-load-data'",
+      "Click the button — status text changes from 'Loading...' to 'Data Loaded!'",
+      "In Selenium: wait.until(ExpectedConditions.textToBePresentInElementLocated(By.id('load-status'), 'Data Loaded!'))",
+      "In Playwright: await expect(page.locator('[data-testid=\"load-status\"]')).toHaveText('Data Loaded!')",
+      "Assert the final text is 'Data Loaded!' and loading state is gone",
+    ],
+  },
+  {
+    TestId: "TC05",
+    TestCaseName: "Wait for a spinner to disappear before asserting completion",
+    steps: [
+      "Navigate to /practice/dynamic-waits",
+      "Locate the 'Start Spinner' button using data-testid='btn-start-spinner'",
+      "Click the button — a spinner appears and disappears after a delay",
+      "In Selenium: wait.until(ExpectedConditions.invisibilityOfElementLocated(By.id('spinner')))",
+      "In Playwright: await page.waitForSelector('[data-testid=\"spinner\"]', { state: 'hidden' })",
+      "Assert the spinner element is no longer visible and the done message appears",
+    ],
+  },
+];
+
+// ─── Tabs & Windows ──────────────────────────────────────────────────────────
+
+export const tabsWindowsTC = [
+  {
+    TestId: "TC01",
+    TestCaseName: "Open a link in a new tab and switch to it",
+    steps: [
+      "Navigate to /practice/tabs-windows",
+      "Locate the 'Open Home Page' button using data-testid='btn-open-home-tab'",
+      "Click the button — a new tab opens with the home page",
+      "In Selenium: String newTab = driver.getWindowHandles().stream().reduce((a, b) -> b).get(); driver.switchTo().window(newTab)",
+      "In Playwright: const [newPage] = await Promise.all([context.waitForEvent('page'), page.click('[data-testid=\"btn-open-home-tab\"]')])",
+      "Assert the new tab title contains 'QA Playground'",
+    ],
+  },
+  {
+    TestId: "TC02",
+    TestCaseName: "Open multiple windows and print all window titles",
+    steps: [
+      "Navigate to /practice/tabs-windows",
+      "Locate the 'Open Multiple Windows' button using data-testid='btn-open-multiple-windows'",
+      "Click the button — additional windows/tabs open",
+      "In Selenium: Set<String> handles = driver.getWindowHandles(); iterate and call driver.switchTo().window(handle); driver.getTitle()",
+      "In Playwright: const pages = context.pages(); for (const p of pages) console.log(await p.title())",
+      "Assert at least 2 window handles / pages exist after clicking",
+    ],
+  },
+  {
+    TestId: "TC03",
+    TestCaseName: "Switch back to the parent window after switching to child",
+    steps: [
+      "Navigate to /practice/tabs-windows",
+      "Store the parent window handle: String parent = driver.getWindowHandle()",
+      "Click 'Open Home Page' to open a child tab",
+      "Switch to the child tab and assert its title",
+      "Switch back: driver.switchTo().window(parent)",
+      "Assert the current page title matches the tabs-windows page title",
+    ],
+  },
+  {
+    TestId: "TC04",
+    TestCaseName: "Close the child window and verify focus returns to parent",
+    steps: [
+      "Navigate to /practice/tabs-windows",
+      "Open a child tab using the 'Open Home Page' button",
+      "Switch to the child tab",
+      "Close the child: driver.close() (Selenium) or newPage.close() (Playwright)",
+      "Switch back to parent: driver.switchTo().window(parentHandle)",
+      "Assert only one window handle remains and the parent page is active",
+    ],
+  },
+  {
+    TestId: "TC05",
+    TestCaseName: "Verify Ctrl+click opens a link in a new tab",
+    steps: [
+      "Navigate to /practice/tabs-windows",
+      "Locate any link on the page",
+      "In Selenium: new Actions(driver).keyDown(Keys.CONTROL).click(link).keyUp(Keys.CONTROL).perform()",
+      "In Playwright: page.click('a', { modifiers: ['Control'] })",
+      "Assert a new tab opens — driver.getWindowHandles().size() > 1 or context.pages().length > 1",
+    ],
+  },
+];
+
+// ─── Date Picker / Calendar ───────────────────────────────────────────────────
+
+export const datePickerTC = [
+  {
+    TestId: "TC01",
+    TestCaseName: "Fill today's date in the date input and verify the value",
+    steps: [
+      "Navigate to /practice/date-picker",
+      "Locate the today's date input using id='input-today-date' or data-testid='input-today-date'",
+      "In Selenium: element.sendKeys('2024-03-28') — format must be YYYY-MM-DD for type=date",
+      "In Playwright: page.fill('#input-today-date', '2024-03-28')",
+      "Assert getAttribute('value') returns '2024-03-28'",
+    ],
+  },
+  {
+    TestId: "TC02",
+    TestCaseName: "Enter a birthday date and assert the value is stored",
+    steps: [
+      "Navigate to /practice/date-picker",
+      "Locate the birthday input using id='input-birthday' or data-testid='input-birthday'",
+      "In Selenium: element.sendKeys('1995-06-15')",
+      "In Playwright: page.fill('#input-birthday', '1995-06-15')",
+      "Assert the input value attribute equals '1995-06-15'",
+    ],
+  },
+  {
+    TestId: "TC03",
+    TestCaseName: "Fill a date range — start date and end date",
+    steps: [
+      "Navigate to /practice/date-picker",
+      "Locate start date input using data-testid='input-date-start'",
+      "Fill with '2024-01-01' using sendKeys (Selenium) or fill() (Playwright)",
+      "Locate end date input using data-testid='input-date-end'",
+      "Fill with '2024-01-31' and assert both inputs hold the correct values",
+    ],
+  },
+  {
+    TestId: "TC04",
+    TestCaseName: "Verify date input rejects out-of-range date (min/max constraint)",
+    steps: [
+      "Navigate to /practice/date-picker",
+      "Locate the restricted date input using data-testid='input-date-restricted'",
+      "Attempt to set a date before the min date using sendKeys or fill()",
+      "In Playwright: await expect(page.locator('#input-date-restricted')).toHaveAttribute('min')",
+      "Assert the input enforces the min/max boundary — value should clamp or stay invalid",
+    ],
+  },
+  {
+    TestId: "TC05",
+    TestCaseName: "Clear a date input and verify it becomes empty",
+    steps: [
+      "Navigate to /practice/date-picker",
+      "Locate the today's date input using data-testid='input-today-date'",
+      "Fill it with any valid date first",
+      "In Selenium: element.clear() — in Playwright: page.fill('#input-today-date', '')",
+      "Assert getAttribute('value') returns an empty string",
+    ],
+  },
+];
+
+// ─── Data Table ───────────────────────────────────────────────────────────────
+
+export const dataTableTC = [
+  {
+    TestId: "TC01",
+    TestCaseName: "Verify all table column headers are present",
+    steps: [
+      "Navigate to /practice/data-table",
+      "Wait for the table to load (data fetched from external API)",
+      "In Selenium: driver.findElements(By.tagName('th')) — assert size equals 6",
+      "In Playwright: page.locator('table th').allInnerTexts()",
+      "Assert headers include: Sr No., Book Name, Book Genre, Book Author, Book ISBN, Book Published",
+    ],
+  },
+  {
+    TestId: "TC02",
+    TestCaseName: "Count the total number of rows in the data table",
+    steps: [
+      "Navigate to /practice/data-table",
+      "Wait for the table to finish loading (books data visible)",
+      "In Selenium: List<WebElement> rows = driver.findElements(By.cssSelector('tbody tr')) — assert rows.size() == 10",
+      "In Playwright: await expect(page.locator('tbody tr')).toHaveCount(10)",
+      "Assert exactly 10 data rows are present in the table body",
+    ],
+  },
+  {
+    TestId: "TC03",
+    TestCaseName: "Read a cell value from a specific row and column",
+    steps: [
+      "Navigate to /practice/data-table",
+      "Wait for table to load",
+      "In Selenium: driver.findElement(By.xpath('(//tbody/tr)[1]/td[2]')).getText()",
+      "In Playwright: page.locator('tbody tr').nth(0).locator('td').nth(1).textContent()",
+      "Assert the returned value is a non-empty string (book title)",
+    ],
+  },
+  {
+    TestId: "TC04",
+    TestCaseName: "Find a book row by author name using XPath or filter",
+    steps: [
+      "Navigate to /practice/data-table",
+      "Wait for table to load",
+      "Note the author name displayed in the 4th column of the first row",
+      "In Selenium: driver.findElement(By.xpath(\"//td[text()='\" + authorName + \"']\"))",
+      "In Playwright: page.locator('tbody tr').filter({ hasText: authorName })",
+      "Assert the matching row is found and visible",
+    ],
+  },
+  {
+    TestId: "TC05",
+    TestCaseName: "Verify the table is not empty after page load",
+    steps: [
+      "Navigate to /practice/data-table",
+      "Wait for the loading state to resolve (spinner or skeleton to disappear)",
+      "In Selenium: assert driver.findElements(By.cssSelector('tbody tr')).size() > 0",
+      "In Playwright: await expect(page.locator('tbody tr').first()).toBeVisible()",
+      "Assert at least one data row is visible in the table",
+    ],
+  },
+  {
+    TestId: "TC06",
+    TestCaseName: "Assert the ISBN column contains only string values",
+    steps: [
+      "Navigate to /practice/data-table",
+      "Wait for table to load",
+      "In Selenium: collect all 5th column (ISBN) cells with findElements(By.xpath('//tbody/tr/td[5]'))",
+      "Call getText() on each and assert each value is a non-empty string",
+      "In Playwright: page.locator('tbody tr td:nth-child(5)').allInnerTexts() — assert all are non-empty",
+    ],
+  },
+];

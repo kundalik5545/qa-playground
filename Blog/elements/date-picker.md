@@ -18,19 +18,20 @@ Native inputs can be automated with `sendKeys` / `fill`. Custom widgets require 
 
 ## Key Methods Summary
 
-| Scenario | Selenium (Java) | Playwright (JS) | Playwright (Python) |
-|---|---|---|---|
-| Set date | `sendKeys("YYYY-MM-DD")` | `fill("YYYY-MM-DD")` | `fill("YYYY-MM-DD")` |
-| Clear date | `clear()` | `fill("")` | `fill("")` |
-| Read value | `getAttribute("value")` | `toHaveValue("...")` | `to_have_value("...")` |
-| JS inject | `executeScript(...)` | `evaluate(...)` | `evaluate(...)` |
-| Navigate calendar | click arrow element | click arrow element | click arrow element |
+| Scenario          | Selenium (Java)          | Playwright (JS)      | Playwright (Python)    |
+| ----------------- | ------------------------ | -------------------- | ---------------------- |
+| Set date          | `sendKeys("YYYY-MM-DD")` | `fill("YYYY-MM-DD")` | `fill("YYYY-MM-DD")`   |
+| Clear date        | `clear()`                | `fill("")`           | `fill("")`             |
+| Read value        | `getAttribute("value")`  | `toHaveValue("...")` | `to_have_value("...")` |
+| JS inject         | `executeScript(...)`     | `evaluate(...)`      | `evaluate(...)`        |
+| Navigate calendar | click arrow element      | click arrow element  | click arrow element    |
 
 ---
 
 ## 1. Set a date on native input
 
 ### Selenium (Java)
+
 ```java
 WebElement dateInput = driver.findElement(By.id("dateInput"));
 dateInput.sendKeys("2025-06-15");
@@ -38,12 +39,14 @@ assertEquals("2025-06-15", dateInput.getAttribute("value"));
 ```
 
 ### Playwright (JS)
+
 ```js
 await page.fill("#dateInput", "2025-06-15");
 await expect(page.locator("#dateInput")).toHaveValue("2025-06-15");
 ```
 
 ### Playwright (Python)
+
 ```python
 page.fill("#dateInput", "2025-06-15")
 expect(page.locator("#dateInput")).to_have_value("2025-06-15")
@@ -54,6 +57,7 @@ expect(page.locator("#dateInput")).to_have_value("2025-06-15")
 ## 2. Clear a date and set a new one
 
 ### Selenium (Java)
+
 ```java
 WebElement dateInput = driver.findElement(By.id("dateInput"));
 dateInput.clear();
@@ -61,12 +65,14 @@ dateInput.sendKeys("2026-01-01");
 ```
 
 ### Playwright (JS)
+
 ```js
 await page.locator("#dateInput").fill("");
 await page.locator("#dateInput").fill("2026-01-01");
 ```
 
 ### Playwright (Python)
+
 ```python
 page.locator("#dateInput").fill("")
 page.locator("#dateInput").fill("2026-01-01")
@@ -79,6 +85,7 @@ page.locator("#dateInput").fill("2026-01-01")
 Some date pickers mark the input as `readOnly`. Use JavaScript to set the value and fire the change event.
 
 ### Selenium (Java)
+
 ```java
 JavascriptExecutor js = (JavascriptExecutor) driver;
 js.executeScript(
@@ -89,6 +96,7 @@ js.executeScript(
 ```
 
 ### Playwright (JS)
+
 ```js
 await page.evaluate(() => {
   const el = document.getElementById("dateInput");
@@ -98,6 +106,7 @@ await page.evaluate(() => {
 ```
 
 ### Playwright (Python)
+
 ```python
 page.evaluate("""() => {
     const el = document.getElementById('dateInput');
@@ -111,6 +120,7 @@ page.evaluate("""() => {
 ## 4. Navigate a custom calendar widget
 
 ### Selenium (Java)
+
 ```java
 // Open the calendar
 driver.findElement(By.id("calendarTrigger")).click();
@@ -126,6 +136,7 @@ assertFalse(driver.findElement(By.id("selectedDateDisplay")).getText().isEmpty()
 ```
 
 ### Playwright (JS)
+
 ```js
 await page.getByTestId("calendarTrigger").click();
 await page.getByTestId("calendar-next").click();
@@ -134,6 +145,7 @@ await expect(page.locator("#selectedDateDisplay")).not.toBeEmpty();
 ```
 
 ### Playwright (Python)
+
 ```python
 page.get_by_test_id("calendarTrigger").click()
 page.get_by_test_id("calendar-next").click()
@@ -146,6 +158,7 @@ expect(page.locator("#selectedDateDisplay")).not_to_be_empty()
 ## 5. Verify a date is disabled in the calendar
 
 ### Selenium (Java)
+
 ```java
 driver.findElement(By.id("calendarTrigger")).click();
 WebElement pastDay = driver.findElement(By.cssSelector("[data-day='2020-01-01']"));
@@ -153,15 +166,18 @@ assertEquals("true", pastDay.getAttribute("aria-disabled"));
 ```
 
 ### Playwright (JS)
+
 ```js
 await page.getByTestId("calendarTrigger").click();
-await expect(page.locator("[data-day='2020-01-01']")).toHaveAttribute("aria-disabled", "true");
+await expect(page.locator("[data-day='2020-01-01']")).toHaveAttribute(
+  "aria-disabled",
+  "true",
+);
 ```
 
 ### Playwright (Python)
+
 ```python
 page.get_by_test_id("calendarTrigger").click()
 expect(page.locator("[data-day='2020-01-01']")).to_have_attribute("aria-disabled", "true")
 ```
-
-> 📄 **Also Read:** [Top 10 Best Automation Practice Website](https://www.qaplayground.com/blog/top-10-best-automation-practice-website)
