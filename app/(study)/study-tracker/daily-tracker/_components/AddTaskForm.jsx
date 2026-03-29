@@ -4,10 +4,10 @@
  * AddTaskForm
  * -----------
  * The input row at the bottom of the task panel.
- * Task name and time (min) are both required.
+ * Task name is required; time (min) is optional.
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 
 const INPUT_CLS =
@@ -17,15 +17,14 @@ const TIME_CLS =
 
 export default function AddTaskForm({ title, time, setTitle, setTime, onAdd }) {
   const [titleError, setTitleError] = useState(false);
-  const [timeError, setTimeError] = useState(false);
+  const titleRef = useRef(null);
 
   function handleAdd() {
     const hasTitleErr = !title.trim();
-    const hasTimeErr = !time || Number(time) <= 0;
     setTitleError(hasTitleErr);
-    setTimeError(hasTimeErr);
-    if (hasTitleErr || hasTimeErr) return;
+    if (hasTitleErr) return;
     onAdd();
+    titleRef.current?.focus();
   }
 
   function handleKeyDown(e) {
@@ -33,7 +32,7 @@ export default function AddTaskForm({ title, time, setTitle, setTime, onAdd }) {
   }
 
   return (
-    <div className="border-t border-gray-100 px-[13px] pt-[10px] pb-[11px]">
+    <div className="px-5 pt-3 pb-3">
       {/* Input row */}
       <div className="flex gap-[7px] flex-wrap items-start">
         {/* Task title */}
@@ -45,6 +44,7 @@ export default function AddTaskForm({ title, time, setTitle, setTime, onAdd }) {
             <span className="text-red-500 text-[0.67rem] font-bold">*</span>
           </div>
           <input
+            ref={titleRef}
             className={cn(INPUT_CLS, titleError && "border-red-400 focus:border-red-400")}
             placeholder="Add a one-off task..."
             value={title}
@@ -59,28 +59,23 @@ export default function AddTaskForm({ title, time, setTitle, setTime, onAdd }) {
           )}
         </div>
 
-        {/* Time in minutes */}
+        {/* Time in minutes (optional) */}
         <div className="flex flex-col w-20 shrink-0">
           <div className="flex items-center gap-1 mb-[3px]">
             <span className="text-[0.67rem] font-semibold text-gray-400 uppercase tracking-[0.4px]">
               Min
             </span>
-            <span className="text-red-500 text-[0.67rem] font-bold">*</span>
+            <span className="text-[0.67rem] text-gray-300 font-normal">(opt)</span>
           </div>
           <input
             type="number"
-            className={cn(TIME_CLS, timeError && "border-red-400 focus:border-red-400")}
+            className={TIME_CLS}
             placeholder="30"
             min={1}
             value={time}
-            onChange={(e) => {
-              setTimeError(false);
-              setTime(e.target.value);
-            }}
+            onChange={(e) => setTime(e.target.value)}
+            onKeyDown={handleKeyDown}
           />
-          {timeError && (
-            <span className="text-[0.65rem] text-red-500 mt-[2px]">Required</span>
-          )}
         </div>
 
         {/* Submit button — aligned to input row */}

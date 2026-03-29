@@ -254,7 +254,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
   return (
     // Force light mode regardless of the site-wide dark/light theme
-    <div style={LIGHT_MODE_STYLE} className="max-w-[1280px]">
+    <div style={LIGHT_MODE_STYLE} className="w-full">
       {/* Page header */}
       <div className="mb-[22px]">
         <div className="flex items-center justify-between flex-wrap gap-3">
@@ -290,29 +290,24 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
         {/* ── Tasks tab ── */}
         <TabsContent value="tasks" className="mt-4">
-          <div className="flex flex-col gap-[18px]">
-            {/* Date strip + task panel — natural width, not stretched */}
-            <div>
-              <DateNavigator
-                state={state}
-                selectedDate={selectedDate}
-                onSelectDate={setSelectedDate}
-              />
-              <TaskList
-                state={state}
-                selectedDate={selectedDate}
-                onToggleHabit={toggleHabit}
-                onToggleTask={toggleTask}
-                onDeleteTask={deleteTask}
-                newTaskTitle={newTaskTitle}
-                setNewTaskTitle={setNewTaskTitle}
-                newTaskTime={newTaskTime}
-                setNewTaskTime={setNewTaskTime}
-                onAddTask={addTask}
-              />
-            </div>
-
-            {/* Analytics panel — full width below the task card */}
+          <div className="flex flex-col gap-4">
+            <DateNavigator
+              state={state}
+              selectedDate={selectedDate}
+              onSelectDate={setSelectedDate}
+            />
+            <TaskList
+              state={state}
+              selectedDate={selectedDate}
+              onToggleHabit={toggleHabit}
+              onToggleTask={toggleTask}
+              onDeleteTask={deleteTask}
+              newTaskTitle={newTaskTitle}
+              setNewTaskTitle={setNewTaskTitle}
+              newTaskTime={newTaskTime}
+              setNewTaskTime={setNewTaskTime}
+              onAddTask={addTask}
+            />
             <AnalyticsPanel
               state={state}
               updateState={updateState}
