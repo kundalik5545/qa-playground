@@ -51,3 +51,5 @@ For daily tracker page do analysis using for below suggetions and then create pl
 create new page pending todos where show all the todos those are not completed in table format. Show new field `reason` for each todo and its not required field. Table should have date and todo filter. Create api routes and logic with proper response for each error and success. Update prisma model to fit new column to store reason. Put that tab after reucurring habits tabs. Also show checkbox to mark it complete. Also show table in todays date first then yesterday date likewise.
 
 ## Prompt 6 - todos - 29 march 2026
+
+fix login flow issues
