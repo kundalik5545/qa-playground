@@ -28,6 +28,18 @@ import {
 } from "@/lib/studyTrackerStorage";
 import CompletionRateChart from "../charts/CompletionRateChart";
 import HabitMatrix from "../habbits/HabitMatrix";
+import { parseTimeSlot } from "../TimeSlotPicker";
+
+function timeSlotToMin(timeSlot) {
+  if (!timeSlot) return Infinity;
+  const { fromHour, fromMin, fromPeriod } = parseTimeSlot(timeSlot);
+  if (!fromHour) return Infinity;
+  let h = parseInt(fromHour);
+  const m = parseInt(fromMin || "0");
+  if (fromPeriod === "PM" && h !== 12) h += 12;
+  if (fromPeriod === "AM" && h === 12) h = 0;
+  return h * 60 + m;
+}
 
 export default function AnalyticsPanel({ state, updateState, selectedDate }) {
   const [viewMode, setViewMode] = useState("month");
@@ -154,7 +166,9 @@ export default function AnalyticsPanel({ state, updateState, selectedDate }) {
           <p className="text-sm text-gray-400">No habits yet.</p>
         ) : (
           <div className="flex flex-col gap-1">
-            {state.habits.map((habit) => {
+            {[...state.habits]
+              .sort((a, b) => timeSlotToMin(a.timeSlot) - timeSlotToMin(b.timeSlot))
+              .map((habit) => {
               const today = getTodayStr();
               const applicable = dateRange.filter(
                 (d) => d <= today && habitAppliesOnDate(habit, d),

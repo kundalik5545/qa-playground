@@ -19,8 +19,21 @@ import {
 } from "@/lib/studyTrackerStorage";
 import { CHECK_SVG } from "./_constants";
 import AddTaskForm from "./AddTaskForm";
+import { parseTimeSlot } from "./TimeSlotPicker";
 
 // ── small helpers ────────────────────────────────────────────────────────────
+
+/** Convert a timeSlot string to minutes-since-midnight for sorting. No slot → Infinity (goes last). */
+function timeSlotToMin(timeSlot) {
+  if (!timeSlot) return Infinity;
+  const { fromHour, fromMin, fromPeriod } = parseTimeSlot(timeSlot);
+  if (!fromHour) return Infinity;
+  let h = parseInt(fromHour);
+  const m = parseInt(fromMin || "0");
+  if (fromPeriod === "PM" && h !== 12) h += 12;
+  if (fromPeriod === "AM" && h === 12) h = 0;
+  return h * 60 + m;
+}
 
 function ProgressBar({ done, total, color = "#2563eb" }) {
   const pct = total ? Math.round((done / total) * 100) : 0;
@@ -61,9 +74,9 @@ export default function TaskList({
   const today = getTodayStr();
 
   const tasks = state.daily[selectedDate] || [];
-  const habits = state.habits.filter((h) =>
-    habitAppliesOnDate(h, selectedDate),
-  );
+  const habits = state.habits
+    .filter((h) => habitAppliesOnDate(h, selectedDate))
+    .sort((a, b) => timeSlotToMin(a.timeSlot) - timeSlotToMin(b.timeSlot));
 
   const completedTasks = tasks.filter((t) => t.done).length;
   const completedHabits = habits.filter(

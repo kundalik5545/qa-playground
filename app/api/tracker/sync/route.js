@@ -90,12 +90,14 @@ export async function POST(request) {
               title: task.title,
               done: task.done ?? false,
               timeMin: task.timeMin ?? 0,
+              reason: task.reason ?? null,
             },
             update: {
               date,
               title: task.title,
               done: task.done ?? false,
               timeMin: task.timeMin ?? 0,
+              reason: task.reason ?? null,
             },
           });
         }

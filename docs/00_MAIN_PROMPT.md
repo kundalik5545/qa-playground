@@ -26,7 +26,7 @@ Fix the UI issue on daily tracker page. For screen small than XL arrange analyti
 
 I want trigger at top to collapse sidebar of study-tracker page. On Collapse right side main container should take full widht. And left side sidebar should show icons only.
 
-## Prompt 3 - Sidebar collapse - 27 march 2026
+## Prompt 4 - Sidebar collapse - 27 march 2026
 
 For daily tracker page do analysis using for below suggetions and then create plan in docs folder with id 19.
 
@@ -45,3 +45,9 @@ For daily tracker page do analysis using for below suggetions and then create pl
 - For completion rate chart should show data in sync with habit tracker chart like filter from habit tracker can change completion rate chart.
 - Also remove progress chart from Habit tracker end and show below completion rate with there respective progress and habbit infront of it als for this show time slot infront of habbit names (in nice ui way)
 - Remove weekly/monthly filter from analytics card which is present at top. Add habit tracjer filter there and update below charts as per those filters including top cards of items done, total items, completion, time done.
+
+## Prompt 5 - Pending todos - 29 march 2026
+
+create new page pending todos where show all the todos those are not completed in table format. Show new field `reason` for each todo and its not required field. Table should have date and todo filter. Create api routes and logic with proper response for each error and success. Update prisma model to fit new column to store reason. Put that tab after reucurring habits tabs. Also show checkbox to mark it complete. Also show table in todays date first then yesterday date likewise.
+
+## Prompt 6 - todos - 29 march 2026

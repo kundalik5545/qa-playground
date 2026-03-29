@@ -18,12 +18,25 @@ import TimeSlotPicker, { buildTimeSlot, computeToTime, parseTimeSlot } from "../
 const CELL_INPUT =
   "w-full border border-[#e9eaed] rounded-[6px] px-2 py-[5px] font-[inherit] text-[0.8rem] text-[#374151] outline-none focus:border-blue-500 transition-colors bg-white";
 
+function timeSlotToMin(timeSlot) {
+  if (!timeSlot) return Infinity;
+  const { fromHour, fromMin, fromPeriod } = parseTimeSlot(timeSlot);
+  if (!fromHour) return Infinity;
+  let h = parseInt(fromHour);
+  const m = parseInt(fromMin || "0");
+  if (fromPeriod === "PM" && h !== 12) h += 12;
+  if (fromPeriod === "AM" && h === 12) h = 0;
+  return h * 60 + m;
+}
+
 export default function HabitList({ state, onUpdateHabit, onDeleteHabit }) {
   const [editId, setEditId] = useState(null);
   const [editValues, setEditValues] = useState({});
   const [editErrors, setEditErrors] = useState({});
 
-  const habits = state.habits || [];
+  const habits = [...(state.habits || [])].sort(
+    (a, b) => timeSlotToMin(a.timeSlot) - timeSlotToMin(b.timeSlot),
+  );
 
   function startEdit(habit) {
     // parseTimeSlot only returns from* — To is always re-derived from From + timeMin

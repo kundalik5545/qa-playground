@@ -46,6 +46,7 @@ import DateNavigator from "./DateNavigator";
 import TaskList from "./TaskList";
 import AnalyticsPanel from "./analytics/AnalyticsPanel";
 import HabitsTab from "./habbits/HabitsTab";
+import PendingTodosView from "./PendingTodosView";
 import { Import } from "lucide-react";
 import { ArrowBigUp } from "lucide-react";
 import { ArrowBigDown } from "lucide-react";
@@ -286,6 +287,7 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
         <TabsList>
           <TabsTrigger value="tasks">📋 Daily Tasks</TabsTrigger>
           <TabsTrigger value="habits">🔄 Recurring Habits</TabsTrigger>
+          <TabsTrigger value="pending">⏳ Pending Todos</TabsTrigger>
         </TabsList>
 
         {/* ── Tasks tab ── */}
@@ -326,6 +328,15 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
             state={state}
             onUpdateHabit={updateHabit}
             onDeleteHabit={deleteHabit}
+          />
+        </TabsContent>
+
+        {/* ── Pending Todos tab ── */}
+        <TabsContent value="pending" className="mt-4">
+          <PendingTodosView
+            state={state}
+            updateState={updateState}
+            showToast={showToast}
           />
         </TabsContent>
       </Tabs>
