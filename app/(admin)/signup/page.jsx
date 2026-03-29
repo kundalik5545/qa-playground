@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,9 @@ export default function SignUpPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false); // T16
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [registered, setRegistered] = useState(false);
+  const [countdown, setCountdown] = useState(5);
+  const countdownRef = useRef(null);
 
   const passwordStrength = getPasswordStrength(password);
   const { label, barWidth, barColor } = strengthConfig[passwordStrength];
@@ -93,9 +96,24 @@ export default function SignUpPage() {
       return;
     }
 
-    router.push("/study-tracker/dashboard");
     setLoading(false);
+    setRegistered(true);
+
+    // Auto-redirect to /login after 5 s
+    let secs = 5;
+    countdownRef.current = setInterval(() => {
+      secs -= 1;
+      setCountdown(secs);
+      if (secs <= 0) {
+        clearInterval(countdownRef.current);
+        router.push("/login");
+      }
+    }, 1000);
   };
+
+  useEffect(() => {
+    return () => clearInterval(countdownRef.current);
+  }, []);
 
   return (
     <div
@@ -110,21 +128,63 @@ export default function SignUpPage() {
           <CardHeader className="text-center space-y-2" id="signup-header">
             <div className="flex justify-center mb-4">
               <div className="p-3 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full shadow-[0_4px_12px_rgba(124,58,237,0.25)] ring-[6px] ring-violet-500/[0.12]">
-                <UserPlus className="h-7 w-7 text-white" />
+                {registered
+                  ? <span className="text-2xl leading-none">📧</span>
+                  : <UserPlus className="h-7 w-7 text-white" />
+                }
               </div>
             </div>
             <h1 className="text-3xl font-bold gradient-title" id="signup-title">
-              Create Account
+              {registered ? "Check your email" : "Create Account"}
             </h1>
             <CardDescription
               className="text-slate-500 dark:text-gray-400"
               id="signup-subtitle"
             >
-              QA PlayGround — join to track your progress
+              {registered
+                ? "We sent a verification link to your inbox"
+                : "QA PlayGround — join to track your progress"}
             </CardDescription>
           </CardHeader>
 
           <CardContent id="signup-content">
+            {registered ? (
+              <div
+                className="text-center space-y-4 py-2"
+                id="signup-success"
+                data-testid="signup-success"
+              >
+                <p className="text-slate-700 dark:text-gray-300">
+                  A verification link has been sent to{" "}
+                  <span className="font-semibold text-violet-600 dark:text-violet-400">
+                    {email}
+                  </span>
+                  .
+                </p>
+                <p className="text-sm text-slate-500 dark:text-gray-400">
+                  Click the link in the email to activate your account, then sign in.
+                </p>
+                <p className="text-xs text-slate-400 dark:text-gray-500">
+                  Didn&apos;t receive it? Check your spam folder.
+                </p>
+                <div className="pt-2">
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center justify-center w-full h-11 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium transition-all duration-200"
+                    data-testid="go-to-login-btn"
+                  >
+                    Go to sign in
+                  </Link>
+                  <p className="text-xs text-slate-400 dark:text-gray-500 mt-3">
+                    Redirecting automatically in{" "}
+                    <span className="font-semibold text-violet-500" data-testid="redirect-countdown">
+                      {countdown}s
+                    </span>
+                    …
+                  </p>
+                </div>
+              </div>
+            ) : (
             <form
               onSubmit={handleSubmit}
               id="signup-form"
@@ -348,9 +408,10 @@ export default function SignUpPage() {
                 </Button>
               </div>
             </form>
+            )}
           </CardContent>
 
-          <CardFooter className="justify-center pb-6" id="signup-footer">
+          {!registered && <CardFooter className="justify-center pb-6" id="signup-footer">
             <p className="text-sm text-slate-500 dark:text-gray-400 mt-2">
               Already have an account?{" "}
               <Link
@@ -362,7 +423,7 @@ export default function SignUpPage() {
                 Sign in
               </Link>
             </p>
-          </CardFooter>
+          </CardFooter>}
         </Card>
       </div>
     </div>
