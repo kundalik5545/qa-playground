@@ -2,6 +2,47 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+const MAX_ARRAY_ITEMS = 5_000;
+const MAX_PAYLOAD_BYTES = 1 * 1024 * 1024; // 1 MB
+
+function isPlainObject(v) {
+  return v !== null && typeof v === "object" && !Array.isArray(v);
+}
+
+function bad(error) {
+  return NextResponse.json({ error }, { status: 400 });
+}
+
+function validateFullState(fullState) {
+  if (!isPlainObject(fullState))
+    return "fullState must be a plain object";
+
+  const keys = ["daily", "habits", "habitLog", "progress", "subtopics", "syllabi", "log"];
+  for (const key of keys) {
+    const val = fullState[key];
+    if (val === undefined || val === null) continue;
+    if (typeof val !== "object")
+      return `"${key}" must be an array or object, got ${typeof val}`;
+  }
+
+  const { habits, log, daily } = fullState;
+
+  if (Array.isArray(habits) && habits.length > MAX_ARRAY_ITEMS)
+    return `"habits" exceeds ${MAX_ARRAY_ITEMS} item limit (got ${habits.length})`;
+
+  if (Array.isArray(log) && log.length > MAX_ARRAY_ITEMS)
+    return `"log" exceeds ${MAX_ARRAY_ITEMS} item limit (got ${log.length})`;
+
+  if (isPlainObject(daily)) {
+    for (const [date, tasks] of Object.entries(daily)) {
+      if (Array.isArray(tasks) && tasks.length > MAX_ARRAY_ITEMS)
+        return `"daily.${date}" exceeds ${MAX_ARRAY_ITEMS} item limit (got ${tasks.length})`;
+    }
+  }
+
+  return null; // valid
+}
+
 /**
  * POST /api/tracker/sync
  * Body: { fullState: { syllabi?, progress?, subtopics?, daily?, habits?, habitLog?, log? } }
@@ -17,10 +58,24 @@ export async function POST(request) {
   if (!userId)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Payload size guard — check Content-Length before parsing
+  const contentLength = Number(request.headers.get("content-length") || 0);
+  if (contentLength > MAX_PAYLOAD_BYTES)
+    return bad("Payload exceeds 1MB limit");
+
   const body = await request.json();
   const { fullState } = body;
   if (!fullState)
     return NextResponse.json({ error: "fullState required" }, { status: 400 });
+
+  // Payload size guard — fallback for requests without Content-Length
+  const payloadSize = Buffer.byteLength(JSON.stringify(fullState), "utf8");
+  if (payloadSize > MAX_PAYLOAD_BYTES)
+    return bad("Payload exceeds 1MB limit");
+
+  // Structure validation
+  const validationError = validateFullState(fullState);
+  if (validationError) return bad(validationError);
 
   const { syllabi, progress, subtopics, daily, habits, habitLog, log } =
     fullState;

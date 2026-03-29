@@ -19,10 +19,11 @@ async function resolveUserId(request) {
     const key = authHeader.slice(7).trim();
     const apiKey = await prisma.apiKey.findUnique({
       where: { key },
-      select: { userId: true },
+      select: { userId: true, expiresAt: true },
     });
-    if (apiKey) return apiKey.userId;
-    return null;
+    if (!apiKey) return null;
+    if (apiKey.expiresAt && apiKey.expiresAt < new Date()) return null;
+    return apiKey.userId;
   }
 
   // 2. Session auth (for QA Playground website)

@@ -105,10 +105,16 @@ export default function DailyTrackerView({ state, updateState, showToast }) {
 
   /** Remove a task by its list index */
   const deleteTask = (index) => {
-    const tasks = (state.daily[selectedDate] || []).filter(
-      (_, i) => i !== index,
-    );
+    const existing = state.daily[selectedDate] || [];
+    const taskToDelete = existing[index];
+    const tasks = existing.filter((_, i) => i !== index);
     updateState("daily", { ...state.daily, [selectedDate]: tasks });
+    // Also remove from DB so it doesn't reappear on next refresh for logged-in users
+    if (user && taskToDelete?.id) {
+      fetch(`/api/tracker/daily/${encodeURIComponent(String(taskToDelete.id))}`, {
+        method: "DELETE",
+      }).catch((err) => console.error("[tracker] delete task failed", err));
+    }
   };
 
   // ── Habit handlers ─────────────────────────────────────────────────────────

@@ -11,7 +11,7 @@ export async function GET(request) {
 
   const keys = await prisma.apiKey.findMany({
     where: { userId: session.user.id },
-    select: { id: true, name: true, key: true, createdAt: true },
+    select: { id: true, name: true, key: true, expiresAt: true, createdAt: true },
     orderBy: { createdAt: "desc" },
   });
 
@@ -26,11 +26,12 @@ export async function POST(request) {
 
   const body = await request.json();
   const name = body.name?.trim() || "Chrome Extension";
+  const expiresAt = body.expiresAt ? new Date(body.expiresAt) : null;
 
   const key = "qapg_" + randomBytes(32).toString("hex");
 
   const apiKey = await prisma.apiKey.create({
-    data: { userId: session.user.id, name, key },
+    data: { userId: session.user.id, name, key, expiresAt },
   });
 
   return NextResponse.json(apiKey, { status: 201 });

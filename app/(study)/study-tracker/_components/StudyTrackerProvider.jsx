@@ -33,7 +33,12 @@ export default function StudyTrackerProvider({ children }) {
       if (!user) return;
 
       try {
-        const res = await fetch("/api/tracker/state");
+        // Fetch only the last 90 days of DailyTask + HabitLog to keep the payload small.
+        // Older records are still in the DB and will be included when `since` is adjusted.
+        const since = new Date();
+        since.setDate(since.getDate() - 90);
+        const sinceParam = since.toISOString().slice(0, 10);
+        const res = await fetch(`/api/tracker/state?since=${sinceParam}`);
         if (!res.ok) return;
         const dbState = await res.json();
 
