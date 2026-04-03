@@ -209,6 +209,7 @@ export default function BankLoginPage() {
                       className="absolute right-0 top-0 h-full px-3"
                       id="toggle-password"
                       data-testid="toggle-password-btn"
+                      aria-label="Toggle password visibility"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -254,6 +255,8 @@ export default function BankLoginPage() {
                     variant="destructive"
                     id="login-alert"
                     data-testid="login-alert"
+                    role="alert"
+                    aria-live="assertive"
                   >
                     <AlertDescription id="alert-message">
                       ⚠️ {alertMessage}

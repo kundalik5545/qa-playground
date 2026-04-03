@@ -2,9 +2,9 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import BankNavbar from "@/components/bank/BankNavbar";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -30,9 +30,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import TablePagination from "@/components/bank/TablePagination";
+import DatePickerInput from "@/components/bank/DatePickerInput";
 import {
   getAccounts,
   getTransactions,
@@ -44,7 +47,16 @@ import {
   formatDateTime,
   initializeData,
 } from "@/lib/bankStorage";
-import { Plus, Download, AlertCircle } from "lucide-react";
+import {
+  Plus,
+  Download,
+  AlertCircle,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+  Loader2,
+} from "lucide-react";
+import { toast } from "sonner";
 
 function TransactionsContent() {
   const router = useRouter();
@@ -53,12 +65,20 @@ function TransactionsContent() {
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Filter states
+  // Filter states — dateFrom/dateTo are Date|null (not strings)
   const [filterAccount, setFilterAccount] = useState("all");
   const [filterType, setFilterType] = useState("all");
-  const [dateFrom, setDateFrom] = useState("");
-  const [dateTo, setDateTo] = useState("");
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+
+  // Column sort state
+  const [colSort, setColSort] = useState({ field: null, direction: "asc" });
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Form states
   const [formData, setFormData] = useState({
@@ -91,10 +111,8 @@ function TransactionsContent() {
   }, [router, searchParams]);
 
   const loadData = () => {
-    const accountsData = getAccounts();
-    const transactionsData = getTransactions();
-    setAccounts(accountsData);
-    setTransactions(transactionsData);
+    setAccounts(getAccounts());
+    setTransactions(getTransactions());
   };
 
   const handleNewTransaction = () => {
@@ -114,29 +132,19 @@ function TransactionsContent() {
   const handleFromAccountChange = (accountId) => {
     setFormData({ ...formData, fromAccount: accountId });
     const account = getAccountById(accountId);
-    if (account) {
-      setAvailableBalance(account.balance);
-    }
+    if (account) setAvailableBalance(account.balance);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    // Clear previous errors
     setFormErrors({});
     setAlertMessage("");
 
-    // Validation
     const errors = {};
-    if (!formData.type) {
-      errors.type = "Please select transaction type";
-    }
-    if (!formData.fromAccount) {
-      errors.fromAccount = "Please select an account";
-    }
-    if (formData.type === "transfer" && !formData.toAccount) {
+    if (!formData.type) errors.type = "Please select transaction type";
+    if (!formData.fromAccount) errors.fromAccount = "Please select an account";
+    if (formData.type === "transfer" && !formData.toAccount)
       errors.toAccount = "Please select destination account";
-    }
     if (
       formData.type === "transfer" &&
       formData.fromAccount === formData.toAccount
@@ -144,9 +152,8 @@ function TransactionsContent() {
       setAlertMessage("Cannot transfer to the same account");
       return;
     }
-    if (!formData.amount || parseFloat(formData.amount) <= 0) {
+    if (!formData.amount || parseFloat(formData.amount) <= 0)
       errors.amount = "Please enter a valid amount";
-    }
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -156,7 +163,6 @@ function TransactionsContent() {
     const amount = parseFloat(formData.amount);
     const fromAccount = getAccountById(formData.fromAccount);
 
-    // Check sufficient balance
     if (
       (formData.type === "withdrawal" || formData.type === "transfer") &&
       fromAccount.balance < amount
@@ -165,75 +171,78 @@ function TransactionsContent() {
       return;
     }
 
-    // Process transaction
-    let newBalance = fromAccount.balance;
+    // 300ms "processing" delay — lets engineers practice submit-button wait strategies
+    setIsSubmitting(true);
+    setTimeout(() => {
+      let newBalance = fromAccount.balance;
 
-    if (formData.type === "deposit") {
-      newBalance += amount;
-    } else if (formData.type === "withdrawal") {
-      newBalance -= amount;
-    } else if (formData.type === "transfer") {
-      newBalance -= amount;
-      const toAccount = getAccountById(formData.toAccount);
-      updateAccountBalance(formData.toAccount, toAccount.balance + amount);
+      if (formData.type === "deposit") {
+        newBalance += amount;
+      } else if (formData.type === "withdrawal") {
+        newBalance -= amount;
+      } else if (formData.type === "transfer") {
+        newBalance -= amount;
+        const toAccount = getAccountById(formData.toAccount);
+        updateAccountBalance(formData.toAccount, toAccount.balance + amount);
+        saveTransaction({
+          type: "deposit",
+          accountId: formData.toAccount,
+          accountName: toAccount.name,
+          amount,
+          balanceAfter: toAccount.balance + amount,
+          description: `Transfer from ${fromAccount.name}`,
+        });
+      }
 
-      // Create deposit transaction for recipient
+      updateAccountBalance(formData.fromAccount, newBalance);
       saveTransaction({
-        type: "deposit",
-        accountId: formData.toAccount,
-        accountName: toAccount.name,
-        amount: amount,
-        balanceAfter: toAccount.balance + amount,
-        description: `Transfer from ${fromAccount.name}`,
+        type: formData.type,
+        accountId: formData.fromAccount,
+        accountName: fromAccount.name,
+        amount,
+        balanceAfter: newBalance,
+        description:
+          formData.description ||
+          (formData.type === "transfer"
+            ? `Transfer to ${getAccountById(formData.toAccount).name}`
+            : ""),
       });
-    }
 
-    updateAccountBalance(formData.fromAccount, newBalance);
-
-    // Save transaction
-    saveTransaction({
-      type: formData.type,
-      accountId: formData.fromAccount,
-      accountName: fromAccount.name,
-      amount: amount,
-      balanceAfter: newBalance,
-      description:
-        formData.description ||
-        (formData.type === "transfer"
-          ? `Transfer to ${getAccountById(formData.toAccount).name}`
-          : ""),
-    });
-
-    setIsModalOpen(false);
-    loadData();
-    alert("Transaction completed successfully!");
+      setIsSubmitting(false);
+      setIsModalOpen(false);
+      loadData();
+      setCurrentPage(1);
+      toast.success("Transaction completed successfully!");
+    }, 300);
   };
 
   const applyFilters = () => {
     const filters = {
       accountId: filterAccount,
       type: filterType,
-      dateFrom: dateFrom,
-      dateTo: dateTo,
+      dateFrom: dateFrom ? dateFrom.toISOString().split("T")[0] : "",
+      dateTo: dateTo ? dateTo.toISOString().split("T")[0] : "",
     };
-    const filtered = filterTransactions(filters);
-    setTransactions(filtered);
+    setTransactions(filterTransactions(filters));
+    setColSort({ field: null, direction: "asc" });
+    setCurrentPage(1);
   };
 
   const resetFilters = () => {
     setFilterAccount("all");
     setFilterType("all");
-    setDateFrom("");
-    setDateTo("");
+    setDateFrom(null);
+    setDateTo(null);
+    setColSort({ field: null, direction: "asc" });
+    setCurrentPage(1);
     loadData();
   };
 
   const handleExport = () => {
     if (transactions.length === 0) {
-      alert("No transactions to export");
+      toast.error("No transactions to export.");
       return;
     }
-
     const headers = [
       "Transaction ID",
       "Date",
@@ -265,16 +274,50 @@ function TransactionsContent() {
     a.download = `transactions_${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     window.URL.revokeObjectURL(url);
-
-    alert("Transactions exported successfully!");
+    toast.success("Transactions exported successfully!");
   };
 
+  const handleColSort = (field) => {
+    setColSort((prev) => {
+      if (prev.field === field) {
+        if (prev.direction === "asc") return { field, direction: "desc" };
+        return { field: null, direction: "asc" };
+      }
+      return { field, direction: "asc" };
+    });
+  };
+
+  const getSortIcon = (field) => {
+    if (colSort.field !== field)
+      return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
+    if (colSort.direction === "asc")
+      return <ArrowUp className="ml-1 h-3 w-3 inline" />;
+    return <ArrowDown className="ml-1 h-3 w-3 inline" />;
+  };
+
+  // Apply column sort (non-destructive — doesn't mutate transactions state)
+  const sortedTransactions = (() => {
+    if (!colSort.field) return transactions;
+    const dir = colSort.direction === "asc" ? 1 : -1;
+    return [...transactions].sort((a, b) => {
+      if (colSort.field === "date")
+        return (new Date(a.date) - new Date(b.date)) * dir;
+      if (colSort.field === "type")
+        return a.type.localeCompare(b.type) * dir;
+      if (colSort.field === "amount")
+        return (a.amount - b.amount) * dir;
+      return 0;
+    });
+  })();
+
+  // Pagination slice
+  const paginatedTransactions = sortedTransactions.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   const getTransactionIcon = (type) => {
-    const icons = {
-      deposit: "💰",
-      withdrawal: "💸",
-      transfer: "🔄",
-    };
+    const icons = { deposit: "💰", withdrawal: "💸", transfer: "🔄" };
     return icons[type] || "💵";
   };
 
@@ -307,8 +350,7 @@ function TransactionsContent() {
             data-testid="new-transaction-button"
             data-action="new-transaction"
           >
-            <Plus className="mr-2 h-4 w-4" id="new-transaction-icon" /> New
-            Transaction
+            <Plus className="mr-2 h-4 w-4" /> New Transaction
           </Button>
         </header>
 
@@ -366,34 +408,33 @@ function TransactionsContent() {
             </div>
 
             <div className="space-y-2" id="filter-date-from-container">
-              <Label htmlFor="date-from" id="date-from-label">
-                From:
-              </Label>
-              <Input
-                type="date"
+              <Label id="date-from-label">From:</Label>
+              <DatePickerInput
                 id="date-from"
                 data-testid="date-from-input"
-                data-filter="date-from"
+                aria-label="Filter from date"
                 value={dateFrom}
-                onChange={(e) => setDateFrom(e.target.value)}
+                onChange={setDateFrom}
+                placeholder="Pick start date"
               />
             </div>
 
             <div className="space-y-2" id="filter-date-to-container">
-              <Label htmlFor="date-to" id="date-to-label">
-                To:
-              </Label>
-              <Input
-                type="date"
+              <Label id="date-to-label">To:</Label>
+              <DatePickerInput
                 id="date-to"
                 data-testid="date-to-input"
-                data-filter="date-to"
+                aria-label="Filter to date"
                 value={dateTo}
-                onChange={(e) => setDateTo(e.target.value)}
+                onChange={setDateTo}
+                placeholder="Pick end date"
               />
             </div>
 
-            <div className="flex items-end gap-2" id="filter-actions-container">
+            <div
+              className="flex items-end gap-2"
+              id="filter-actions-container"
+            >
               <Button
                 onClick={applyFilters}
                 id="apply-filters-btn"
@@ -415,8 +456,9 @@ function TransactionsContent() {
                 id="export-btn"
                 data-testid="export-button"
                 data-action="export"
+                aria-label="Export transactions as CSV"
               >
-                <Download className="h-4 w-4" id="export-icon" />
+                <Download className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -434,11 +476,29 @@ function TransactionsContent() {
                   <TableHead data-column="id" id="header-transaction-id">
                     Transaction ID
                   </TableHead>
-                  <TableHead data-column="date" id="header-transaction-date">
-                    Date & Time
+                  <TableHead
+                    data-column="date"
+                    id="header-transaction-date"
+                    data-testid="sort-date-header"
+                    data-sort-direction={
+                      colSort.field === "date" ? colSort.direction : "none"
+                    }
+                    className="cursor-pointer select-none hover:bg-muted/50"
+                    onClick={() => handleColSort("date")}
+                  >
+                    Date & Time {getSortIcon("date")}
                   </TableHead>
-                  <TableHead data-column="type" id="header-transaction-type">
-                    Type
+                  <TableHead
+                    data-column="type"
+                    id="header-transaction-type"
+                    data-testid="sort-type-header"
+                    data-sort-direction={
+                      colSort.field === "type" ? colSort.direction : "none"
+                    }
+                    className="cursor-pointer select-none hover:bg-muted/50"
+                    onClick={() => handleColSort("type")}
+                  >
+                    Type {getSortIcon("type")}
                   </TableHead>
                   <TableHead
                     data-column="account"
@@ -449,8 +509,14 @@ function TransactionsContent() {
                   <TableHead
                     data-column="amount"
                     id="header-transaction-amount"
+                    data-testid="sort-amount-header"
+                    data-sort-direction={
+                      colSort.field === "amount" ? colSort.direction : "none"
+                    }
+                    className="cursor-pointer select-none hover:bg-muted/50"
+                    onClick={() => handleColSort("amount")}
                   >
-                    Amount
+                    Amount {getSortIcon("amount")}
                   </TableHead>
                   <TableHead data-column="balance" id="header-balance-after">
                     Balance After
@@ -467,8 +533,11 @@ function TransactionsContent() {
                 id="transactions-tbody"
                 data-testid="transactions-tbody"
               >
-                {transactions.length === 0 ? (
-                  <TableRow id="empty-transactions">
+                {paginatedTransactions.length === 0 ? (
+                  <TableRow
+                    id="empty-transactions"
+                    data-testid="empty-state"
+                  >
                     <TableCell
                       colSpan={7}
                       className="text-center text-muted-foreground"
@@ -478,7 +547,7 @@ function TransactionsContent() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  transactions.map((transaction) => (
+                  paginatedTransactions.map((transaction) => (
                     <TableRow
                       key={transaction.id}
                       data-transaction-id={transaction.id}
@@ -489,7 +558,14 @@ function TransactionsContent() {
                         data-testid="transaction-id"
                         id={`transaction-id-${transaction.id}`}
                       >
-                        {transaction.transactionId}
+                        <Link
+                          href={`/bank/transactions/${transaction.id}`}
+                          id={`transaction-id-link-${transaction.id}`}
+                          data-testid="transaction-id-link"
+                          className="text-purple-600 hover:underline font-mono text-sm"
+                        >
+                          {transaction.transactionId}
+                        </Link>
                       </TableCell>
                       <TableCell
                         data-testid="transaction-date"
@@ -550,6 +626,17 @@ function TransactionsContent() {
                 )}
               </TableBody>
             </Table>
+
+            {/* Pagination */}
+            {sortedTransactions.length > 0 && (
+              <TablePagination
+                totalItems={sortedTransactions.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
+            )}
           </div>
         </section>
       </main>
@@ -560,6 +647,9 @@ function TransactionsContent() {
           className="sm:max-w-[500px]"
           id="transaction-modal"
           data-testid="transaction-modal"
+          role="dialog"
+          aria-labelledby="modal-title"
+          aria-modal="true"
         >
           <DialogHeader id="transaction-modal-header">
             <DialogTitle id="modal-title" data-testid="modal-title">
@@ -576,10 +666,8 @@ function TransactionsContent() {
             data-testid="transaction-form"
           >
             <div className="space-y-4 py-4" id="transaction-form-fields">
-              <div className="space-y-2" id="transaction-type-field">
-                <Label htmlFor="transaction-type" id="transaction-type-label">
-                  Transaction Type *
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="transaction-type">Transaction Type *</Label>
                 <Select
                   value={formData.type}
                   onValueChange={(value) =>
@@ -589,6 +677,7 @@ function TransactionsContent() {
                   <SelectTrigger
                     id="transaction-type"
                     data-testid="transaction-type-select"
+                    aria-invalid={formErrors.type ? "true" : undefined}
                   >
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
@@ -599,19 +688,14 @@ function TransactionsContent() {
                   </SelectContent>
                 </Select>
                 {formErrors.type && (
-                  <p
-                    className="text-sm text-destructive"
-                    id="transaction-type-error"
-                  >
+                  <p className="text-sm text-destructive" role="alert">
                     {formErrors.type}
                   </p>
                 )}
               </div>
 
-              <div className="space-y-2" id="from-account-field">
-                <Label htmlFor="from-account" id="from-account-label">
-                  From Account *
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="from-account">From Account *</Label>
                 <Select
                   value={formData.fromAccount}
                   onValueChange={handleFromAccountChange}
@@ -619,6 +703,7 @@ function TransactionsContent() {
                   <SelectTrigger
                     id="from-account"
                     data-testid="from-account-select"
+                    aria-invalid={formErrors.fromAccount ? "true" : undefined}
                   >
                     <SelectValue placeholder="Select account" />
                   </SelectTrigger>
@@ -631,10 +716,7 @@ function TransactionsContent() {
                   </SelectContent>
                 </Select>
                 {formErrors.fromAccount && (
-                  <p
-                    className="text-sm text-destructive"
-                    id="from-account-error"
-                  >
+                  <p className="text-sm text-destructive" role="alert">
                     {formErrors.fromAccount}
                   </p>
                 )}
@@ -642,9 +724,7 @@ function TransactionsContent() {
 
               {formData.type === "transfer" && (
                 <div className="space-y-2" id="to-account-group">
-                  <Label htmlFor="to-account" id="to-account-label">
-                    To Account *
-                  </Label>
+                  <Label htmlFor="to-account">To Account *</Label>
                   <Select
                     value={formData.toAccount}
                     onValueChange={(value) =>
@@ -654,6 +734,7 @@ function TransactionsContent() {
                     <SelectTrigger
                       id="to-account"
                       data-testid="to-account-select"
+                      aria-invalid={formErrors.toAccount ? "true" : undefined}
                     >
                       <SelectValue placeholder="Select account" />
                     </SelectTrigger>
@@ -666,23 +747,15 @@ function TransactionsContent() {
                     </SelectContent>
                   </Select>
                   {formErrors.toAccount && (
-                    <p
-                      className="text-sm text-destructive"
-                      id="to-account-error"
-                    >
+                    <p className="text-sm text-destructive" role="alert">
                       {formErrors.toAccount}
                     </p>
                   )}
                 </div>
               )}
 
-              <div className="space-y-2" id="transaction-amount-field">
-                <Label
-                  htmlFor="transaction-amount"
-                  id="transaction-amount-label"
-                >
-                  Amount *
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="transaction-amount">Amount *</Label>
                 <Input
                   type="number"
                   step="0.01"
@@ -691,33 +764,23 @@ function TransactionsContent() {
                   placeholder="0.00"
                   data-testid="transaction-amount-input"
                   value={formData.amount}
+                  aria-invalid={formErrors.amount ? "true" : undefined}
                   onChange={(e) =>
                     setFormData({ ...formData, amount: e.target.value })
                   }
                 />
                 {formErrors.amount && (
-                  <p
-                    className="text-sm text-destructive"
-                    id="transaction-amount-error"
-                  >
+                  <p className="text-sm text-destructive" role="alert">
                     {formErrors.amount}
                   </p>
                 )}
-                <p
-                  className="text-sm text-muted-foreground"
-                  id="available-balance"
-                >
+                <p className="text-sm text-muted-foreground" id="available-balance">
                   Available balance: {formatCurrency(availableBalance)}
                 </p>
               </div>
 
-              <div className="space-y-2" id="transaction-description-field">
-                <Label
-                  htmlFor="transaction-description"
-                  id="transaction-description-label"
-                >
-                  Description
-                </Label>
+              <div className="space-y-2">
+                <Label htmlFor="transaction-description">Description</Label>
                 <Textarea
                   id="transaction-description"
                   placeholder="Optional description"
@@ -737,10 +800,7 @@ function TransactionsContent() {
                 </p>
               </div>
 
-              <div
-                className="flex items-center space-x-2"
-                id="notification-checkbox-container"
-              >
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id="send-notification"
                   data-testid="notification-checkbox"
@@ -752,7 +812,6 @@ function TransactionsContent() {
                 <Label
                   htmlFor="send-notification"
                   className="font-normal cursor-pointer"
-                  id="send-notification-label"
                 >
                   Send email notification
                 </Label>
@@ -763,8 +822,10 @@ function TransactionsContent() {
                   variant="destructive"
                   id="transaction-alert"
                   data-testid="transaction-alert"
+                  role="alert"
+                  aria-live="assertive"
                 >
-                  <AlertCircle className="h-4 w-4" id="alert-icon" />
+                  <AlertCircle className="h-4 w-4" />
                   <AlertDescription id="transaction-alert-message">
                     {alertMessage}
                   </AlertDescription>
@@ -779,6 +840,7 @@ function TransactionsContent() {
                 onClick={() => setIsModalOpen(false)}
                 id="cancel-transaction-btn"
                 data-testid="cancel-transaction-button"
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
@@ -787,8 +849,20 @@ function TransactionsContent() {
                 className="bg-gradient-to-r from-purple-600 to-pink-600"
                 id="submit-transaction-btn"
                 data-testid="submit-transaction-button"
+                data-state={isSubmitting ? "loading" : "idle"}
+                disabled={isSubmitting}
               >
-                Submit Transaction
+                {isSubmitting ? (
+                  <>
+                    <Loader2
+                      className="mr-2 h-4 w-4 animate-spin"
+                      data-testid="loading-spinner"
+                    />
+                    Processing…
+                  </>
+                ) : (
+                  "Submit Transaction"
+                )}
               </Button>
             </DialogFooter>
           </form>

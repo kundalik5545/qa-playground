@@ -31,6 +31,8 @@ export default function BankNavbar({ username }) {
             className="bg-card shadow-md border-b"
             id="main-navbar"
             data-testid="main-navbar"
+            role="navigation"
+            aria-label="Bank navigation"
         >
             <div className="container mx-auto px-4 py-3">
                 <div className="flex items-center justify-between gap-4">
@@ -76,6 +78,7 @@ export default function BankNavbar({ username }) {
                             id="logout-btn"
                             data-testid="logout-button"
                             data-action="logout"
+                            aria-label="Logout"
                             onClick={handleLogout}
                         >
                             Logout

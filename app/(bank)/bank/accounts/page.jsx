@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import BankNavbar from "@/components/bank/BankNavbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +43,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
+import TablePagination from "@/components/bank/TablePagination";
 import {
   getAccounts,
   saveAccount,
@@ -49,7 +51,28 @@ import {
   formatCurrency,
   initializeData,
 } from "@/lib/bankStorage";
-import { Plus, Pencil, Trash2, Search } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  ArrowUp,
+  ArrowDown,
+  ArrowUpDown,
+} from "lucide-react";
+import { toast } from "sonner";
+
+function SkeletonRows({ cols, rows = 5 }) {
+  return Array.from({ length: rows }).map((_, i) => (
+    <TableRow key={i} className="animate-pulse">
+      {Array.from({ length: cols }).map((__, j) => (
+        <TableCell key={j}>
+          <div className="h-4 bg-muted rounded w-3/4" />
+        </TableCell>
+      ))}
+    </TableRow>
+  ));
+}
 
 function AccountsContent() {
   const router = useRouter();
@@ -60,12 +83,21 @@ function AccountsContent() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [sortBy, setSortBy] = useState("name");
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Column-level sort state (takes precedence over dropdown sort when set)
+  const [colSort, setColSort] = useState({ field: null, direction: "asc" });
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [currentAccount, setCurrentAccount] = useState(null);
   const [deleteAccountId, setDeleteAccountId] = useState(null);
+  const [deleteAccountName, setDeleteAccountName] = useState("");
 
   // Form states
   const [formData, setFormData] = useState({
@@ -87,9 +119,13 @@ function AccountsContent() {
       }
       setUsername(currentUser);
       initializeData();
-      loadAccounts();
 
-      // Check for action parameter
+      // 600ms artificial load delay — lets engineers practice skeleton wait strategies
+      setTimeout(() => {
+        loadAccounts();
+        setIsLoading(false);
+      }, 600);
+
       if (searchParams.get("action") === "add") {
         handleAddAccount();
       }
@@ -98,7 +134,8 @@ function AccountsContent() {
 
   useEffect(() => {
     applyFilters();
-  }, [accounts, searchTerm, filterType, sortBy]);
+    setCurrentPage(1); // Reset page when filters change
+  }, [accounts, searchTerm, filterType, sortBy, colSort]);
 
   const loadAccounts = () => {
     const accountsData = getAccounts();
@@ -108,7 +145,6 @@ function AccountsContent() {
   const applyFilters = () => {
     let filtered = [...accounts];
 
-    // Search filter
     if (searchTerm) {
       filtered = filtered.filter(
         (acc) =>
@@ -117,24 +153,55 @@ function AccountsContent() {
       );
     }
 
-    // Type filter
     if (filterType !== "all") {
       filtered = filtered.filter((acc) => acc.type === filterType);
     }
 
-    // Sort
-    filtered.sort((a, b) => {
-      if (sortBy === "name") {
-        return a.name.localeCompare(b.name);
-      } else if (sortBy === "balance") {
-        return b.balance - a.balance;
-      } else if (sortBy === "date") {
-        return new Date(b.createdDate) - new Date(a.createdDate);
-      }
-      return 0;
-    });
+    // Column sort takes precedence over dropdown sort
+    if (colSort.field) {
+      const dir = colSort.direction === "asc" ? 1 : -1;
+      filtered.sort((a, b) => {
+        if (colSort.field === "name") return a.name.localeCompare(b.name) * dir;
+        if (colSort.field === "balance") return (a.balance - b.balance) * dir;
+        if (colSort.field === "status")
+          return a.status.localeCompare(b.status) * dir;
+        return 0;
+      });
+    } else {
+      filtered.sort((a, b) => {
+        if (sortBy === "name") return a.name.localeCompare(b.name);
+        if (sortBy === "balance") return b.balance - a.balance;
+        if (sortBy === "date")
+          return new Date(b.createdDate) - new Date(a.createdDate);
+        return 0;
+      });
+    }
 
     setFilteredAccounts(filtered);
+  };
+
+  // Derived: current page slice
+  const paginatedAccounts = filteredAccounts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handleColSort = (field) => {
+    setColSort((prev) => {
+      if (prev.field === field) {
+        if (prev.direction === "asc") return { field, direction: "desc" };
+        return { field: null, direction: "asc" };
+      }
+      return { field, direction: "asc" };
+    });
+  };
+
+  const getSortIcon = (field) => {
+    if (colSort.field !== field)
+      return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-40" />;
+    if (colSort.direction === "asc")
+      return <ArrowUp className="ml-1 h-3 w-3 inline" />;
+    return <ArrowDown className="ml-1 h-3 w-3 inline" />;
   };
 
   const handleAddAccount = () => {
@@ -165,8 +232,9 @@ function AccountsContent() {
     setIsModalOpen(true);
   };
 
-  const handleDeleteClick = (accountId) => {
+  const handleDeleteClick = (accountId, accountName) => {
     setDeleteAccountId(accountId);
+    setDeleteAccountName(accountName);
     setIsDeleteModalOpen(true);
   };
 
@@ -174,50 +242,53 @@ function AccountsContent() {
     deleteAccount(deleteAccountId);
     setIsDeleteModalOpen(false);
     loadAccounts();
+    toast.success("Account deleted successfully.");
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Validation
     const errors = {};
-    if (!formData.name.trim()) {
-      errors.name = "Account name is required";
-    }
-    if (!formData.type) {
-      errors.type = "Please select account type";
-    }
-    if (!formData.balance || parseFloat(formData.balance) < 0) {
+    if (!formData.name.trim()) errors.name = "Account name is required";
+    if (!formData.type) errors.type = "Please select account type";
+    if (!formData.balance || parseFloat(formData.balance) < 0)
       errors.balance = "Please enter a valid balance";
-    }
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
       return;
     }
 
-    const accountData = {
+    const isEdit = !!formData.id;
+    saveAccount({
       id: formData.id || undefined,
       name: formData.name,
       type: formData.type,
       balance: parseFloat(formData.balance),
       status: formData.status,
       overdraft: formData.overdraft,
-    };
-
-    saveAccount(accountData);
+    });
     setIsModalOpen(false);
     loadAccounts();
+    toast.success(
+      isEdit ? "Account updated successfully!" : "Account created successfully!"
+    );
   };
 
   const resetFilters = () => {
     setSearchTerm("");
     setFilterType("all");
     setSortBy("name");
+    setColSort({ field: null, direction: "asc" });
+    setCurrentPage(1);
   };
 
   return (
-    <div className="min-h-screen bg-background" id="accounts-page-container">
+    <div
+      className="min-h-screen bg-background"
+      id="accounts-page-container"
+      data-loading={isLoading ? "true" : "false"}
+    >
       <BankNavbar username={username} />
 
       <main
@@ -242,8 +313,7 @@ function AccountsContent() {
             data-testid="add-account-button"
             data-action="add-account"
           >
-            <Plus className="mr-2 h-4 w-4" id="add-account-icon" /> Add New
-            Account
+            <Plus className="mr-2 h-4 w-4" /> Add New Account
           </Button>
         </header>
 
@@ -261,10 +331,7 @@ function AccountsContent() {
                 Search:
               </Label>
               <div className="relative" id="search-input-wrapper">
-                <Search
-                  className="absolute left-3 top-3 h-4 w-4 text-muted-foreground"
-                  id="search-icon"
-                />
+                <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="search-input"
                   placeholder="Search by name or number"
@@ -302,7 +369,13 @@ function AccountsContent() {
               <Label htmlFor="sort-by" id="sort-by-label">
                 Sort By:
               </Label>
-              <Select value={sortBy} onValueChange={setSortBy}>
+              <Select
+                value={sortBy}
+                onValueChange={(v) => {
+                  setSortBy(v);
+                  setColSort({ field: null, direction: "asc" });
+                }}
+              >
                 <SelectTrigger
                   id="sort-by"
                   data-testid="sort-by-select"
@@ -344,17 +417,44 @@ function AccountsContent() {
                   <TableHead data-column="number" id="header-account-number">
                     Account Number
                   </TableHead>
-                  <TableHead data-column="name" id="header-account-name">
-                    Account Name
+                  <TableHead
+                    data-column="name"
+                    id="header-account-name"
+                    data-testid="sort-name-header"
+                    data-sort-direction={
+                      colSort.field === "name" ? colSort.direction : "none"
+                    }
+                    className="cursor-pointer select-none hover:bg-muted/50"
+                    onClick={() => handleColSort("name")}
+                  >
+                    Account Name {getSortIcon("name")}
                   </TableHead>
                   <TableHead data-column="type" id="header-account-type">
                     Type
                   </TableHead>
-                  <TableHead data-column="balance" id="header-account-balance">
-                    Balance
+                  <TableHead
+                    data-column="balance"
+                    id="header-account-balance"
+                    data-testid="sort-balance-header"
+                    data-sort-direction={
+                      colSort.field === "balance" ? colSort.direction : "none"
+                    }
+                    className="cursor-pointer select-none hover:bg-muted/50"
+                    onClick={() => handleColSort("balance")}
+                  >
+                    Balance {getSortIcon("balance")}
                   </TableHead>
-                  <TableHead data-column="status" id="header-account-status">
-                    Status
+                  <TableHead
+                    data-column="status"
+                    id="header-account-status"
+                    data-testid="sort-status-header"
+                    data-sort-direction={
+                      colSort.field === "status" ? colSort.direction : "none"
+                    }
+                    className="cursor-pointer select-none hover:bg-muted/50"
+                    onClick={() => handleColSort("status")}
+                  >
+                    Status {getSortIcon("status")}
                   </TableHead>
                   <TableHead data-column="actions" id="header-account-actions">
                     Actions
@@ -362,8 +462,10 @@ function AccountsContent() {
                 </TableRow>
               </TableHeader>
               <TableBody id="accounts-tbody" data-testid="accounts-tbody">
-                {filteredAccounts.length === 0 ? (
-                  <TableRow id="empty-accounts">
+                {isLoading ? (
+                  <SkeletonRows cols={6} rows={5} />
+                ) : paginatedAccounts.length === 0 ? (
+                  <TableRow id="empty-accounts" data-testid="empty-state">
                     <TableCell
                       colSpan={6}
                       className="text-center text-muted-foreground"
@@ -373,7 +475,7 @@ function AccountsContent() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredAccounts.map((account) => (
+                  paginatedAccounts.map((account) => (
                     <TableRow
                       key={account.id}
                       data-account-id={account.id}
@@ -390,7 +492,14 @@ function AccountsContent() {
                         data-testid="account-name"
                         id={`account-name-${account.id}`}
                       >
-                        {account.name}
+                        <Link
+                          href={`/bank/accounts/${account.id}`}
+                          id={`account-name-link-${account.id}`}
+                          data-testid={`account-name-link-${account.id}`}
+                          className="text-purple-600 hover:underline font-medium"
+                        >
+                          {account.name}
+                        </Link>
                       </TableCell>
                       <TableCell
                         data-testid="account-type"
@@ -416,9 +525,7 @@ function AccountsContent() {
                       >
                         <Badge
                           variant={
-                            account.status === "active"
-                              ? "default"
-                              : "secondary"
+                            account.status === "active" ? "default" : "secondary"
                           }
                           id={`account-status-badge-${account.id}`}
                         >
@@ -438,26 +545,22 @@ function AccountsContent() {
                             data-testid={`edit-account-${account.id}`}
                             data-action="edit"
                             id={`edit-account-btn-${account.id}`}
+                            aria-label={`Edit account ${account.name}`}
                           >
-                            <Pencil
-                              className="h-4 w-4 mr-1"
-                              id={`edit-icon-${account.id}`}
-                            />{" "}
-                            Edit
+                            <Pencil className="h-4 w-4 mr-1" /> Edit
                           </Button>
                           <Button
                             size="sm"
                             variant="destructive"
-                            onClick={() => handleDeleteClick(account.id)}
+                            onClick={() =>
+                              handleDeleteClick(account.id, account.name)
+                            }
                             data-testid={`delete-account-${account.id}`}
                             data-action="delete"
                             id={`delete-account-btn-${account.id}`}
+                            aria-label={`Delete account ${account.name}`}
                           >
-                            <Trash2
-                              className="h-4 w-4 mr-1"
-                              id={`delete-icon-${account.id}`}
-                            />{" "}
-                            Delete
+                            <Trash2 className="h-4 w-4 mr-1" /> Delete
                           </Button>
                         </div>
                       </TableCell>
@@ -466,6 +569,17 @@ function AccountsContent() {
                 )}
               </TableBody>
             </Table>
+
+            {/* Pagination */}
+            {!isLoading && filteredAccounts.length > 0 && (
+              <TablePagination
+                totalItems={filteredAccounts.length}
+                itemsPerPage={itemsPerPage}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                onItemsPerPageChange={setItemsPerPage}
+              />
+            )}
           </div>
         </section>
       </main>
@@ -476,6 +590,9 @@ function AccountsContent() {
           className="sm:max-w-[500px]"
           id="account-modal"
           data-testid="account-modal"
+          role="dialog"
+          aria-labelledby="modal-title"
+          aria-modal="true"
         >
           <DialogHeader id="account-modal-header">
             <DialogTitle id="modal-title" data-testid="modal-title">
@@ -504,6 +621,7 @@ function AccountsContent() {
                   placeholder="e.g., My Savings Account"
                   data-testid="account-name-input"
                   value={formData.name}
+                  aria-invalid={formErrors.name ? "true" : undefined}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
@@ -512,6 +630,7 @@ function AccountsContent() {
                   <p
                     className="text-sm text-destructive"
                     id="account-name-error"
+                    role="alert"
                   >
                     {formErrors.name}
                   </p>
@@ -531,6 +650,7 @@ function AccountsContent() {
                   <SelectTrigger
                     id="account-type"
                     data-testid="account-type-select"
+                    aria-invalid={formErrors.type ? "true" : undefined}
                   >
                     <SelectValue placeholder="Select account type" />
                   </SelectTrigger>
@@ -544,6 +664,7 @@ function AccountsContent() {
                   <p
                     className="text-sm text-destructive"
                     id="account-type-error"
+                    role="alert"
                   >
                     {formErrors.type}
                   </p>
@@ -563,6 +684,7 @@ function AccountsContent() {
                   placeholder="0.00"
                   data-testid="initial-balance-input"
                   value={formData.balance}
+                  aria-invalid={formErrors.balance ? "true" : undefined}
                   onChange={(e) =>
                     setFormData({ ...formData, balance: e.target.value })
                   }
@@ -571,6 +693,7 @@ function AccountsContent() {
                   <p
                     className="text-sm text-destructive"
                     id="initial-balance-error"
+                    role="alert"
                   >
                     {formErrors.balance}
                   </p>
@@ -586,10 +709,7 @@ function AccountsContent() {
                   }
                   id="status-radio-group"
                 >
-                  <div
-                    className="flex items-center space-x-2"
-                    id="status-active-container"
-                  >
+                  <div className="flex items-center space-x-2">
                     <RadioGroupItem
                       value="active"
                       id="status-active"
@@ -598,15 +718,11 @@ function AccountsContent() {
                     <Label
                       htmlFor="status-active"
                       className="font-normal cursor-pointer"
-                      id="status-active-label"
                     >
                       Active
                     </Label>
                   </div>
-                  <div
-                    className="flex items-center space-x-2"
-                    id="status-inactive-container"
-                  >
+                  <div className="flex items-center space-x-2">
                     <RadioGroupItem
                       value="inactive"
                       id="status-inactive"
@@ -615,7 +731,6 @@ function AccountsContent() {
                     <Label
                       htmlFor="status-inactive"
                       className="font-normal cursor-pointer"
-                      id="status-inactive-label"
                     >
                       Inactive
                     </Label>
@@ -623,10 +738,7 @@ function AccountsContent() {
                 </RadioGroup>
               </div>
 
-              <div
-                className="flex items-center space-x-2"
-                id="overdraft-checkbox-container"
-              >
+              <div className="flex items-center space-x-2">
                 <Checkbox
                   id="enable-overdraft"
                   name="enableOverdraft"
@@ -639,7 +751,6 @@ function AccountsContent() {
                 <Label
                   htmlFor="enable-overdraft"
                   className="font-normal cursor-pointer"
-                  id="overdraft-label"
                 >
                   Enable Overdraft Protection
                 </Label>
@@ -670,8 +781,17 @@ function AccountsContent() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
-        <AlertDialogContent id="delete-modal" data-testid="delete-modal">
+      <AlertDialog
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+      >
+        <AlertDialogContent
+          id="delete-modal"
+          data-testid="delete-modal"
+          role="alertdialog"
+          aria-labelledby="delete-modal-title-text"
+          aria-describedby="delete-message"
+        >
           <AlertDialogHeader id="delete-modal-header">
             <AlertDialogTitle
               data-testid="delete-modal-title"

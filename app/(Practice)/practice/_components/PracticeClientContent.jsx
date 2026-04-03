@@ -68,16 +68,31 @@ export default function PracticeClientContent() {
       )}
 
       {/* Card grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-        {filtered.map((el, i) => (
+      <div
+        id="practice-cards-grid"
+        data-testid="practice-cards-grid"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+      >
+        {filtered.map((el, i) => {
+          const cardId = el.slug ?? "bank-app";
+          return (
           <Link
             key={i}
             href={el.link}
             prefetch={false}
+            id={`card-link-${cardId}`}
+            name={`card-link-${cardId}`}
+            data-testid={`card-link-${cardId}`}
+            data-element={cardId}
             aria-label={`Practice ${el.title} – ${el.Description}`}
             className="block group cursor-pointer"
           >
-            <Card className="h-56 transition-all duration-300 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1 group-hover:scale-105">
+            <Card
+              id={`practice-card-${cardId}`}
+              data-testid={`practice-card-${cardId}`}
+              data-element-title={el.title}
+              className="h-56 transition-all duration-300 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1 group-hover:scale-105"
+            >
               <CardHeader className="flex flex-row items-center justify-between p-1 shadow-lg dark:shadow-md dark:shadow-gray-800 space-y-0">
                 <p className="px-2 text-xl font-semibold">{el.title}</p>
                 {el.isBankDemo && (
@@ -106,7 +121,8 @@ export default function PracticeClientContent() {
               </CardFooter>
             </Card>
           </Link>
-        ))}
+        );
+        })}
       </div>
     </div>
   );

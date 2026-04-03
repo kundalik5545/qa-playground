@@ -25,6 +25,25 @@ import {
 } from "@/lib/bankStorage";
 import { Wallet, CreditCard, TrendingUp, Plus, Eye } from "lucide-react";
 
+function SkeletonCard({ id, testId }) {
+  return (
+    <Card
+      className="animate-pulse"
+      id={id}
+      data-testid={testId}
+      data-testid-skeleton="skeleton-card"
+    >
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <div className="h-4 bg-muted rounded w-2/3" />
+        <div className="h-8 w-8 bg-muted rounded-full" />
+      </CardHeader>
+      <CardContent>
+        <div className="h-8 bg-muted rounded w-1/2" data-testid="skeleton-card" />
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const [username, setUsername] = useState("Admin");
@@ -33,9 +52,9 @@ export default function DashboardPage() {
   const [transactionsCount, setTransactionsCount] = useState(0);
   const [recentTransactions, setRecentTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check authentication
     if (typeof window !== "undefined") {
       const currentUser = sessionStorage.getItem("currentUser");
       if (!currentUser) {
@@ -43,12 +62,13 @@ export default function DashboardPage() {
         return;
       }
       setUsername(currentUser);
-
-      // Initialize data
       initializeData();
 
-      // Load dashboard data
-      loadDashboardData();
+      // Artificial 800ms load delay — lets engineers practice wait-for-element strategies
+      setTimeout(() => {
+        loadDashboardData();
+        setIsLoading(false);
+      }, 800);
     }
   }, [router]);
 
@@ -65,25 +85,21 @@ export default function DashboardPage() {
   };
 
   const getTransactionIcon = (type) => {
-    const icons = {
-      deposit: "💰",
-      withdrawal: "💸",
-      transfer: "🔄",
-    };
+    const icons = { deposit: "💰", withdrawal: "💸", transfer: "🔄" };
     return icons[type] || "💵";
   };
 
   const getAccountIcon = (type) => {
-    const icons = {
-      savings: "🏦",
-      checking: "💳",
-      credit: "💎",
-    };
+    const icons = { savings: "🏦", checking: "💳", credit: "💎" };
     return icons[type] || "💰";
   };
 
   return (
-    <div className="min-h-screen bg-background" id="dashboard-page-container">
+    <div
+      className="min-h-screen bg-background"
+      id="dashboard-page-container"
+      data-loading={isLoading ? "true" : "false"}
+    >
       <BankNavbar username={username} />
 
       <main
@@ -117,98 +133,108 @@ export default function DashboardPage() {
           className="grid grid-cols-1 md:grid-cols-3 gap-6"
           id="summary-section"
         >
-          <Card
-            className="hover:shadow-lg transition-all hover:-translate-y-1"
-            id="total-balance-card"
-            data-testid="total-balance-card"
-          >
-            <CardHeader
-              className="flex flex-row items-center justify-between pb-2"
-              id="total-balance-card-header"
-            >
-              <CardTitle
-                className="text-sm font-medium text-muted-foreground"
-                id="total-balance-title"
+          {isLoading ? (
+            <>
+              <SkeletonCard id="total-balance-card" testId="total-balance-card" />
+              <SkeletonCard id="accounts-count-card" testId="accounts-count-card" />
+              <SkeletonCard id="transactions-count-card" testId="transactions-count-card" />
+            </>
+          ) : (
+            <>
+              <Card
+                className="hover:shadow-lg transition-all hover:-translate-y-1"
+                id="total-balance-card"
+                data-testid="total-balance-card"
               >
-                Total Balance
-              </CardTitle>
-              <Wallet
-                className="h-8 w-8 text-purple-600"
-                id="total-balance-icon"
-              />
-            </CardHeader>
-            <CardContent id="total-balance-card-content">
-              <div
-                className="text-3xl font-bold text-purple-600"
-                id="total-balance"
-                data-testid="total-balance"
-              >
-                {formatCurrency(totalBalance)}
-              </div>
-            </CardContent>
-          </Card>
+                <CardHeader
+                  className="flex flex-row items-center justify-between pb-2"
+                  id="total-balance-card-header"
+                >
+                  <CardTitle
+                    className="text-sm font-medium text-muted-foreground"
+                    id="total-balance-title"
+                  >
+                    Total Balance
+                  </CardTitle>
+                  <Wallet
+                    className="h-8 w-8 text-purple-600"
+                    id="total-balance-icon"
+                  />
+                </CardHeader>
+                <CardContent id="total-balance-card-content">
+                  <div
+                    className="text-3xl font-bold text-purple-600"
+                    id="total-balance"
+                    data-testid="total-balance"
+                  >
+                    {formatCurrency(totalBalance)}
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card
-            className="hover:shadow-lg transition-all hover:-translate-y-1"
-            id="accounts-count-card"
-            data-testid="accounts-count-card"
-          >
-            <CardHeader
-              className="flex flex-row items-center justify-between pb-2"
-              id="accounts-count-card-header"
-            >
-              <CardTitle
-                className="text-sm font-medium text-muted-foreground"
-                id="accounts-count-title"
+              <Card
+                className="hover:shadow-lg transition-all hover:-translate-y-1"
+                id="accounts-count-card"
+                data-testid="accounts-count-card"
               >
-                Active Accounts
-              </CardTitle>
-              <CreditCard
-                className="h-8 w-8 text-pink-600"
-                id="accounts-count-icon"
-              />
-            </CardHeader>
-            <CardContent id="accounts-count-card-content">
-              <div
-                className="text-3xl font-bold text-pink-600"
-                id="accounts-count"
-                data-testid="accounts-count"
-              >
-                {accountsCount}
-              </div>
-            </CardContent>
-          </Card>
+                <CardHeader
+                  className="flex flex-row items-center justify-between pb-2"
+                  id="accounts-count-card-header"
+                >
+                  <CardTitle
+                    className="text-sm font-medium text-muted-foreground"
+                    id="accounts-count-title"
+                  >
+                    Active Accounts
+                  </CardTitle>
+                  <CreditCard
+                    className="h-8 w-8 text-pink-600"
+                    id="accounts-count-icon"
+                  />
+                </CardHeader>
+                <CardContent id="accounts-count-card-content">
+                  <div
+                    className="text-3xl font-bold text-pink-600"
+                    id="accounts-count"
+                    data-testid="accounts-count"
+                  >
+                    {accountsCount}
+                  </div>
+                </CardContent>
+              </Card>
 
-          <Card
-            className="hover:shadow-lg transition-all hover:-translate-y-1"
-            id="transactions-count-card"
-            data-testid="transactions-count-card"
-          >
-            <CardHeader
-              className="flex flex-row items-center justify-between pb-2"
-              id="transactions-count-card-header"
-            >
-              <CardTitle
-                className="text-sm font-medium text-muted-foreground"
-                id="transactions-count-title"
+              <Card
+                className="hover:shadow-lg transition-all hover:-translate-y-1"
+                id="transactions-count-card"
+                data-testid="transactions-count-card"
               >
-                Total Transactions
-              </CardTitle>
-              <TrendingUp
-                className="h-8 w-8 text-blue-600"
-                id="transactions-count-icon"
-              />
-            </CardHeader>
-            <CardContent id="transactions-count-card-content">
-              <div
-                className="text-3xl font-bold text-blue-600"
-                id="transactions-count"
-                data-testid="transactions-count"
-              >
-                {transactionsCount}
-              </div>
-            </CardContent>
-          </Card>
+                <CardHeader
+                  className="flex flex-row items-center justify-between pb-2"
+                  id="transactions-count-card-header"
+                >
+                  <CardTitle
+                    className="text-sm font-medium text-muted-foreground"
+                    id="transactions-count-title"
+                  >
+                    Total Transactions
+                  </CardTitle>
+                  <TrendingUp
+                    className="h-8 w-8 text-blue-600"
+                    id="transactions-count-icon"
+                  />
+                </CardHeader>
+                <CardContent id="transactions-count-card-content">
+                  <div
+                    className="text-3xl font-bold text-blue-600"
+                    id="transactions-count"
+                    data-testid="transactions-count"
+                  >
+                    {transactionsCount}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </section>
 
         {/* Quick Actions */}
@@ -277,105 +303,101 @@ export default function DashboardPage() {
             className="rounded-md border"
             id="recent-transactions-table-wrapper"
           >
-            <Table
-              id="recent-transactions-table"
-              data-testid="recent-transactions-table"
-            >
-              <TableHeader id="recent-transactions-header">
-                <TableRow id="recent-transactions-header-row">
-                  <TableHead data-column="date" id="header-date">
-                    Date
-                  </TableHead>
-                  <TableHead data-column="type" id="header-type">
-                    Type
-                  </TableHead>
-                  <TableHead data-column="account" id="header-account">
-                    Account
-                  </TableHead>
-                  <TableHead data-column="amount" id="header-amount">
-                    Amount
-                  </TableHead>
-                  <TableHead data-column="status" id="header-status">
-                    Status
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody
-                id="transactions-tbody"
-                data-testid="transactions-tbody"
+            {isLoading ? (
+              <div className="p-4 space-y-3 animate-pulse" data-testid="skeleton-card">
+                {[...Array(3)].map((_, i) => (
+                  <div key={i} className="flex gap-4">
+                    <div className="h-4 bg-muted rounded flex-1" />
+                    <div className="h-4 bg-muted rounded flex-1" />
+                    <div className="h-4 bg-muted rounded flex-1" />
+                    <div className="h-4 bg-muted rounded w-20" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <Table
+                id="recent-transactions-table"
+                data-testid="recent-transactions-table"
               >
-                {recentTransactions.length === 0 ? (
-                  <TableRow id="empty-transactions">
-                    <TableCell
-                      colSpan={5}
-                      className="text-center text-muted-foreground"
-                      id="empty-transactions-message"
-                    >
-                      No transactions yet
-                    </TableCell>
+                <TableHeader id="recent-transactions-header">
+                  <TableRow id="recent-transactions-header-row">
+                    <TableHead data-column="date" id="header-date">Date</TableHead>
+                    <TableHead data-column="type" id="header-type">Type</TableHead>
+                    <TableHead data-column="account" id="header-account">Account</TableHead>
+                    <TableHead data-column="amount" id="header-amount">Amount</TableHead>
+                    <TableHead data-column="status" id="header-status">Status</TableHead>
                   </TableRow>
-                ) : (
-                  recentTransactions.map((transaction) => (
-                    <TableRow
-                      key={transaction.id}
-                      data-transaction-id={transaction.id}
-                      id={`recent-transaction-row-${transaction.id}`}
-                    >
+                </TableHeader>
+                <TableBody
+                  id="transactions-tbody"
+                  data-testid="transactions-tbody"
+                >
+                  {recentTransactions.length === 0 ? (
+                    <TableRow id="empty-transactions">
                       <TableCell
-                        id={`recent-transaction-date-${transaction.id}`}
+                        colSpan={5}
+                        className="text-center text-muted-foreground"
+                        id="empty-transactions-message"
+                        data-testid="empty-state"
                       >
-                        {formatDate(transaction.date)}
-                      </TableCell>
-                      <TableCell
-                        id={`recent-transaction-type-${transaction.id}`}
-                      >
-                        <span
-                          className={`font-medium ${
-                            transaction.type === "deposit"
-                              ? "text-green-600"
-                              : transaction.type === "withdrawal"
-                              ? "text-red-600"
-                              : "text-blue-600"
-                          }`}
-                        >
-                          {getTransactionIcon(transaction.type)}{" "}
-                          {transaction.type.charAt(0).toUpperCase() +
-                            transaction.type.slice(1)}
-                        </span>
-                      </TableCell>
-                      <TableCell
-                        id={`recent-transaction-account-${transaction.id}`}
-                      >
-                        {transaction.accountName}
-                      </TableCell>
-                      <TableCell
-                        className={
-                          transaction.type === "withdrawal"
-                            ? "text-red-600"
-                            : "text-green-600"
-                        }
-                        id={`recent-transaction-amount-${transaction.id}`}
-                      >
-                        {transaction.type === "withdrawal" ? "-" : "+"}
-                        {formatCurrency(transaction.amount)}
-                      </TableCell>
-                      <TableCell
-                        id={`recent-transaction-status-${transaction.id}`}
-                      >
-                        <Badge
-                          variant="outline"
-                          className="bg-green-50 text-green-700 border-green-200"
-                          id={`recent-transaction-badge-${transaction.id}`}
-                        >
-                          {transaction.status.charAt(0).toUpperCase() +
-                            transaction.status.slice(1)}
-                        </Badge>
+                        No transactions yet
                       </TableCell>
                     </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+                  ) : (
+                    recentTransactions.map((transaction) => (
+                      <TableRow
+                        key={transaction.id}
+                        data-transaction-id={transaction.id}
+                        id={`recent-transaction-row-${transaction.id}`}
+                      >
+                        <TableCell id={`recent-transaction-date-${transaction.id}`}>
+                          {formatDate(transaction.date)}
+                        </TableCell>
+                        <TableCell id={`recent-transaction-type-${transaction.id}`}>
+                          <span
+                            className={`font-medium ${
+                              transaction.type === "deposit"
+                                ? "text-green-600"
+                                : transaction.type === "withdrawal"
+                                ? "text-red-600"
+                                : "text-blue-600"
+                            }`}
+                          >
+                            {getTransactionIcon(transaction.type)}{" "}
+                            {transaction.type.charAt(0).toUpperCase() +
+                              transaction.type.slice(1)}
+                          </span>
+                        </TableCell>
+                        <TableCell id={`recent-transaction-account-${transaction.id}`}>
+                          {transaction.accountName}
+                        </TableCell>
+                        <TableCell
+                          className={
+                            transaction.type === "withdrawal"
+                              ? "text-red-600"
+                              : "text-green-600"
+                          }
+                          id={`recent-transaction-amount-${transaction.id}`}
+                        >
+                          {transaction.type === "withdrawal" ? "-" : "+"}
+                          {formatCurrency(transaction.amount)}
+                        </TableCell>
+                        <TableCell id={`recent-transaction-status-${transaction.id}`}>
+                          <Badge
+                            variant="outline"
+                            className="bg-green-50 text-green-700 border-green-200"
+                            id={`recent-transaction-badge-${transaction.id}`}
+                          >
+                            {transaction.status.charAt(0).toUpperCase() +
+                              transaction.status.slice(1)}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            )}
           </div>
         </section>
 
@@ -387,65 +409,79 @@ export default function DashboardPage() {
           <h2 className="text-2xl font-bold mb-4" id="accounts-overview-title">
             Accounts Overview
           </h2>
-          <div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
-            id="accounts-list"
-            data-testid="accounts-grid"
-          >
-            {accounts.length === 0 ? (
-              <div
-                className="col-span-full bg-muted p-8 rounded-lg text-center"
-                id="empty-accounts"
-              >
-                <p
-                  className="text-muted-foreground"
-                  id="empty-accounts-message"
+          {isLoading ? (
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse"
+              data-testid="skeleton-card"
+            >
+              {[...Array(2)].map((_, i) => (
+                <div key={i} className="bg-muted rounded-lg p-6 space-y-3">
+                  <div className="h-10 w-10 bg-muted-foreground/20 rounded-full" />
+                  <div className="h-5 bg-muted-foreground/20 rounded w-3/4" />
+                  <div className="h-7 bg-muted-foreground/20 rounded w-1/2" />
+                  <div className="h-4 bg-muted-foreground/20 rounded w-2/3" />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+              id="accounts-list"
+              data-testid="accounts-grid"
+            >
+              {accounts.length === 0 ? (
+                <div
+                  className="col-span-full bg-muted p-8 rounded-lg text-center"
+                  id="empty-accounts"
+                  data-testid="empty-state"
                 >
-                  No accounts found. Create your first account!
-                </p>
-              </div>
-            ) : (
-              accounts.map((account) => (
-                <Card
-                  key={account.id}
-                  className="hover:shadow-lg transition-all"
-                  data-account-id={account.id}
-                  id={`account-card-${account.id}`}
-                >
-                  <CardHeader
-                    className="flex flex-row items-center justify-between pb-2"
-                    id={`account-card-header-${account.id}`}
+                  <p className="text-muted-foreground" id="empty-accounts-message">
+                    No accounts found. Create your first account!
+                  </p>
+                </div>
+              ) : (
+                accounts.map((account) => (
+                  <Card
+                    key={account.id}
+                    className="hover:shadow-lg transition-all"
+                    data-account-id={account.id}
+                    id={`account-card-${account.id}`}
                   >
-                    <div className="text-4xl" id={`account-icon-${account.id}`}>
-                      {getAccountIcon(account.type)}
-                    </div>
-                  </CardHeader>
-                  <CardContent id={`account-card-content-${account.id}`}>
-                    <h3
-                      className="font-semibold text-lg mb-1"
-                      id={`account-name-${account.id}`}
+                    <CardHeader
+                      className="flex flex-row items-center justify-between pb-2"
+                      id={`account-card-header-${account.id}`}
                     >
-                      {account.name}
-                    </h3>
-                    <p
-                      className="text-2xl font-bold text-purple-600 mb-2"
-                      id={`account-balance-${account.id}`}
-                    >
-                      {formatCurrency(account.balance)}
-                    </p>
-                    <p
-                      className="text-sm text-muted-foreground"
-                      id={`account-details-${account.id}`}
-                    >
-                      {account.type.charAt(0).toUpperCase() +
-                        account.type.slice(1)}{" "}
-                      • {account.accountNumber}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+                      <div className="text-4xl" id={`account-icon-${account.id}`}>
+                        {getAccountIcon(account.type)}
+                      </div>
+                    </CardHeader>
+                    <CardContent id={`account-card-content-${account.id}`}>
+                      <h3
+                        className="font-semibold text-lg mb-1"
+                        id={`account-name-${account.id}`}
+                      >
+                        {account.name}
+                      </h3>
+                      <p
+                        className="text-2xl font-bold text-purple-600 mb-2"
+                        id={`account-balance-${account.id}`}
+                      >
+                        {formatCurrency(account.balance)}
+                      </p>
+                      <p
+                        className="text-sm text-muted-foreground"
+                        id={`account-details-${account.id}`}
+                      >
+                        {account.type.charAt(0).toUpperCase() +
+                          account.type.slice(1)}{" "}
+                        • {account.accountNumber}
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
         </section>
       </main>
 
