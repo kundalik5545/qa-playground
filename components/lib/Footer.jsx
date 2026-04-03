@@ -34,10 +34,19 @@ const platformLinks = [
     badgeClass:
       "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
   },
+
   {
     href: "/qa-tools",
     label: "QA Tools",
     icon: <Wrench className="h-3.5 w-3.5" />,
+    badge: "Free",
+    badgeClass:
+      "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
+  },
+  {
+    href: "https://t.me/QAPlayGround_Bot",
+    label: "QA Playground Bot",
+    icon: <FaTelegram className="h-3.5 w-3.5" />,
     badge: "Free",
     badgeClass:
       "bg-orange-50 text-orange-600 dark:bg-orange-950/40 dark:text-orange-400",
