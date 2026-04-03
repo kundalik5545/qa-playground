@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,81 +45,20 @@ import {
   Copy,
   Check,
   KeyRound,
-  Camera,
-  Scissors,
   Download,
   Globe,
+  Send,
 } from "lucide-react";
+import TelegramBotPanel from "./TelegramBotPanel";
 import { useTracker } from "../../_components/StudyTrackerProvider";
-
-const RESOURCE_TYPES = [
-  "ARTICLE",
-  "VIDEO",
-  "COURSE",
-  "BOOK",
-  "TOOL",
-  "DOCUMENTATION",
-  "OTHER",
-];
-
-const TYPE_LABELS = {
-  ARTICLE: "Article",
-  VIDEO: "Video",
-  COURSE: "Course",
-  BOOK: "Book",
-  TOOL: "Tool",
-  DOCUMENTATION: "Docs",
-  OTHER: "Other",
-};
-
-const TYPE_COLORS = {
-  ARTICLE: { bg: "#eff6ff", color: "#2563eb" },
-  VIDEO: { bg: "#fef2f2", color: "#dc2626" },
-  COURSE: { bg: "#f0fdf4", color: "#16a34a" },
-  BOOK: { bg: "#fffbeb", color: "#d97706" },
-  TOOL: { bg: "#faf5ff", color: "#9333ea" },
-  DOCUMENTATION: { bg: "#f0f9ff", color: "#0284c7" },
-  OTHER: { bg: "#f9fafb", color: "#6b7280" },
-};
-
-const EMPTY_FORM = {
-  resourceType: "",
-  title: "",
-  url: "",
-  description: "",
-  tags: [],
-  image: "",
-};
-
-// ── Feature flag ──────────────────────────────────────────────────────────────
-// Set to false to hide all Chrome extension cards from the DOM entirely.
-const SHOW_EXTENSION_CARDS = false;
-// ──────────────────────────────────────────────────────────────────────────────
-
-// Each extension injects a DOM element with its domId when installed.
-// Update installUrl values once extensions are published to the Chrome Web Store.
-const CHROME_EXTENSIONS = [
-  {
-    id: "ext-qa-clipper",
-    domId: "qa-clipper-ext-installed",
-    title: "QA Clipper",
-    description:
-      "Clip and save resources from any webpage directly to your QA Playground resource list.",
-    Icon: Scissors,
-    installUrl:
-      "https://chromewebstore.google.com/detail/jegdkegbomfbmhhimfjgacdblcoodfpd?utm_source=item-share-cb",
-  },
-  {
-    id: "ext-qa-screenshot",
-    domId: "qa-screenshot-ext-installed",
-    title: "QA Capture",
-    description:
-      "Capture and annotate screenshots of web elements for your QA reports.",
-    Icon: Camera,
-    installUrl:
-      "https://chromewebstore.google.com/detail/jhgkhnokloeklnagbkgkgcfphafifefg?utm_source=item-share-cb",
-  },
-];
+import {
+  CHROME_EXTENSIONS,
+  EMPTY_FORM,
+  RESOURCE_TYPES,
+  SHOW_EXTENSION_CARDS,
+  TYPE_LABELS,
+} from "./resource-constant";
+import ResourceCard from "./ResourceCard";
 
 export default function ResourcesView({ showToast }) {
   const { user, sessionPending: isPending } = useTracker();
@@ -140,12 +79,20 @@ export default function ResourcesView({ showToast }) {
   const [saving, setSaving] = useState(false);
   const [tagInput, setTagInput] = useState("");
 
+  // Cache: cacheKey (URLSearchParams string) → resource array
+  const cacheRef = useRef({});
+  // Abort controller for the current in-flight fetch
+  const abortControllerRef = useRef(null);
+
   // API Keys panel
   const [keysOpen, setKeysOpen] = useState(false);
   const [apiKeys, setApiKeys] = useState([]);
   const [keysLoading, setKeysLoading] = useState(false);
   const [newKeyName, setNewKeyName] = useState("");
   const [copiedKey, setCopiedKey] = useState(null);
+
+  // Telegram Bot panel
+  const [telegramOpen, setTelegramOpen] = useState(false);
   // Set of ext IDs whose DOM sentinel element is present in the page
   const [installedExtIds, setInstalledExtIds] = useState(new Set());
 
@@ -162,25 +109,48 @@ export default function ResourcesView({ showToast }) {
     setInstalledExtIds(installed);
   }, []);
 
-  const fetchResources = useCallback(async () => {
-    if (!isLoggedIn) return;
-    setLoading(true);
-    try {
+  const fetchResources = useCallback(
+    async (forceRefresh = false) => {
+      if (!isLoggedIn) return;
       const params = new URLSearchParams();
       if (search) params.set("search", search);
       if (filterType !== "ALL") params.set("type", filterType);
       if (filterTag) params.set("tag", filterTag);
-      const res = await fetch(`/api/resources?${params}`);
-      if (res.ok) setResources(await res.json());
-    } catch (_) {
-      showToast("Failed to load resources", true);
-    } finally {
-      setLoading(false);
-    }
-  }, [isLoggedIn, search, filterType, filterTag, showToast]);
+      const cacheKey = params.toString();
+
+      if (!forceRefresh && cacheRef.current[cacheKey]) {
+        setResources(cacheRef.current[cacheKey]);
+        return;
+      }
+
+      // Cancel any previous in-flight request before starting a new one
+      abortControllerRef.current?.abort();
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/resources?${params}`, {
+          signal: controller.signal,
+        });
+        if (res.ok) {
+          const data = await res.json();
+          cacheRef.current[cacheKey] = data;
+          setResources(data);
+        }
+      } catch (err) {
+        if (err.name !== "AbortError")
+          showToast("Failed to load resources", true);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [isLoggedIn, search, filterType, filterTag, showToast],
+  );
 
   useEffect(() => {
     fetchResources();
+    return () => abortControllerRef.current?.abort();
   }, [fetchResources]);
 
   const fetchApiKeys = async () => {
@@ -265,7 +235,8 @@ export default function ResourcesView({ showToast }) {
       if (!res.ok) throw new Error();
       showToast(editingId ? "Resource updated!" : "Resource added!");
       setDialogOpen(false);
-      fetchResources();
+      cacheRef.current = {};
+      fetchResources(true);
     } catch (_) {
       showToast("Failed to save resource", true);
     } finally {
@@ -278,6 +249,7 @@ export default function ResourcesView({ showToast }) {
       const res = await fetch(`/api/resources/${id}`, { method: "DELETE" });
       if (!res.ok) throw new Error();
       showToast("Resource deleted");
+      cacheRef.current = {};
       setResources((prev) => prev.filter((r) => r.id !== id));
     } catch (_) {
       showToast("Failed to delete resource", true);
@@ -320,6 +292,7 @@ export default function ResourcesView({ showToast }) {
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
+
 
   // Collect all unique tags for filter suggestions
   const allTags = [
@@ -371,6 +344,17 @@ export default function ResourcesView({ showToast }) {
           </span>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            className="gap-1.5 dark:text-white"
+            onClick={() => setTelegramOpen(true)}
+            id="telegram-bot-btn"
+            data-testid="telegram-bot-btn"
+          >
+            <Send size={14} />
+            Telegram Bot
+          </Button>
           <Button
             size="sm"
             variant="outline"
@@ -596,7 +580,7 @@ export default function ResourcesView({ showToast }) {
                       {TYPE_LABELS[r.resourceType]}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 max-w-52 xl:max-w-80 overflow-hidden">
                     <a
                       href={r.url}
                       target="_blank"
@@ -682,103 +666,18 @@ export default function ResourcesView({ showToast }) {
         </div>
       ) : (
         <div
-          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3"
+          className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
           id="resources-card-grid"
           data-testid="resources-card-grid"
         >
           {resources.map((r) => (
-            <div
+            <ResourceCard
               key={r.id}
-              className="bg-white border border-[#e9eaed] rounded-xl overflow-hidden flex flex-col hover:shadow-sm transition-shadow h-full"
-              data-testid={`resource-card-${r.id}`}
-            >
-              {r.image && (
-                <div className="h-[160px] overflow-hidden bg-gray-100">
-                  <img
-                    src={r.image}
-                    alt={r.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              )}
-              <div className="p-4 flex flex-col gap-2 flex-1">
-                <div className="flex items-center justify-between">
-                  <span
-                    className="inline-flex items-center px-[9px] py-[3px] rounded-full text-[0.72rem] font-semibold"
-                    style={TYPE_COLORS[r.resourceType]}
-                  >
-                    {TYPE_LABELS[r.resourceType]}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      className="w-7 h-7 flex items-center justify-center rounded-[6px] bg-transparent border-none cursor-pointer text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-                      onClick={() => openEdit(r)}
-                      title="Edit"
-                      data-testid={`edit-card-${r.id}`}
-                    >
-                      <Pencil size={13} />
-                    </button>
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <button
-                          className="w-7 h-7 flex items-center justify-center rounded-[6px] bg-transparent border-none cursor-pointer text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
-                          title="Delete"
-                          data-testid={`delete-card-${r.id}`}
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent>
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete resource?</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            &ldquo;{r.title}&rdquo; will be permanently deleted.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel>Cancel</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleDelete(r.id)}>
-                            Delete
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
-                  </div>
-                </div>
-                <a
-                  href={r.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="font-medium text-[#1f2937] no-underline hover:text-blue-600 hover:underline inline-flex items-center gap-1 text-sm transition-colors"
-                  data-testid={`card-title-${r.id}`}
-                >
-                  {r.title}
-                  <ExternalLink size={12} />
-                </a>
-                {r.description && (
-                  <p className="text-[0.77rem] text-gray-500 line-clamp-2 m-0">
-                    {r.description}
-                  </p>
-                )}
-                {r.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {r.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-block bg-gray-100 text-gray-600 text-[0.72rem] px-[7px] py-[2px] rounded-full cursor-pointer hover:bg-gray-200 transition-colors"
-                        onClick={() => setFilterTag(tag)}
-                        title={`Filter by "${tag}"`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
-                <p className="text-[0.72rem] text-gray-400 mt-auto pt-1 m-0">
-                  {new Date(r.createdAt).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
+              r={r}
+              onEdit={openEdit}
+              onDelete={handleDelete}
+              onFilterByTag={setFilterTag}
+            />
           ))}
         </div>
       )}
@@ -938,6 +837,7 @@ export default function ResourcesView({ showToast }) {
                 id="res-image"
                 data-testid="res-image-input"
                 type="url"
+                prefetch={false}
                 placeholder="https://..."
                 value={form.image}
                 onChange={(e) =>
@@ -1072,6 +972,13 @@ export default function ResourcesView({ showToast }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── TELEGRAM BOT PANEL ── */}
+      <TelegramBotPanel
+        open={telegramOpen}
+        onOpenChange={setTelegramOpen}
+        showToast={showToast}
+      />
     </div>
   );
 }

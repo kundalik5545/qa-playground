@@ -47,6 +47,8 @@ model User {
   habits           Habit[]
   habitLogs        HabitLog[]
   activityLogs     ActivityLog[]
+  telegramUser     TelegramUser?
+  notes            Note[]
 }
 
 model Resource {
@@ -59,6 +61,7 @@ model Resource {
   description  String?
   tags         String[]
   image        String?
+  source       String       @default("web")
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
 }
@@ -164,6 +167,7 @@ model DailyTask {
   done      Boolean  @default(false)
   timeMin   Int      @default(0)
   reason    String?
+  source    String   @default("web")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -258,4 +262,35 @@ model SiteAlertResponse {
   visitorId  String
   userAgent  String?
   createdAt  DateTime          @default(now())
+}
+
+// ─── Telegram Bot Feature ─────────────────────────────────────────────────────
+
+// Links a platform User to a Telegram chatId.
+// tokenHash stores SHA-256 of pending connect token; cleared after successful connection.
+model TelegramUser {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chatId      String?   @unique
+  username    String?
+  tokenHash   String?
+  tokenExpiry DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Notes saved by the user — from Telegram bot or web interface.
+model Note {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trigger   String
+  title     String
+  content   String
+  source    String   @default("web")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
