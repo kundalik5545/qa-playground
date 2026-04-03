@@ -124,8 +124,8 @@ const Footer = () => {
     <footer aria-label="Site footer">
       <div className="container mx-auto px-4 pt-4 pb-2 max-w-7xl">
         {/* Main grid */}
-        {/* sr-only H3 bridges the heading level gap (page H2 → footer H4) */}
-        <h3 className="sr-only">Footer Navigation</h3>
+        {/* sr-only paragraph bridges the heading level gap (page H2 → footer H4) */}
+        <p className="sr-only" role="presentation">Footer Navigation</p>
         <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-8 md:gap-10 pb-10 border-b border-border">
           {/* Column 1 — Brand */}
           <div className="col-span-1 sm:col-span-3 md:col-span-1 flex flex-col gap-3">
@@ -179,9 +179,9 @@ const Footer = () => {
 
           {/* Column 2 — Platform */}
           <div className="flex flex-col gap-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
               Platform
-            </h4>
+            </p>
             <nav className="flex flex-col gap-2.5" aria-label="Platform links">
               {platformLinks.map((link) => (
                 <Link
@@ -214,9 +214,9 @@ const Footer = () => {
 
           {/* Column 3 — Learn */}
           <div className="flex flex-col gap-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
               Learn
-            </h4>
+            </p>
             <nav className="flex flex-col gap-2.5" aria-label="Learn links">
               {learnLinks.map((link) => (
                 <Link
@@ -235,9 +235,9 @@ const Footer = () => {
 
           {/* Column 4 — Company */}
           <div className="flex flex-col gap-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
               Company
-            </h4>
+            </p>
             <nav className="flex flex-col gap-2.5" aria-label="Company links">
               {companyLinks.map((link) => (
                 <Link

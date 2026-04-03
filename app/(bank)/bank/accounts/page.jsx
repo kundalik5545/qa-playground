@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BankNavbar from "@/app/(bank)/bank/_components/BankNavbar";
+import BankBreadcrumb from "@/app/(bank)/bank/_components/BankBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -369,13 +370,20 @@ function AccountsContent() {
           className="flex justify-between items-center"
           id="accounts-header"
         >
-          <h1
-            className="text-4xl font-bold"
-            id="page-title"
-            data-testid="page-title"
-          >
-            Manage Accounts
-          </h1>
+          <div>
+            <BankBreadcrumb items={[
+              { label: 'Home', href: '/' },
+              { label: 'Bank Demo', href: '/bank' },
+              { label: 'Manage Accounts' }
+            ]} />
+            <h1
+              className="text-4xl font-bold"
+              id="page-title"
+              data-testid="page-title"
+            >
+              Manage Accounts — Bank Demo | QA Playground
+            </h1>
+          </div>
           {role !== "viewer" && (
             <div className="flex gap-2" id="accounts-header-actions">
               <Button
@@ -566,7 +574,10 @@ function AccountsContent() {
           className="bg-card rounded-lg shadow-md"
           id="accounts-table-section"
         >
-          <div className="rounded-md border" id="accounts-table-wrapper">
+          <div className="p-6 pb-2 border-b">
+            <h2 className="text-2xl font-bold" id="accounts-table-title">Your Bank Accounts</h2>
+          </div>
+          <div className="rounded-md border-x border-b" id="accounts-table-wrapper">
             <Table id="accounts-table" data-testid="accounts-table">
               <TableHeader
                 id="accounts-table-header"

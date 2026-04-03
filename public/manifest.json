@@ -1,0 +1,21 @@
+{
+  "name": "QA Playground - SecureBank Demo",
+  "short_name": "QA Playground",
+  "description": "Practice E2E automation testing with QA Playground and the SecureBank Demo.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/mainicons/edit.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

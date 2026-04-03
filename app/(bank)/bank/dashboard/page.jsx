@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import BankNavbar from "@/app/(bank)/bank/_components/BankNavbar";
+import BankBreadcrumb from "@/app/(bank)/bank/_components/BankBreadcrumb";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -290,12 +291,17 @@ export default function DashboardPage() {
           id="dashboard-header"
         >
           <div id="dashboard-header-content">
+            <BankBreadcrumb items={[
+              { label: 'Home', href: '/' },
+              { label: 'Bank Demo', href: '/bank' },
+              { label: 'Dashboard' }
+            ]} />
             <h1
               className="text-4xl font-bold"
               id="page-title"
               data-testid="page-title"
             >
-              Dashboard
+              SecureBank Dashboard — QA Automation Practice
             </h1>
             <p
               className="text-muted-foreground mt-2"

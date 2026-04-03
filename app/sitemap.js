@@ -39,5 +39,12 @@ export default async function sitemap() {
     })
     .filter(Boolean);
 
-  return [...staticPages, ...practicePages, ...blogPosts];
+  // Bank demo pages
+  const bankPages = [
+    { url: `${basicDetails.websiteURL}/bank/dashboard`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${basicDetails.websiteURL}/bank/accounts`, changeFrequency: "monthly", priority: 0.7 },
+    { url: `${basicDetails.websiteURL}/bank/transactions`, changeFrequency: "monthly", priority: 0.7 },
+  ];
+
+  return [...staticPages, ...practicePages, ...blogPosts, ...bankPages];
 }

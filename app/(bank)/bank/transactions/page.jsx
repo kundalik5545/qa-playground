@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import BankNavbar from "@/app/(bank)/bank/_components/BankNavbar";
+import BankBreadcrumb from "@/app/(bank)/bank/_components/BankBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -371,13 +372,20 @@ function TransactionsContent() {
           className="flex justify-between items-center"
           id="transactions-header"
         >
-          <h1
-            className="text-4xl font-bold"
-            id="page-title"
-            data-testid="page-title"
-          >
-            Transactions
-          </h1>
+          <div>
+            <BankBreadcrumb items={[
+              { label: 'Home', href: '/' },
+              { label: 'Bank Demo', href: '/bank' },
+              { label: 'Transactions' }
+            ]} />
+            <h1
+              className="text-4xl font-bold"
+              id="page-title"
+              data-testid="page-title"
+            >
+              Transaction History — Bank Demo | QA Playground
+            </h1>
+          </div>
           {role !== "viewer" && (
             <Button
               onClick={handleNewTransaction}
@@ -569,7 +577,10 @@ function TransactionsContent() {
           className="bg-card rounded-lg shadow-md"
           id="transactions-table-section"
         >
-          <div className="rounded-md border" id="transactions-table-wrapper">
+          <div className="p-6 pb-2 border-b">
+            <h2 className="text-2xl font-bold" id="transactions-table-title">Your Transactions</h2>
+          </div>
+          <div className="rounded-md border-x border-b" id="transactions-table-wrapper">
             <Table id="transactions-table" data-testid="transactions-table">
               <TableHeader
                 id="transactions-table-header"

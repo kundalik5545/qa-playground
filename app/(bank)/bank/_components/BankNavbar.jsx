@@ -79,16 +79,14 @@ export default function BankNavbar({ username, role }) {
                     {/* Right side: help, user info, logout, mobile hamburger */}
                     <div className="flex items-center gap-2">
                         {/* Help link — desktop only */}
-                        <a
-                            href="https://www.qaplayground.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <Link
+                            href="/docs/bank-demo"
                             id="help-link"
                             data-testid="help-link"
                             className="hidden md:inline text-sm text-muted-foreground hover:text-foreground transition-colors px-2 py-1 rounded-md hover:bg-accent"
                         >
                             Help &amp; Docs
-                        </a>
+                        </Link>
 
                         {/* User info — hidden on small screens */}
                         <span
@@ -163,14 +161,12 @@ export default function BankNavbar({ username, role }) {
                                             {link.label}
                                         </Link>
                                     ))}
-                                    <a
-                                        href="https://www.qaplayground.com"
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <Link
+                                        href="/docs/bank-demo"
                                         className="block px-4 py-3 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
                                     >
                                         Help &amp; Docs
-                                    </a>
+                                    </Link>
                                 </div>
 
                                 <div className="mt-6 px-4 border-t pt-4 space-y-2">

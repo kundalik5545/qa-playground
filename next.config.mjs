@@ -34,6 +34,7 @@ const nextConfig = {
       { source: "/practice/waits", destination: "/practice/dynamic-waits", permanent: true },
       { source: "/practice/simple-table", destination: "/practice/data-table", permanent: true },
       { source: "/practice/upload-download", destination: "/practice/file-upload", permanent: true },
+      { source: "/bank/login", destination: "/login", permanent: true },
     ];
   },
 

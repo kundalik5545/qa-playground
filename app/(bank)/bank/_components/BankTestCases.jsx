@@ -34,7 +34,13 @@ export default function BankTestCases({ testCases, title = "Test Cases" }) {
 
       <p className="text-sm text-muted-foreground">
         Expand each test case to see step-by-step automation instructions for
-        Selenium and Playwright.
+        Selenium and Playwright. Looking for more inspiration? Read our{" "}
+        <a 
+          href="/blog/25-real-world-automation-test-cases-for-qa-engineers" 
+          className="text-purple-600 hover:underline"
+        >
+          guide on 25 real-world automation test cases
+        </a>.
       </p>
 
       <Accordion

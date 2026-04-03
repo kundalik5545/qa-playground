@@ -1,6 +1,6 @@
 # MAIN Prompt
 
-Go through `selenium-docs/AUTOMATION_PRACTICE_ANALYSIS.md` and `bank-docs/BANK_APP_FEATURES.md` file under`docs`folder and understand all requirment or changes. Then create a Tasks under`docs/bank-docs` folder.
+Go through `21-UI-ISSUES-BANK.md` file under`docs`folder and understand all requirment or changes. Then create a Tasks under`docs/bank-docs/tasks` folder.
 
 ## Rules
 

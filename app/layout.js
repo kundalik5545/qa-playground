@@ -11,6 +11,10 @@ import SiteAlertPopup from "@/components/SiteAlertPopup";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const viewport = {
+  themeColor: "#7c3aed",
+};
+
 export const metadata = {
   title: {
     default: `${basicDetails.websiteName}: Practice Automation Testing with Selenium`,
