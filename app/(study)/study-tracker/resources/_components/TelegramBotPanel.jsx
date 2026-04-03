@@ -28,7 +28,10 @@ import {
   Check,
   Loader2,
   RefreshCw,
+  ExternalLink,
 } from "lucide-react";
+
+const BOT_URL = "https://t.me/qaplayground_bot";
 
 export default function TelegramBotPanel({ open, onOpenChange, showToast }) {
   const [status, setStatus] = useState(null); // null | { linked, token?, expiresAt?, username?, createdAt? }
@@ -65,7 +68,9 @@ export default function TelegramBotPanel({ open, onOpenChange, showToast }) {
   const disconnect = async () => {
     setDisconnecting(true);
     try {
-      const res = await fetch("/api/telegram/connect-token", { method: "DELETE" });
+      const res = await fetch("/api/telegram/connect-token", {
+        method: "DELETE",
+      });
       if (!res.ok) throw new Error();
       setStatus(null);
       showToast("Telegram disconnected");
@@ -84,7 +89,7 @@ export default function TelegramBotPanel({ open, onOpenChange, showToast }) {
 
   const handleOpen = (val) => {
     onOpenChange(val);
-    if (val && !status) fetchStatus();
+    if (val) fetchStatus();
   };
 
   return (
@@ -121,7 +126,12 @@ export default function TelegramBotPanel({ open, onOpenChange, showToast }) {
                 )}
                 {status.createdAt && (
                   <p className="text-xs text-green-500">
-                    Since {new Date(status.createdAt).toLocaleDateString()}
+                    Connected on{" "}
+                    {new Date(status.createdAt).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
                   </p>
                 )}
               </div>
@@ -132,57 +142,77 @@ export default function TelegramBotPanel({ open, onOpenChange, showToast }) {
                 Quick reference
               </p>
               <p className="text-xs text-muted-foreground">
-                <code className="bg-muted px-1 rounded">#todo Buy groceries @30min</code>
+                <code className="bg-muted px-1 rounded">
+                  #todo Buy groceries @30min
+                </code>
               </p>
               <p className="text-xs text-muted-foreground">
-                <code className="bg-muted px-1 rounded">https://example.com #js #tutorial</code>
+                <code className="bg-muted px-1 rounded">
+                  https://example.com #js #tutorial
+                </code>
               </p>
               <p className="text-xs text-muted-foreground">
-                <code className="bg-muted px-1 rounded">#note Your note content #tag</code>
+                <code className="bg-muted px-1 rounded">
+                  #note Your note content #tag
+                </code>
               </p>
             </div>
 
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/5"
-                  disabled={disconnecting}
-                  id="disconnect-telegram-btn"
-                  data-testid="disconnect-telegram-btn"
-                >
-                  {disconnecting ? (
-                    <Loader2 size={13} className="animate-spin" />
-                  ) : (
-                    <Link2Off size={13} />
-                  )}
-                  Disconnect Telegram
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Disconnect Telegram?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Your bot messages will stop saving. You can reconnect
-                    anytime.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={disconnect}>
-                    Disconnect
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <div className="flex flex-wrap items-center gap-2">
+              <a
+                href={BOT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors no-underline"
+                data-testid="open-telegram-bot-btn"
+              >
+                <Send size={13} />
+                Open Telegram
+                <ExternalLink size={11} className="opacity-75" />
+              </a>
+
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 text-destructive border-destructive/30 hover:bg-destructive/5"
+                    disabled={disconnecting}
+                    id="disconnect-telegram-btn"
+                    data-testid="disconnect-telegram-btn"
+                  >
+                    {disconnecting ? (
+                      <Loader2 size={13} className="animate-spin" />
+                    ) : (
+                      <Link2Off size={13} />
+                    )}
+                    Disconnect Telegram
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Disconnect Telegram?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Your bot messages will stop saving. You can reconnect
+                      anytime.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={disconnect}>
+                      Disconnect
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </div>
           </div>
         ) : (
           /* ── Not linked — show connect flow ── */
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Link your Telegram account to save todos, resources, and notes
-              by messaging the bot.
+              Link your Telegram account to save todos, resources, and notes by
+              messaging the bot.
             </p>
 
             <ol className="space-y-3 text-sm">
@@ -215,69 +245,115 @@ export default function TelegramBotPanel({ open, onOpenChange, showToast }) {
               </li>
             </ol>
 
-            {status?.token ? (
-              <div className="space-y-2">
-                <p className="text-xs text-muted-foreground">
-                  Your connect token{" "}
-                  <span className="text-orange-500 font-medium">
-                    (expires in 15 min)
-                  </span>
-                </p>
-                <div className="flex items-center gap-2 p-2 rounded border bg-muted/30">
-                  <code
-                    className="flex-1 text-xs font-mono text-foreground truncate"
-                    data-testid="telegram-token-display"
+            <div className="flex flex-col gap-2">
+              {status?.token ? (
+                <>
+                  <div className="space-y-0.5">
+                    <p className="text-xs text-muted-foreground">
+                      Your connect token
+                    </p>
+                    <div className="flex gap-3 text-xs">
+                      {status.createdAt && (
+                        <span className="text-muted-foreground">
+                          Generated:{" "}
+                          {new Date(status.createdAt).toLocaleTimeString(
+                            undefined,
+                            { hour: "2-digit", minute: "2-digit" },
+                          )}
+                        </span>
+                      )}
+                      {status.expiresAt && (
+                        <span className="text-orange-500 font-medium">
+                          Expires:{" "}
+                          {new Date(status.expiresAt).toLocaleTimeString(
+                            undefined,
+                            { hour: "2-digit", minute: "2-digit" },
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 rounded border bg-muted/30">
+                    <code
+                      className="flex-1 text-xs font-mono text-foreground truncate"
+                      data-testid="telegram-token-display"
+                    >
+                      {status.token}
+                    </code>
+                    <button
+                      className="shrink-0 p-1 rounded hover:bg-muted transition-colors"
+                      onClick={() => copyToken(status.token)}
+                      title="Copy token"
+                      data-testid="copy-telegram-token-btn"
+                    >
+                      {copied ? (
+                        <Check size={13} className="text-green-600" />
+                      ) : (
+                        <Copy size={13} />
+                      )}
+                    </button>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-1.5 w-full"
+                    onClick={generateToken}
+                    disabled={generating}
+                    data-testid="refresh-telegram-token-btn"
                   >
-                    {status.token}
-                  </code>
-                  <button
-                    className="shrink-0 p-1 rounded hover:bg-muted transition-colors"
-                    onClick={() => copyToken(status.token)}
-                    title="Copy token"
-                    data-testid="copy-telegram-token-btn"
-                  >
-                    {copied ? (
-                      <Check size={13} className="text-green-600" />
+                    {generating ? (
+                      <Loader2 size={13} className="animate-spin" />
                     ) : (
-                      <Copy size={13} />
+                      <RefreshCw size={13} />
                     )}
-                  </button>
-                </div>
+                    Regenerate token
+                  </Button>
+                </>
+              ) : (
                 <Button
-                  variant="ghost"
                   size="sm"
-                  className="gap-1.5 text-xs h-7 px-2"
+                  className="gap-1.5 w-full"
                   onClick={generateToken}
                   disabled={generating}
-                  data-testid="refresh-telegram-token-btn"
+                  id="generate-telegram-token-btn"
+                  data-testid="generate-telegram-token-btn"
                 >
                   {generating ? (
-                    <Loader2 size={11} className="animate-spin" />
+                    <Loader2 size={13} className="animate-spin" />
                   ) : (
-                    <RefreshCw size={11} />
+                    <Send size={13} />
                   )}
-                  Regenerate token
+                  Generate Connect Token
                 </Button>
-              </div>
-            ) : (
-              <Button
-                size="sm"
-                className="gap-1.5"
-                onClick={generateToken}
-                disabled={generating}
-                id="generate-telegram-token-btn"
-                data-testid="generate-telegram-token-btn"
+              )}
+
+              {/* Open Telegram bot — always visible */}
+              <a
+                href={BOT_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors no-underline w-full"
+                data-testid="open-telegram-bot-btn"
               >
-                {generating ? (
-                  <Loader2 size={13} className="animate-spin" />
-                ) : (
-                  <Send size={13} />
-                )}
-                Generate Connect Token
-              </Button>
-            )}
+                <Send size={13} />
+                Open Telegram
+                <ExternalLink size={11} className="opacity-75" />
+              </a>
+            </div>
           </div>
         )}
+
+        <div className="flex items-center justify-center">
+          <a
+            href="/help/telegram-setup"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-xs text-green-600 hover:text-green-700 font-medium transition-colors no-underline"
+          >
+            <ExternalLink size={11} />
+            Setup guide &amp; command reference
+          </a>
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
