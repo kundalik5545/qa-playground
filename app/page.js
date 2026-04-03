@@ -26,7 +26,9 @@ import {
   Chrome,
   ExternalLink,
   Plug,
+  Send,
 } from "lucide-react";
+import TelegramBotResourceLink from "@/app/(study)/study-tracker/resources/_components/telegram-bot/TelegramBotResourceLink";
 
 export const metadata = {
   title: "QA Playground — Practice Selenium, Playwright & Cypress",
@@ -253,7 +255,7 @@ const LandingPage = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {/* Practice Elements */}
           <Card className="p-6 shadow-lg rounded-xl border-t-4 border-t-blue-500 flex flex-col">
             <CardContent className="pt-0 flex flex-col flex-1">
@@ -337,6 +339,31 @@ const LandingPage = () => {
                   Track Your Progress
                 </Button>
               </Link>
+            </CardContent>
+          </Card>
+
+          {/* QA Playground Telegram Bot */}
+          <Card className="p-6 shadow-lg rounded-xl border-t-4 border-t-sky-500 relative overflow-hidden flex flex-col">
+            <div className="absolute top-3 right-3">
+              <Badge className="bg-sky-500 text-white text-xs">New</Badge>
+            </div>
+            <CardContent className="pt-0 flex flex-col flex-1">
+              <div className="mb-4">
+                <Send className="h-10 w-10 text-sky-500" aria-hidden="true" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">
+                QA Playground Telegram Bot
+              </h3>
+              <p className="text-muted-foreground text-sm mb-4 flex-1">
+                Save resources, todos, and notes directly from Telegram. Message{" "}
+                <span className="font-medium text-sky-600 dark:text-sky-400">
+                  @qaplayground_bot
+                </span>{" "}
+                and they appear instantly in your Resources list.
+              </p>
+              <div className="flex flex-col gap-2">
+                <TelegramBotResourceLink />
+              </div>
             </CardContent>
           </Card>
         </div>

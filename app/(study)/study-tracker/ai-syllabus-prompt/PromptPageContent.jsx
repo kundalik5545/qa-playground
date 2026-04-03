@@ -169,7 +169,7 @@ const STEPS = [
   },
   {
     num: "5",
-    text: 'Go to the JSON → File converter (button below), paste it, and click Download.',
+    text: "Go to the JSON → File converter (button below), paste it, and click Download.",
   },
   {
     num: "6",
@@ -220,7 +220,7 @@ function CopyButton({ text, label = "Copy" }) {
         "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[7px] border text-[0.78rem] font-semibold cursor-pointer transition-all whitespace-nowrap flex-shrink-0",
         copied
           ? "bg-emerald-500 border-emerald-500 text-white"
-          : "bg-white border-[#e9eaed] text-[#374151] hover:bg-gray-50 hover:border-gray-300"
+          : "bg-white border-[#e9eaed] text-[#374151] hover:bg-gray-50 hover:border-gray-300",
       )}
     >
       {copied ? <Check size={13} /> : <Copy size={13} />}
@@ -236,9 +236,14 @@ function CodeBlock({ filename, icon, copyText, children }) {
       <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-[#e2e8f0]">
         <div className="flex items-center gap-2">
           {icon && <span className="text-base">{icon}</span>}
-          <span className="text-[0.74rem] font-mono font-medium text-gray-500">{filename}</span>
+          <span className="text-[0.74rem] font-mono font-medium text-gray-500">
+            {filename}
+          </span>
         </div>
-        <CopyButton text={copyText} label={`Copy${filename ? " " + filename.split(".").pop().toUpperCase() : ""}`} />
+        <CopyButton
+          text={copyText}
+          label={`Copy${filename ? " " + filename.split(".").pop().toUpperCase() : ""}`}
+        />
       </div>
       <pre className="m-0 px-5 py-4 text-[0.88rem] leading-[1.75] text-[#24292e] font-mono overflow-x-auto whitespace-pre-wrap break-words">
         {children}
@@ -254,7 +259,9 @@ function Section({ title, hint, children }) {
       <div className="flex items-baseline gap-2 mb-3">
         <h2 className="text-[1.05rem] font-bold text-[#1a1d23] m-0">{title}</h2>
         {hint && (
-          <span className="text-[0.74rem] text-gray-400 font-medium">— {hint}</span>
+          <span className="text-[0.74rem] text-gray-400 font-medium">
+            — {hint}
+          </span>
         )}
       </div>
       {children}
@@ -264,20 +271,57 @@ function Section({ title, hint, children }) {
 
 // ── Rules data ────────────────────────────────────────────────────────────────
 const RULES = [
-  <>"version" must always be <IC>1</IC>.</>,
-  <>"type" must always be exactly <IC>qa-tracker-syllabus</IC>.</>,
-  <>{"exportedAt"} must be a valid ISO 8601 timestamp (e.g. <IC>2026-03-20T10:00:00.000Z</IC>).</>,
-  <>"id" inside "syllabus" must be a short, lowercase, hyphenated string (e.g. <IC>cypress</IC>, <IC>rest-api</IC>, <IC>java-basics</IC>).</>,
-  <>Section IDs must follow the pattern: <IC>&lt;syllabus-id&gt;-s1</IC>, <IC>&lt;syllabus-id&gt;-s2</IC>, etc.</>,
-  <>Topic IDs must follow the pattern: <IC>&lt;syllabus-id&gt;-t1</IC>, <IC>&lt;syllabus-id&gt;-t2</IC>, etc. Numbered sequentially across all sections.</>,
-  <>Each topic must have <strong>2–5 subtopics</strong> as plain strings.</>,
-  <>"resources" must always be an empty array <IC>[]</IC>.</>,
-  <>Organize topics into <strong>3–5 logical sections</strong> (e.g. Fundamentals, Core Features, Advanced, CI/CD, Best Practices).</>,
-  <>Each section should have <strong>2–5 topics</strong>.</>,
-  <>Choose a relevant <strong>emoji</strong> for the icon.</>,
-  <>Choose a fitting <strong>hex color</strong> (avoid #ffffff and #000000).</>,
-  <>Output must be <strong>valid JSON</strong> — no trailing commas, no comments.</>,
-  <>Always begin the response with a <IC>FILENAME: &lt;topic-slug&gt;.json</IC> line before the JSON (e.g. <IC>FILENAME: playwright.json</IC>). This is the name the user saves the file as.</>,
+  <>
+    "version" must always be <IC>1</IC>.
+  </>,
+  <>
+    "type" must always be exactly <IC>qa-tracker-syllabus</IC>.
+  </>,
+  <>
+    {"exportedAt"} must be a valid ISO 8601 timestamp (e.g.{" "}
+    <IC>2026-03-20T10:00:00.000Z</IC>).
+  </>,
+  <>
+    "id" inside "syllabus" must be a short, lowercase, hyphenated string (e.g.{" "}
+    <IC>cypress</IC>, <IC>rest-api</IC>, <IC>java-basics</IC>).
+  </>,
+  <>
+    Section IDs must follow the pattern: <IC>&lt;syllabus-id&gt;-s1</IC>,{" "}
+    <IC>&lt;syllabus-id&gt;-s2</IC>, etc.
+  </>,
+  <>
+    Topic IDs must follow the pattern: <IC>&lt;syllabus-id&gt;-t1</IC>,{" "}
+    <IC>&lt;syllabus-id&gt;-t2</IC>, etc. Numbered sequentially across all
+    sections.
+  </>,
+  <>
+    Each topic must have <strong>2–5 subtopics</strong> as plain strings.
+  </>,
+  <>
+    "resources" must always be an empty array <IC>[]</IC>.
+  </>,
+  <>
+    Organize topics into <strong>3–5 logical sections</strong> (e.g.
+    Fundamentals, Core Features, Advanced, CI/CD, Best Practices).
+  </>,
+  <>
+    Each section should have <strong>2–5 topics</strong>.
+  </>,
+  <>
+    Choose a relevant <strong>emoji</strong> for the icon.
+  </>,
+  <>
+    Choose a fitting <strong>hex color</strong> (avoid #ffffff and #000000).
+  </>,
+  <>
+    Output must be <strong>valid JSON</strong> — no trailing commas, no
+    comments.
+  </>,
+  <>
+    Always begin the response with a <IC>FILENAME: &lt;topic-slug&gt;.json</IC>{" "}
+    line before the JSON (e.g. <IC>FILENAME: playwright.json</IC>). This is the
+    name the user saves the file as.
+  </>,
 ];
 
 // ── Prompt renderer with highlighted topic slot ───────────────────────────────
@@ -285,17 +329,19 @@ function PromptWithHighlight({ topic }) {
   const placeholder = "[YOUR TOPIC HERE]";
   const idx = THE_PROMPT.indexOf(placeholder);
   const before = THE_PROMPT.slice(0, idx);
-  const after  = THE_PROMPT.slice(idx + placeholder.length);
+  const after = THE_PROMPT.slice(idx + placeholder.length);
 
   return (
     <>
       {before}
-      <mark className={cn(
-        "rounded px-[3px] not-italic font-semibold",
-        topic
-          ? "bg-emerald-100 text-emerald-700"
-          : "bg-amber-100 text-amber-700"
-      )}>
+      <mark
+        className={cn(
+          "rounded px-[3px] not-italic font-semibold",
+          topic
+            ? "bg-emerald-100 text-emerald-700"
+            : "bg-amber-100 text-amber-700",
+        )}
+      >
         {topic || placeholder}
       </mark>
       {after}
@@ -314,10 +360,9 @@ export default function PromptPageContent() {
   return (
     <div className="min-h-[calc(100vh-64px)] bg-[#f8f9fc] text-[#1a1d23]">
       <div className="max-w-[820px] mx-auto px-6 pt-8 pb-16">
-
         {/* Back link */}
         <Link
-          href="/study-tracker/dashboard"
+          href="/study-tracker/syllabus"
           prefetch={false}
           className="inline-flex items-center gap-1.5 text-[0.82rem] font-semibold text-gray-500 no-underline mb-7 hover:text-blue-600 transition-colors"
         >
@@ -339,8 +384,9 @@ export default function PromptPageContent() {
             AI Syllabus Generator Prompt
           </h1>
           <p className="text-base text-gray-500 m-0 leading-relaxed">
-            Use this ready-made prompt with ChatGPT, Claude, Gemini, or any AI to generate a study
-            syllabus in the exact format the QA Study Tracker can import.
+            Use this ready-made prompt with ChatGPT, Claude, Gemini, or any AI
+            to generate a study syllabus in the exact format the QA Study
+            Tracker can import.
           </p>
         </div>
 
@@ -377,7 +423,7 @@ export default function PromptPageContent() {
                     "text-[0.74rem] font-medium px-[10px] py-[4px] rounded-full border transition-colors cursor-pointer",
                     trimmed === t
                       ? "bg-blue-600 border-blue-600 text-white"
-                      : "bg-[#f8f9fc] border-[#e9eaed] text-[#374151] hover:border-blue-300 hover:text-blue-600 hover:bg-[#eff2ff]"
+                      : "bg-[#f8f9fc] border-[#e9eaed] text-[#374151] hover:border-blue-300 hover:text-blue-600 hover:bg-[#eff2ff]",
                   )}
                 >
                   {t}
@@ -390,7 +436,11 @@ export default function PromptPageContent() {
         {/* ── The Prompt ── */}
         <Section
           title="The Prompt"
-          hint={trimmed ? `Topic set to "${trimmed}"` : "Enter a topic above to auto-fill"}
+          hint={
+            trimmed
+              ? `Topic set to "${trimmed}"`
+              : "Enter a topic above to auto-fill"
+          }
         >
           <CodeBlock filename="prompt.txt" copyText={promptText}>
             <PromptWithHighlight topic={trimmed} />
@@ -398,28 +448,40 @@ export default function PromptPageContent() {
         </Section>
 
         {/* ── Rules ── */}
-        <Section title="JSON Structure Rules" hint="The AI must follow all 14 rules exactly">
+        <Section
+          title="JSON Structure Rules"
+          hint="The AI must follow all 14 rules exactly"
+        >
           <div className="bg-white border border-[#e9eaed] rounded-xl overflow-hidden">
             {RULES.map((rule, i) => (
               <div
                 key={i}
                 className={cn(
                   "flex gap-3 px-4 py-[11px] items-start",
-                  i < RULES.length - 1 && "border-b border-[#f0f1f4]"
+                  i < RULES.length - 1 && "border-b border-[#f0f1f4]",
                 )}
               >
                 <span className="min-w-[22px] h-[22px] rounded-full bg-[#eff2ff] text-blue-600 text-[0.68rem] font-bold font-mono flex items-center justify-center flex-shrink-0 mt-[1px]">
                   {i + 1}
                 </span>
-                <span className="text-[0.84rem] text-[#374151] leading-[1.55]">{rule}</span>
+                <span className="text-[0.84rem] text-[#374151] leading-[1.55]">
+                  {rule}
+                </span>
               </div>
             ))}
           </div>
         </Section>
 
         {/* ── Example Output ── */}
-        <Section title="Example Output (Playwright)" hint="This is what a correctly generated syllabus looks like">
-          <CodeBlock filename="playwright-syllabus.json" icon="🎭" copyText={EXAMPLE_JSON}>
+        <Section
+          title="Example Output (Playwright)"
+          hint="This is what a correctly generated syllabus looks like"
+        >
+          <CodeBlock
+            filename="playwright-syllabus.json"
+            icon="🎭"
+            copyText={EXAMPLE_JSON}
+          >
             {EXAMPLE_JSON}
           </CodeBlock>
         </Section>
@@ -432,13 +494,15 @@ export default function PromptPageContent() {
                 key={i}
                 className={cn(
                   "flex gap-[14px] px-4 py-[13px] items-start",
-                  i < STEPS.length - 1 && "border-b border-[#f0f1f4]"
+                  i < STEPS.length - 1 && "border-b border-[#f0f1f4]",
                 )}
               >
                 <div className="min-w-[28px] h-[28px] rounded-full bg-blue-600 text-white text-[0.75rem] font-bold font-mono flex items-center justify-center flex-shrink-0 mt-[1px]">
                   {step.num}
                 </div>
-                <span className="text-[0.88rem] text-[#1f2937] leading-[1.6] pt-1">{step.text}</span>
+                <span className="text-[0.88rem] text-[#1f2937] leading-[1.6] pt-1">
+                  {step.text}
+                </span>
               </div>
             ))}
           </div>
@@ -461,8 +525,6 @@ export default function PromptPageContent() {
             </Link>
           </div>
         </Section>
-
-
       </div>
     </div>
   );

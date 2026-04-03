@@ -49,7 +49,7 @@ import {
   Globe,
   Send,
 } from "lucide-react";
-import TelegramBotPanel from "./TelegramBotPanel";
+import TelegramBotPanel from "./telegram-bot/TelegramBotPanel";
 import { useTracker } from "../../_components/StudyTrackerProvider";
 import {
   CHROME_EXTENSIONS,
@@ -292,7 +292,6 @@ export default function ResourcesView({ showToast }) {
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
   };
-
 
   // Collect all unique tags for filter suggestions
   const allTags = [
@@ -872,13 +871,15 @@ export default function ResourcesView({ showToast }) {
           data-testid="api-keys-dialog"
         >
           <DialogHeader>
-            <DialogTitle>API Keys — Chrome Extension</DialogTitle>
+            <DialogTitle>API Keys — QA Playground Clipper</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-muted-foreground">
-            Use these keys in your Chrome extension:{" "}
-            <code className="text-xs bg-muted px-1 rounded">
-              Authorization: Bearer &lt;key&gt;
-            </code>
+            Use this key in the{" "}
+            <span className="font-medium text-foreground">
+              QA Playground Clipper
+            </span>{" "}
+            Chrome extension to save any resource directly to your Resources
+            list from any webpage — no copy-paste needed.
           </p>
 
           <div className="flex gap-2">
