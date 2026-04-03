@@ -274,7 +274,7 @@ model TelegramUser {
   user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   chatId      String?   @unique
   username    String?
-  tokenHash   String?
+  tokenHash   String? // SHA-256 hash — used by webhook for verification 
   tokenExpiry DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
