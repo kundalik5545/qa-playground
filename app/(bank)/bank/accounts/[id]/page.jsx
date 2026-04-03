@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import BankNavbar from "@/components/bank/BankNavbar";
+import BankNavbar from "@/app/(bank)/bank/_components/BankNavbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -22,6 +22,7 @@ import {
   formatDate,
   formatDateTime,
   initializeData,
+  getCurrentSession,
 } from "@/lib/bankStorage";
 import {
   ArrowLeft,
@@ -49,12 +50,12 @@ export default function AccountDetailPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const currentUser = sessionStorage.getItem("currentUser");
-      if (!currentUser) {
+      const session = getCurrentSession();
+      if (!session) {
         router.push("/bank");
         return;
       }
-      setUsername(currentUser);
+      setUsername(session.username);
       initializeData();
 
       const acc = getAccountById(params.id);
@@ -104,7 +105,10 @@ export default function AccountDetailPage() {
     <div className="min-h-screen bg-background" id="account-detail-page">
       <BankNavbar username={username} />
 
-      <main className="container mx-auto p-6 space-y-6" id="account-detail-main">
+      <main
+        className="container mx-auto p-6 space-y-6"
+        id="account-detail-main"
+      >
         {/* Breadcrumb */}
         <nav
           aria-label="Breadcrumb"
@@ -139,18 +143,30 @@ export default function AccountDetailPage() {
           </span>
         </nav>
 
-        {/* Back button */}
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => router.back()}
-          id="back-button"
-          data-testid="back-button"
-          aria-label="Go back"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
+        {/* Back button + Open Statement */}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => router.back()}
+            id="back-button"
+            data-testid="back-button"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back
+          </Button>
+          <a
+            href={`/bank/accounts/${params.id}?statement=true`}
+            target="_blank"
+            rel="noopener noreferrer"
+            id="open-statement-link"
+            data-testid="open-statement-link"
+            className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 border rounded-md hover:bg-accent transition-colors"
+          >
+            📄 Open Statement
+          </a>
+        </div>
 
         {/* Account Header Card */}
         <Card
@@ -186,7 +202,8 @@ export default function AccountDetailPage() {
                 id="account-detail-status-badge"
                 data-testid="account-detail-status"
               >
-                {account.status.charAt(0).toUpperCase() + account.status.slice(1)}
+                {account.status.charAt(0).toUpperCase() +
+                  account.status.slice(1)}
               </Badge>
             </div>
           </CardHeader>
@@ -203,7 +220,9 @@ export default function AccountDetailPage() {
                 </p>
               </div>
               <div id="detail-type">
-                <p className="text-sm text-muted-foreground mb-1">Account Type</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Account Type
+                </p>
                 <p
                   className="font-semibold capitalize"
                   id="account-detail-type"
@@ -321,8 +340,8 @@ export default function AccountDetailPage() {
                             txn.type === "deposit"
                               ? "text-green-600"
                               : txn.type === "withdrawal"
-                              ? "text-red-600"
-                              : "text-blue-600"
+                                ? "text-red-600"
+                                : "text-blue-600"
                           }`}
                         >
                           {getTransactionIcon(txn.type)}{" "}

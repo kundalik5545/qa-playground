@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import BankNavbar from "@/components/bank/BankNavbar";
+import BankNavbar from "@/app/(bank)/bank/_components/BankNavbar";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,14 +43,37 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
-import TablePagination from "@/components/bank/TablePagination";
+import TablePagination from "@/app/(bank)/bank/_components/TablePagination";
+import OpenAccountWizard from "@/app/(bank)/bank/_components/OpenAccountWizard";
+import ScrollToTop from "@/app/(bank)/bank/_components/ScrollToTop";
+import BankTestCases from "@/app/(bank)/bank/_components/BankTestCases";
+import { bankAccountsTC } from "@/data/bankTestCases";
 import {
   getAccounts,
   saveAccount,
   deleteAccount,
   formatCurrency,
   initializeData,
+  getCurrentSession,
+  getTotalBalance,
 } from "@/lib/bankStorage";
+
+// Badge color lookup maps — full Tailwind strings (no dynamic concatenation)
+const TYPE_BADGE_MAP = {
+  savings:
+    "border border-blue-300   bg-blue-50   text-blue-700   dark:border-blue-700   dark:bg-blue-900/30   dark:text-blue-300",
+  checking:
+    "border border-green-300  bg-green-50  text-green-700  dark:border-green-700  dark:bg-green-900/30  dark:text-green-300",
+  credit:
+    "border border-orange-300 bg-orange-50 text-orange-700 dark:border-orange-700 dark:bg-orange-900/30 dark:text-orange-300",
+};
+
+const STATUS_BADGE_MAP = {
+  active:
+    "border border-green-300 bg-green-50 text-green-700 dark:border-green-700 dark:bg-green-900/30 dark:text-green-300",
+  inactive:
+    "border border-red-300   bg-red-50   text-red-700   dark:border-red-700   dark:bg-red-900/30   dark:text-red-300",
+};
 import {
   Plus,
   Pencil,
@@ -78,6 +101,12 @@ function AccountsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [username, setUsername] = useState("Admin");
+  const [role, setRole] = useState("admin");
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
+
+  // Inline cell editing (P4-A)
+  const [editingId, setEditingId] = useState(null);
+  const [editingName, setEditingName] = useState("");
   const [accounts, setAccounts] = useState([]);
   const [filteredAccounts, setFilteredAccounts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -112,12 +141,13 @@ function AccountsContent() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const currentUser = sessionStorage.getItem("currentUser");
-      if (!currentUser) {
+      const session = getCurrentSession();
+      if (!session) {
         router.push("/bank");
         return;
       }
-      setUsername(currentUser);
+      setUsername(session.username);
+      setRole(session.role || "admin");
       initializeData();
 
       // 600ms artificial load delay — lets engineers practice skeleton wait strategies
@@ -149,7 +179,7 @@ function AccountsContent() {
       filtered = filtered.filter(
         (acc) =>
           acc.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          acc.accountNumber.includes(searchTerm)
+          acc.accountNumber.includes(searchTerm),
       );
     }
 
@@ -183,7 +213,7 @@ function AccountsContent() {
   // Derived: current page slice
   const paginatedAccounts = filteredAccounts.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const handleColSort = (field) => {
@@ -271,7 +301,9 @@ function AccountsContent() {
     setIsModalOpen(false);
     loadAccounts();
     toast.success(
-      isEdit ? "Account updated successfully!" : "Account created successfully!"
+      isEdit
+        ? "Account updated successfully!"
+        : "Account created successfully!",
     );
   };
 
@@ -283,14 +315,52 @@ function AccountsContent() {
     setCurrentPage(1);
   };
 
+  // Inline edit handlers (P4-A)
+  const handleInlineEditStart = (account) => {
+    setEditingId(account.id);
+    setEditingName(account.name);
+  };
+
+  const handleInlineEditSave = (account) => {
+    const trimmed = editingName.trim();
+    if (trimmed && trimmed !== account.name) {
+      saveAccount({ ...account, name: trimmed });
+      loadAccounts();
+      toast.success("Account name updated.");
+    }
+    setEditingId(null);
+  };
+
+  const handleInlineEditCancel = () => {
+    setEditingId(null);
+    setEditingName("");
+  };
+
+  // 'n' keyboard shortcut → open Add Account modal (P4-C)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key !== "n" && e.key !== "N") return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = e.target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || e.target.isContentEditable)
+        return;
+      if (role === "viewer") return;
+      e.preventDefault();
+      handleAddAccount();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [role]);
+
   return (
     <div
       className="min-h-screen bg-background"
       id="accounts-page-container"
       data-loading={isLoading ? "true" : "false"}
     >
-      <BankNavbar username={username} />
+      <BankNavbar username={username} role={role} />
 
+      <ScrollToTop />
       <main
         className="container mx-auto p-6 space-y-6"
         id="accounts-main-content"
@@ -306,16 +376,102 @@ function AccountsContent() {
           >
             Manage Accounts
           </h1>
-          <Button
-            onClick={handleAddAccount}
-            className="bg-gradient-to-r from-purple-600 to-pink-600"
-            id="add-account-btn"
-            data-testid="add-account-button"
-            data-action="add-account"
-          >
-            <Plus className="mr-2 h-4 w-4" /> Add New Account
-          </Button>
+          {role !== "viewer" && (
+            <div className="flex gap-2" id="accounts-header-actions">
+              <Button
+                onClick={() => setIsWizardOpen(true)}
+                variant="outline"
+                id="open-wizard-btn"
+                data-testid="open-wizard-button"
+                data-action="open-wizard"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Open New Account
+              </Button>
+              <Button
+                onClick={handleAddAccount}
+                className="bg-gradient-to-r from-purple-600 to-pink-600"
+                id="add-account-btn"
+                data-testid="add-account-button"
+                data-action="add-account"
+                data-permission="admin"
+                data-hotkey="n"
+              >
+                <Plus className="mr-2 h-4 w-4" /> Add New Account
+                <kbd className="ml-2 text-xs bg-white/20 px-1.5 py-0.5 rounded font-mono">
+                  N
+                </kbd>
+              </Button>
+            </div>
+          )}
         </header>
+
+        {/* Summary stats bar (UI-4) */}
+        {!isLoading && (
+          <section
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            id="accounts-summary-bar"
+            data-testid="accounts-summary-bar"
+          >
+            <div
+              className="bg-card rounded-lg border p-4 flex flex-col gap-1"
+              id="summary-total-balance"
+            >
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                Total Balance
+              </span>
+              <span
+                className="text-2xl font-bold text-purple-600"
+                data-testid="summary-total-balance"
+              >
+                {formatCurrency(
+                  accounts.reduce((s, a) => s + parseFloat(a.balance), 0),
+                )}
+              </span>
+            </div>
+            <div
+              className="bg-card rounded-lg border p-4 flex flex-col gap-1"
+              id="summary-total-accounts"
+            >
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                Total Accounts
+              </span>
+              <span
+                className="text-2xl font-bold text-pink-600"
+                data-testid="summary-total-accounts"
+              >
+                {accounts.length}
+              </span>
+            </div>
+            <div
+              className="bg-card rounded-lg border p-4 flex flex-col gap-1"
+              id="summary-active-accounts"
+            >
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                Active
+              </span>
+              <span
+                className="text-2xl font-bold text-green-600"
+                data-testid="summary-active-accounts"
+              >
+                {accounts.filter((a) => a.status === "active").length}
+              </span>
+            </div>
+            <div
+              className="bg-card rounded-lg border p-4 flex flex-col gap-1"
+              id="summary-filtered-accounts"
+            >
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">
+                Showing (filtered)
+              </span>
+              <span
+                className="text-2xl font-bold text-blue-600"
+                data-testid="summary-filtered-accounts"
+              >
+                {filteredAccounts.length}
+              </span>
+            </div>
+          </section>
+        )}
 
         {/* Filters */}
         <section
@@ -412,7 +568,10 @@ function AccountsContent() {
         >
           <div className="rounded-md border" id="accounts-table-wrapper">
             <Table id="accounts-table" data-testid="accounts-table">
-              <TableHeader id="accounts-table-header">
+              <TableHeader
+                id="accounts-table-header"
+                className="sticky top-0 z-10 bg-card"
+              >
                 <TableRow id="accounts-header-row">
                   <TableHead data-column="number" id="header-account-number">
                     Account Number
@@ -481,6 +640,7 @@ function AccountsContent() {
                       data-account-id={account.id}
                       data-testid={`account-row-${account.id}`}
                       id={`account-row-${account.id}`}
+                      className="hover:bg-muted/50 transition-colors border-l-2 border-l-transparent hover:border-l-purple-500"
                     >
                       <TableCell
                         data-testid="account-number"
@@ -491,22 +651,45 @@ function AccountsContent() {
                       <TableCell
                         data-testid="account-name"
                         id={`account-name-${account.id}`}
+                        data-editable="true"
+                        data-editing={
+                          editingId === account.id ? "true" : "false"
+                        }
+                        onDoubleClick={() => handleInlineEditStart(account)}
+                        title="Double-click to edit"
                       >
-                        <Link
-                          href={`/bank/accounts/${account.id}`}
-                          id={`account-name-link-${account.id}`}
-                          data-testid={`account-name-link-${account.id}`}
-                          className="text-purple-600 hover:underline font-medium"
-                        >
-                          {account.name}
-                        </Link>
+                        {editingId === account.id ? (
+                          <Input
+                            id={`inline-edit-${account.id}`}
+                            data-testid="inline-edit-input"
+                            value={editingName}
+                            autoFocus
+                            className="h-7 py-0 text-sm w-40"
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onBlur={() => handleInlineEditSave(account)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter")
+                                handleInlineEditSave(account);
+                              if (e.key === "Escape") handleInlineEditCancel();
+                            }}
+                          />
+                        ) : (
+                          <Link
+                            href={`/bank/accounts/${account.id}`}
+                            id={`account-name-link-${account.id}`}
+                            data-testid={`account-name-link-${account.id}`}
+                            className="text-purple-600 hover:underline font-medium"
+                          >
+                            {account.name}
+                          </Link>
+                        )}
                       </TableCell>
                       <TableCell
                         data-testid="account-type"
                         id={`account-type-${account.id}`}
                       >
                         <Badge
-                          variant="outline"
+                          className={TYPE_BADGE_MAP[account.type] || "border"}
                           id={`account-type-badge-${account.id}`}
                         >
                           {account.type.charAt(0).toUpperCase() +
@@ -524,8 +707,8 @@ function AccountsContent() {
                         id={`account-status-${account.id}`}
                       >
                         <Badge
-                          variant={
-                            account.status === "active" ? "default" : "secondary"
+                          className={
+                            STATUS_BADGE_MAP[account.status] || "border"
                           }
                           id={`account-status-badge-${account.id}`}
                         >
@@ -534,35 +717,46 @@ function AccountsContent() {
                         </Badge>
                       </TableCell>
                       <TableCell id={`account-actions-${account.id}`}>
-                        <div
-                          className="flex gap-2"
-                          id={`account-actions-container-${account.id}`}
-                        >
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleEditAccount(account)}
-                            data-testid={`edit-account-${account.id}`}
-                            data-action="edit"
-                            id={`edit-account-btn-${account.id}`}
-                            aria-label={`Edit account ${account.name}`}
+                        {role !== "viewer" ? (
+                          <div
+                            className="flex gap-2"
+                            id={`account-actions-container-${account.id}`}
                           >
-                            <Pencil className="h-4 w-4 mr-1" /> Edit
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() =>
-                              handleDeleteClick(account.id, account.name)
-                            }
-                            data-testid={`delete-account-${account.id}`}
-                            data-action="delete"
-                            id={`delete-account-btn-${account.id}`}
-                            aria-label={`Delete account ${account.name}`}
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditAccount(account)}
+                              data-testid={`edit-account-${account.id}`}
+                              data-action="edit"
+                              data-permission="admin"
+                              id={`edit-account-btn-${account.id}`}
+                              aria-label={`Edit account ${account.name}`}
+                            >
+                              <Pencil className="h-4 w-4 mr-1" /> Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() =>
+                                handleDeleteClick(account.id, account.name)
+                              }
+                              data-testid={`delete-account-${account.id}`}
+                              data-action="delete"
+                              data-permission="admin"
+                              id={`delete-account-btn-${account.id}`}
+                              aria-label={`Delete account ${account.name}`}
+                            >
+                              <Trash2 className="h-4 w-4 mr-1" /> Delete
+                            </Button>
+                          </div>
+                        ) : (
+                          <span
+                            className="text-xs text-muted-foreground"
+                            id={`account-actions-container-${account.id}`}
                           >
-                            <Trash2 className="h-4 w-4 mr-1" /> Delete
-                          </Button>
-                        </div>
+                            —
+                          </span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))
@@ -582,6 +776,12 @@ function AccountsContent() {
             )}
           </div>
         </section>
+
+        {/* Test Cases */}
+        <BankTestCases
+          testCases={bankAccountsTC}
+          title="Accounts Page — Test Cases"
+        />
       </main>
 
       {/* Add/Edit Account Modal */}
@@ -780,11 +980,15 @@ function AccountsContent() {
         </DialogContent>
       </Dialog>
 
+      {/* Open Account Wizard */}
+      <OpenAccountWizard
+        open={isWizardOpen}
+        onOpenChange={setIsWizardOpen}
+        onAccountCreated={loadAccounts}
+      />
+
       {/* Delete Confirmation Dialog */}
-      <AlertDialog
-        open={isDeleteModalOpen}
-        onOpenChange={setIsDeleteModalOpen}
-      >
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <AlertDialogContent
           id="delete-modal"
           data-testid="delete-modal"

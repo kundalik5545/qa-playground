@@ -118,6 +118,24 @@ body {
   background-attachment: fixed;
 }
 
+/* Bank login — animated gradient background (UI-12) */
+@keyframes bank-bg-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50%       { background-position: 100% 50%; }
+}
+
+.bank-login-bg {
+  background: linear-gradient(-45deg, #f3e8ff, #ede9fe, #dbeafe, #fce7f3, #f3e8ff);
+  background-size: 400% 400%;
+  animation: bank-bg-shift 12s ease infinite;
+}
+
+.dark .bank-login-bg {
+  background: linear-gradient(-45deg, #1a0638, #0c1435, #180d30, #1a0622, #1a0638);
+  background-size: 400% 400%;
+  animation: bank-bg-shift 12s ease infinite;
+}
+
 .dark .auth-card-shadow {
   box-shadow:
     0 4px 6px -1px rgba(99, 102, 241, 0.15),

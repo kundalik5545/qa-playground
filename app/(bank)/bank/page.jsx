@@ -17,6 +17,9 @@ import {
 } from "@/components/ui/card";
 import { Building2, Eye, EyeOff, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { setCurrentSession } from "@/lib/bankStorage";
+import BankTestCases from "@/app/(bank)/bank/_components/BankTestCases";
+import { bankLoginTC } from "@/data/bankTestCases";
 
 export default function BankLoginPage() {
   const router = useRouter();
@@ -70,17 +73,20 @@ export default function BankLoginPage() {
 
     // Check credentials
     if (username === "admin" && password === "admin123") {
-      // Successful login
-      if (typeof window !== "undefined") {
-        sessionStorage.setItem("currentUser", username);
-
-        if (rememberMe) {
-          localStorage.setItem("rememberedUser", username);
-        } else {
-          localStorage.removeItem("rememberedUser");
-        }
+      setCurrentSession("admin", "admin");
+      if (rememberMe) {
+        localStorage.setItem("rememberedUser", username);
+      } else {
+        localStorage.removeItem("rememberedUser");
       }
-
+      router.push("/bank/dashboard");
+    } else if (username === "viewer" && password === "viewer123") {
+      setCurrentSession("viewer", "viewer");
+      if (rememberMe) {
+        localStorage.setItem("rememberedUser", username);
+      } else {
+        localStorage.removeItem("rememberedUser");
+      }
       router.push("/bank/dashboard");
     } else {
       // Failed login
@@ -100,248 +106,323 @@ export default function BankLoginPage() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex flex-col items-center justify-center p-4 py-16 relative"
       id="bank-login-page-container"
     >
-      <div className="w-full max-w-md" id="bank-login-wrapper">
-        <Card
-          className="backdrop-blur-sm bg-card/95 shadow-2xl"
-          id="bank-login-card"
-        >
-          <CardHeader className="text-center space-y-4" id="bank-login-header">
-            <div className="flex justify-center" id="logo-container">
-              <div
-                className="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full animate-bounce"
-                id="logo-wrapper"
-              >
-                <Building2
-                  className="h-12 w-12 text-white"
-                  id="bank-logo"
-                  data-testid="bank-logo"
-                />
+      <Button
+        variant="outline"
+        size="icon"
+        className="fixed top-4 right-4 rounded-full z-50 shadow-md"
+        id="theme-toggle"
+        data-testid="theme-toggle"
+        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      >
+        {theme === "dark" ? (
+          <Sun className="h-5 w-5" id="theme-sun-icon" />
+        ) : (
+          <Moon className="h-5 w-5" id="theme-moon-icon" />
+        )}
+      </Button>
+
+      <div className="w-full max-w-6xl mx-auto space-y-16" id="bank-login-wrapper">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          
+          {/* Left Side: Infographic (Hidden on mobile) */}
+          <div className="hidden lg:flex flex-col items-center text-center space-y-8 select-none">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full blur-[80px] opacity-20 animate-pulse" />
+              <div className="relative p-12 bg-card border border-border/50 shadow-2xl rounded-full">
+                <Building2 className="h-32 w-32 text-purple-600 dark:text-purple-400" />
               </div>
             </div>
-            <CardTitle
-              className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
-              id="app-title"
-            >
-              SecureBank Demo
-            </CardTitle>
-            <CardDescription id="app-subtitle">
-              Automation Testing Practice Application
-            </CardDescription>
-          </CardHeader>
+            <div className="space-y-4">
+              <h1 className="text-5xl font-extrabold tracking-tight">
+                Welcome to{" "}
+                <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  SecureBank
+                </span>
+              </h1>
+              <p className="text-xl text-muted-foreground max-w-lg mx-auto leading-relaxed">
+                Your premier automation testing practice ground. Master complex UI interactions, state management, and end-to-end testing scenarios.
+              </p>
+            </div>
+          </div>
 
-          <CardContent id="bank-login-content">
-            <form
-              onSubmit={handleSubmit}
-              id="login-form"
-              name="loginForm"
-              data-testid="login-form"
+          {/* Right Side: Login Panel */}
+          <div className="w-full max-w-md mx-auto lg:mx-0 lg:ml-auto">
+            <Card
+              className="backdrop-blur-sm bg-card/95 shadow-2xl border border-border/50"
+              id="bank-login-card"
             >
-              <div className="space-y-4" id="login-form-fields">
-                <div className="space-y-2" id="username-field-container">
-                  <Label htmlFor="username" id="username-label">
-                    Username
-                  </Label>
-                  <Input
-                    type="text"
-                    id="username"
-                    name="username"
-                    placeholder="Enter your username"
-                    data-testid="username-input"
-                    data-field="username"
-                    autoComplete="username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    onBlur={() => {
-                      if (!username.trim()) {
-                        setErrors((prev) => ({
-                          ...prev,
-                          username: "Username is required",
-                        }));
-                      } else {
-                        setErrors((prev) => ({ ...prev, username: "" }));
-                      }
-                    }}
-                  />
-                  {errors.username && (
-                    <p
-                      className="text-sm text-destructive"
-                      id="username-error"
-                      data-testid="username-error"
-                    >
-                      {errors.username}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-2" id="password-field-container">
-                  <Label htmlFor="password" id="password-label">
-                    Password
-                  </Label>
-                  <div className="relative" id="password-input-wrapper">
-                    <Input
-                      type={showPassword ? "text" : "password"}
-                      id="password"
-                      name="password"
-                      placeholder="Enter your password"
-                      data-testid="password-input"
-                      data-field="password"
-                      autoComplete="current-password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      onBlur={() => {
-                        if (!password.trim()) {
-                          setErrors((prev) => ({
-                            ...prev,
-                            password: "Password is required",
-                          }));
-                        } else {
-                          setErrors((prev) => ({ ...prev, password: "" }));
-                        }
-                      }}
+              <CardHeader className="text-center space-y-4" id="bank-login-header">
+                <div className="flex justify-center lg:hidden" id="logo-container">
+                  <div
+                    className="p-4 bg-gradient-to-br from-purple-600 to-pink-600 rounded-full animate-bounce"
+                    id="logo-wrapper"
+                  >
+                    <Building2
+                      className="h-12 w-12 text-white"
+                      id="bank-logo"
+                      data-testid="bank-logo"
                     />
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="absolute right-0 top-0 h-full px-3"
-                      id="toggle-password"
-                      data-testid="toggle-password-btn"
-                      aria-label="Toggle password visibility"
-                      onClick={() => setShowPassword(!showPassword)}
-                    >
-                      {showPassword ? (
-                        <EyeOff className="h-4 w-4" />
-                      ) : (
-                        <Eye className="h-4 w-4" />
-                      )}
-                    </Button>
                   </div>
-                  {errors.password && (
-                    <p
-                      className="text-sm text-destructive"
-                      id="password-error"
-                      data-testid="password-error"
-                    >
-                      {errors.password}
-                    </p>
-                  )}
                 </div>
-
-                <div
-                  className="flex items-center space-x-2"
-                  id="remember-me-container"
+                <CardTitle
+                  className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent"
+                  id="app-title"
                 >
-                  <Checkbox
-                    id="remember-me"
-                    name="rememberMe"
-                    data-testid="remember-checkbox"
-                    checked={rememberMe}
-                    onCheckedChange={setRememberMe}
-                  />
-                  <Label
-                    htmlFor="remember-me"
-                    className="text-sm font-normal cursor-pointer"
-                    id="remember-me-label"
+                  SecureBank Demo
+                </CardTitle>
+                <CardDescription id="app-subtitle">
+                  Automation Testing Practice Application
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent id="bank-login-content">
+                <form
+                  onSubmit={handleSubmit}
+                  id="login-form"
+                  name="loginForm"
+                  data-testid="login-form"
+                >
+                  <div className="space-y-4" id="login-form-fields">
+                    <div className="space-y-2" id="username-field-container">
+                      <Label htmlFor="username" id="username-label">
+                        Username
+                      </Label>
+                      <Input
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Enter your username"
+                        data-testid="username-input"
+                        data-field="username"
+                        autoComplete="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        onBlur={() => {
+                          if (!username.trim()) {
+                            setErrors((prev) => ({
+                              ...prev,
+                              username: "Username is required",
+                            }));
+                          } else {
+                            setErrors((prev) => ({ ...prev, username: "" }));
+                          }
+                        }}
+                      />
+                      {errors.username && (
+                        <p
+                          className="text-sm text-destructive"
+                          id="username-error"
+                          data-testid="username-error"
+                        >
+                          {errors.username}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="space-y-2" id="password-field-container">
+                      <Label htmlFor="password" id="password-label">
+                        Password
+                      </Label>
+                      <div className="relative" id="password-input-wrapper">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          id="password"
+                          name="password"
+                          placeholder="Enter your password"
+                          data-testid="password-input"
+                          data-field="password"
+                          autoComplete="current-password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          onBlur={() => {
+                            if (!password.trim()) {
+                              setErrors((prev) => ({
+                                ...prev,
+                                password: "Password is required",
+                              }));
+                            } else {
+                              setErrors((prev) => ({ ...prev, password: "" }));
+                            }
+                          }}
+                        />
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="absolute right-0 top-0 h-full px-3"
+                          id="toggle-password"
+                          data-testid="toggle-password-btn"
+                          aria-label="Toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <EyeOff className="h-4 w-4" />
+                          ) : (
+                            <Eye className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </div>
+                      {errors.password && (
+                        <p
+                          className="text-sm text-destructive"
+                          id="password-error"
+                          data-testid="password-error"
+                        >
+                          {errors.password}
+                        </p>
+                      )}
+                    </div>
+
+                    <div
+                      className="flex items-center space-x-2"
+                      id="remember-me-container"
+                    >
+                      <Checkbox
+                        id="remember-me"
+                        name="rememberMe"
+                        data-testid="remember-checkbox"
+                        checked={rememberMe}
+                        onCheckedChange={setRememberMe}
+                      />
+                      <Label
+                        htmlFor="remember-me"
+                        className="text-sm font-normal cursor-pointer"
+                        id="remember-me-label"
+                      >
+                        Remember me
+                      </Label>
+                    </div>
+
+                    {alertMessage && (
+                      <Alert
+                        variant="destructive"
+                        id="login-alert"
+                        data-testid="login-alert"
+                        role="alert"
+                        aria-live="assertive"
+                      >
+                        <AlertDescription id="alert-message">
+                          ⚠️ {alertMessage}
+                        </AlertDescription>
+                      </Alert>
+                    )}
+
+                    <div className="space-y-2" id="login-actions-container">
+                      <Button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                        id="login-btn"
+                        data-testid="login-button"
+                        data-action="login"
+                      >
+                        Login
+                      </Button>
+
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        className="w-full"
+                        id="clear-btn"
+                        data-testid="clear-button"
+                        data-action="clear"
+                        onClick={handleClear}
+                      >
+                        Clear
+                      </Button>
+                    </div>
+                  </div>
+                </form>
+              </CardContent>
+
+              <CardFooter id="bank-login-footer">
+                <div className="w-full space-y-2" id="demo-credentials-wrapper">
+                  <p
+                    className="text-center text-sm font-semibold"
+                    id="demo-credentials-title"
                   >
-                    Remember me
-                  </Label>
+                    Demo Credentials:
+                  </p>
+                  <table
+                    className="w-full text-sm border rounded-md overflow-hidden"
+                    id="demo-credentials"
+                    data-testid="demo-credentials-table"
+                  >
+                    <thead className="bg-muted">
+                      <tr>
+                        <th className="text-left px-3 py-2 font-medium">Role</th>
+                        <th className="text-left px-3 py-2 font-medium">
+                          Username
+                        </th>
+                        <th className="text-left px-3 py-2 font-medium">
+                          Password
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-t">
+                        <td className="px-3 py-2 text-muted-foreground">
+                          Full Access
+                        </td>
+                        <td className="px-3 py-2">
+                          <code
+                            className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs"
+                            id="demo-username-text"
+                            data-testid="demo-username"
+                          >
+                            admin
+                          </code>
+                        </td>
+                        <td className="px-3 py-2">
+                          <code
+                            className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs"
+                            id="demo-password-text"
+                            data-testid="demo-password"
+                          >
+                            admin123
+                          </code>
+                        </td>
+                      </tr>
+                      <tr className="border-t">
+                        <td className="px-3 py-2 text-muted-foreground">
+                          Read-only
+                        </td>
+                        <td className="px-3 py-2">
+                          <code
+                            className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs"
+                            id="demo-viewer-username"
+                            data-testid="demo-viewer-username"
+                          >
+                            viewer
+                          </code>
+                        </td>
+                        <td className="px-3 py-2">
+                          <code
+                            className="bg-primary text-primary-foreground px-2 py-0.5 rounded text-xs"
+                            id="demo-viewer-password"
+                            data-testid="demo-viewer-password"
+                          >
+                            viewer123
+                          </code>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
 
-                {alertMessage && (
-                  <Alert
-                    variant="destructive"
-                    id="login-alert"
-                    data-testid="login-alert"
-                    role="alert"
-                    aria-live="assertive"
-                  >
-                    <AlertDescription id="alert-message">
-                      ⚠️ {alertMessage}
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <div className="space-y-2" id="login-actions-container">
-                  <Button
-                    type="submit"
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                    id="login-btn"
-                    data-testid="login-button"
-                    data-action="login"
-                  >
-                    Login
-                  </Button>
-
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="w-full"
-                    id="clear-btn"
-                    data-testid="clear-button"
-                    data-action="clear"
-                    onClick={handleClear}
-                  >
-                    Clear
-                  </Button>
-                </div>
-              </div>
-            </form>
-          </CardContent>
-
-          <CardFooter id="bank-login-footer">
-            <div
-              className="w-full text-center space-y-2"
-              id="demo-credentials-wrapper"
-            >
-              <div
-                className="bg-muted p-3 rounded-md text-sm"
-                id="demo-credentials"
-              >
-                <p className="font-semibold mb-1" id="demo-credentials-title">
-                  Demo Credentials:
-                </p>
-                <p id="demo-username-container">
-                  Username:{" "}
-                  <code
-                    className="bg-primary text-primary-foreground px-2 py-0.5 rounded"
-                    id="demo-username-text"
-                    data-testid="demo-username"
-                  >
-                    admin
-                  </code>
-                </p>
-                <p id="demo-password-container">
-                  Password:{" "}
-                  <code
-                    className="bg-primary text-primary-foreground px-2 py-0.5 rounded"
-                    id="demo-password-text"
-                    data-testid="demo-password"
-                  >
-                    admin123
-                  </code>
-                </p>
-              </div>
-            </div>
-          </CardFooter>
-        </Card>
-
-        <Button
-          variant="outline"
-          size="icon"
-          className="fixed top-4 right-4 rounded-full"
-          id="theme-toggle"
-          data-testid="theme-toggle"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-        >
-          {theme === "dark" ? (
-            <Sun className="h-5 w-5" id="theme-sun-icon" />
-          ) : (
-            <Moon className="h-5 w-5" id="theme-moon-icon" />
-          )}
-        </Button>
+        {/* Bottom Test Cases Section */}
+        <div className="w-full max-w-4xl mx-auto pt-8">
+          <BankTestCases
+            testCases={bankLoginTC}
+            title="Login Page — Test Cases"
+          />
+        </div>
       </div>
     </div>
   );

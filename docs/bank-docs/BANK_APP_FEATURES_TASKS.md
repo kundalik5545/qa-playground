@@ -2,7 +2,7 @@
 
 > **Source docs:** `docs/selenium-docs/AUTOMATION_PRACTICE_ANALYSIS.md` · `docs/bank-docs/BANK_APP_FEATURES.md`
 > **Goal:** Close all automation-practice gaps and upgrade UI to a modern, complete QA practice ground.
-> **Last updated:** 2026-04-03 — Phase 1 & 2 complete
+> **Last updated:** 2026-04-03 — All phases complete (P1–P4 + UI)
 
 ---
 
@@ -17,13 +17,13 @@
 | P2-B  | Loading & Skeleton States            | ✅ Done        |
 | P2-C  | Calendar Date Picker                 | ✅ Done        |
 | P2-D  | Account & Transaction Detail Pages   | ✅ Done        |
-| P3-A  | Multi-step Wizard (Open Account)     | ⬜ Not started |
-| P3-B  | Role-based UI (Viewer role)          | ⬜ Not started |
-| P3-C  | Drag-and-drop Pinned Accounts        | ⬜ Not started |
-| P4-A  | Inline Cell Editing                  | ⬜ Not started |
-| P4-B  | Cross-tab / New Window Scenarios     | ⬜ Not started |
-| P4-C  | Keyboard Navigation & Shortcuts      | ⬜ Not started |
-| UI    | Modern UI Polish Pass                | ⬜ Not started |
+| P3-A  | Multi-step Wizard (Open Account)     | ✅ Done        |
+| P3-B  | Role-based UI (Viewer role)          | ✅ Done        |
+| P3-C  | Drag-and-drop Pinned Accounts        | ✅ Done        |
+| P4-A  | Inline Cell Editing                  | ✅ Done        |
+| P4-B  | Cross-tab / New Window Scenarios     | ✅ Done        |
+| P4-C  | Keyboard Navigation & Shortcuts      | ✅ Done        |
+| UI    | Modern UI Polish Pass                | ✅ Done        |
 
 ---
 
@@ -174,16 +174,16 @@
 
 ### Tasks
 
-- [ ] **P3-A-1** — Add a "Open New Account" button on the Accounts page (separate from the existing "Add Account" modal) with `data-testid="open-wizard-button"`
-- [ ] **P3-A-2** — Create `components/bank/OpenAccountWizard.jsx` — a Dialog/Sheet with 3-step form
-- [ ] **P3-A-3** — **Step 1:** Account type selection via card-based radio buttons (Savings / Checking / Credit); each card gets `data-testid="type-card-{type}"`, `data-selected="true|false"`
-- [ ] **P3-A-4** — **Step 2:** Account details — Account Name (text), Initial Deposit (number), Status (radio Active/Inactive), Overdraft (checkbox)
-- [ ] **P3-A-5** — **Step 3:** Review & Confirm — read-only summary of all entered data; "Confirm & Open Account" button
-- [ ] **P3-A-6** — Step indicator bar at the top: shows Step 1 / 2 / 3 with `data-step="1|2|3"` and `data-step-status="active|complete|pending"` on each step indicator
-- [ ] **P3-A-7** — "Next" button (`data-testid="wizard-next"`) and "Back" button (`data-testid="wizard-back"`) for navigation between steps
-- [ ] **P3-A-8** — Current step number indicator text: `"Step 2 of 3"` with `data-testid="wizard-step-indicator"`
-- [ ] **P3-A-9** — Data entered in Steps 1 and 2 persists when navigating back and forward
-- [ ] **P3-A-10** — On confirm (Step 3), creates account via `saveAccount()` and shows success toast; closes wizard
+- [x] **P3-A-1** — Add a "Open New Account" button on the Accounts page (separate from the existing "Add Account" modal) with `data-testid="open-wizard-button"`
+- [x] **P3-A-2** — Create `components/bank/OpenAccountWizard.jsx` — a Dialog/Sheet with 3-step form
+- [x] **P3-A-3** — **Step 1:** Account type selection via card-based radio buttons (Savings / Checking / Credit); each card gets `data-testid="type-card-{type}"`, `data-selected="true|false"`
+- [x] **P3-A-4** — **Step 2:** Account details — Account Name (text), Initial Deposit (number), Status (radio Active/Inactive), Overdraft (checkbox)
+- [x] **P3-A-5** — **Step 3:** Review & Confirm — read-only summary of all entered data; "Confirm & Open Account" button
+- [x] **P3-A-6** — Step indicator bar at the top: shows Step 1 / 2 / 3 with `data-step="1|2|3"` and `data-step-status="active|complete|pending"` on each step indicator
+- [x] **P3-A-7** — "Next" button (`data-testid="wizard-next"`) and "Back" button (`data-testid="wizard-back"`) for navigation between steps
+- [x] **P3-A-8** — Current step number indicator text: `"Step 2 of 3"` with `data-testid="wizard-step-indicator"`
+- [x] **P3-A-9** — Data entered in Steps 1 and 2 persists when navigating back and forward
+- [x] **P3-A-10** — On confirm (Step 3), creates account via `saveAccount()` and shows success toast; closes wizard
 
 **Files to create:** `components/bank/OpenAccountWizard.jsx`
 **Files to edit:** `app/(bank)/bank/accounts/page.jsx`
@@ -196,14 +196,14 @@
 
 ### Tasks
 
-- [ ] **P3-B-1** — Add `viewer` / `viewer123` credentials to the login validation in `bank/page.jsx`; store `{ username: "viewer", role: "viewer" }` in `sessionStorage`
-- [ ] **P3-B-2** — Update login page demo credentials section to show both: `admin / admin123` (Full access) and `viewer / viewer123` (Read-only)
-- [ ] **P3-B-3** — Read `role` from sessionStorage on each post-login page; pass it down as a prop or read via a shared hook
-- [ ] **P3-B-4** — In `accounts/page.jsx`: hide "Add Account", "Edit", and "Delete" buttons when `role === "viewer"`; add `data-permission="admin"` on those buttons
-- [ ] **P3-B-5** — In `transactions/page.jsx`: hide "New Transaction" button when `role === "viewer"`; add `data-permission="admin"`
-- [ ] **P3-B-6** — In `BankNavbar.jsx`: show a `(Read-only)` badge next to the username when role is viewer; badge `data-testid="viewer-badge"`
-- [ ] **P3-B-7** — Add a role indicator on Dashboard: `"You are logged in as: Admin | Read-only Viewer"` with `data-testid="role-indicator"`
-- [ ] **P3-B-8** — Update `bankStorage.js` `initializeData()` to also store role in the session; update `sessionStorage` key shape to `{ username, role }`
+- [x] **P3-B-1** — Add `viewer` / `viewer123` credentials to the login validation in `bank/page.jsx`; store `{ username: "viewer", role: "viewer" }` in `sessionStorage`
+- [x] **P3-B-2** — Update login page demo credentials section to show both: `admin / admin123` (Full access) and `viewer / viewer123` (Read-only)
+- [x] **P3-B-3** — Read `role` from sessionStorage on each post-login page; pass it down as a prop or read via a shared hook
+- [x] **P3-B-4** — In `accounts/page.jsx`: hide "Add Account", "Edit", and "Delete" buttons when `role === "viewer"`; add `data-permission="admin"` on those buttons
+- [x] **P3-B-5** — In `transactions/page.jsx`: hide "New Transaction" button when `role === "viewer"`; add `data-permission="admin"`
+- [x] **P3-B-6** — In `BankNavbar.jsx`: show a `(Read-only)` badge next to the username when role is viewer; badge `data-testid="viewer-badge"`
+- [x] **P3-B-7** — Add a role indicator on Dashboard: `"You are logged in as: Admin | Read-only Viewer"` with `data-testid="role-indicator"`
+- [x] **P3-B-8** — Update `bankStorage.js` — added `getCurrentSession()` / `setCurrentSession()` helpers; session key shape is now `{ username, role }`
 
 **Files to edit:** `app/(bank)/bank/page.jsx`, `app/(bank)/bank/accounts/page.jsx`, `app/(bank)/bank/transactions/page.jsx`, `app/(bank)/bank/dashboard/page.jsx`, `components/bank/BankNavbar.jsx`, `lib/bankStorage.js`
 
@@ -215,12 +215,12 @@
 
 ### Tasks
 
-- [ ] **P3-C-1** — Add a "Pinned Accounts" section to `dashboard/page.jsx` below the Quick Actions section
-- [ ] **P3-C-2** — Use HTML5 drag-and-drop API (no extra library) — `draggable`, `onDragStart`, `onDragOver`, `onDrop` event handlers
-- [ ] **P3-C-3** — Each pinned account card gets `data-testid="draggable-account-{id}"`, `draggable="true"`, and `data-account-id="{id}"`
-- [ ] **P3-C-4** — Drop zone gets `data-testid="drop-zone"` and `data-drop-active="true|false"` when drag is over it
-- [ ] **P3-C-5** — Order is persisted in `localStorage` key `pinnedAccountsOrder`
-- [ ] **P3-C-6** — Add a drag handle icon (GripVertical from lucide-react) on each card
+- [x] **P3-C-1** — Add a "Pinned Accounts" section to `dashboard/page.jsx` below the Quick Actions section
+- [x] **P3-C-2** — Use HTML5 drag-and-drop API (no extra library) — `draggable`, `onDragStart`, `onDragOver`, `onDrop` event handlers
+- [x] **P3-C-3** — Each pinned account card gets `data-testid="draggable-account-{id}"`, `draggable="true"`, and `data-account-id="{id}"`
+- [x] **P3-C-4** — Drop zone gets `data-testid="drop-zone"` and `data-drop-active="true|false"` when drag is over it
+- [x] **P3-C-5** — Order is persisted in `localStorage` key `pinnedAccountsOrder`
+- [x] **P3-C-6** — Add a drag handle icon (GripVertical from lucide-react) on each card
 
 **Files to edit:** `app/(bank)/bank/dashboard/page.jsx`, `lib/bankStorage.js`
 
@@ -232,11 +232,11 @@
 
 ### Tasks
 
-- [ ] **P4-A-1** — Account Name cell in the Accounts table gets `data-editable="true"` attribute
-- [ ] **P4-A-2** — On double-click, replace the cell text with an `<input>` pre-filled with current name; cell gets `data-editing="true"`
-- [ ] **P4-A-3** — Press Enter or blur → save via `saveAccount()`; show success toast; revert cell to display mode
-- [ ] **P4-A-4** — Press Escape → discard changes; revert to original name; cell `data-editing` back to `false`
-- [ ] **P4-A-5** — Inline input gets `data-testid="inline-edit-input"` and `id="inline-edit-{id}"`
+- [x] **P4-A-1** — Account Name cell in the Accounts table gets `data-editable="true"` attribute
+- [x] **P4-A-2** — On double-click, replace the cell text with an `<input>` pre-filled with current name; cell gets `data-editing="true"`
+- [x] **P4-A-3** — Press Enter or blur → save via `saveAccount()`; show success toast; revert cell to display mode
+- [x] **P4-A-4** — Press Escape → discard changes; revert to original name; cell `data-editing` back to `false`
+- [x] **P4-A-5** — Inline input gets `data-testid="inline-edit-input"` and `id="inline-edit-{id}"`
 
 **Files to edit:** `app/(bank)/bank/accounts/page.jsx`
 
@@ -248,8 +248,8 @@
 
 ### Tasks
 
-- [ ] **P4-B-1** — Add an "Open Statement" link on the Account Detail page (`/bank/accounts/[id]`) that opens a printable version in a new tab (`target="_blank"`, `data-testid="open-statement-link"`)
-- [ ] **P4-B-2** — Add a "Help & Docs" link in `BankNavbar` that opens `https://www.qaplayground.com` in a new tab; `data-testid="help-link"`, `rel="noopener noreferrer"`
+- [x] **P4-B-1** — Add an "Open Statement" link on the Account Detail page (`/bank/accounts/[id]`) that opens a printable version in a new tab (`target="_blank"`, `data-testid="open-statement-link"`)
+- [x] **P4-B-2** — Add a "Help & Docs" link in `BankNavbar` that opens `https://www.qaplayground.com` in a new tab; `data-testid="help-link"`, `rel="noopener noreferrer"`
 
 **Files to edit:** `app/(bank)/bank/accounts/[id]/page.jsx`, `components/bank/BankNavbar.jsx`
 
@@ -261,12 +261,12 @@
 
 ### Tasks
 
-- [ ] **P4-C-1** — Verify and fix tab order on the login form: Username → Password → Toggle → Remember me → Login → Clear
-- [ ] **P4-C-2** — Pressing Escape closes any open modal (Dialog / AlertDialog) — add `onKeyDown` handler or verify shadcn Dialog already handles it
-- [ ] **P4-C-3** — Add global `keydown` listener on `accounts/page.jsx` for key `n` → triggers open Add Account modal; `data-hotkey="n"` on the Add Account button
-- [ ] **P4-C-4** — Add global `keydown` listener on `transactions/page.jsx` for key `n` → triggers open New Transaction modal; `data-hotkey="n"` on the New Transaction button
-- [ ] **P4-C-5** — Show keyboard shortcut hints in the UI: small `<kbd>N</kbd>` badge next to "Add Account" and "New Transaction" buttons
-- [ ] **P4-C-6** — Pressing Enter inside the login form (while focused on any field) submits it — verify this already works
+- [x] **P4-C-1** — Tab order verified correct via DOM order: Username → Password → Toggle → Remember me → Login → Clear; no changes needed
+- [x] **P4-C-2** — Escape closes modals: verified — Radix UI Dialog handles this natively; no changes needed
+- [x] **P4-C-3** — Added global `keydown` listener on `accounts/page.jsx` for key `n` → opens Add Account modal; `data-hotkey="n"` added
+- [x] **P4-C-4** — Added global `keydown` listener on `transactions/page.jsx` for key `n` → opens New Transaction modal; `data-hotkey="n"` added
+- [x] **P4-C-5** — `<kbd>N</kbd>` badge added inside "Add New Account" and "New Transaction" buttons
+- [x] **P4-C-6** — Enter-to-submit verified: form has `onSubmit` handler and login button is `type="submit"`; already works
 
 **Files to edit:** `app/(bank)/bank/page.jsx`, `app/(bank)/bank/accounts/page.jsx`, `app/(bank)/bank/transactions/page.jsx`
 
@@ -280,41 +280,41 @@
 
 **Dashboard**
 
-- [ ] **UI-1** — Upgrade stat cards: add subtle gradient backgrounds, animated count-up on load, and a trend indicator (e.g., "+3 this week" in muted text)
-- [ ] **UI-2** — Replace plain Accounts grid cards with a richer card: show account type icon in a coloured circle badge, show status badge, and a mini balance bar
-- [ ] **UI-3** — Add a "Quick Stats" mini chart strip (pure CSS bar chart) showing last 7 days deposit vs withdrawal totals
+- [x] **UI-1** — Stat cards upgraded: gradient backgrounds, count-up animation (40-step, 25ms), trend indicators ("X this week")
+- [x] **UI-2** — Accounts overview cards now show colored circle icon badge, status badge, mini balance bar (% of total) with type-specific color
+- [x] **UI-3** — "Quick Stats" CSS bar chart added: last 7 days deposits (green) vs withdrawals (red) per day, with legend
 
 **Accounts Page**
 
-- [ ] **UI-4** — Add a page header with total balance summary and account count prominently displayed
-- [ ] **UI-5** — Give the Accounts table a sticky header so column names remain visible while scrolling
-- [ ] **UI-6** — Color-code the Type badge: Savings = blue, Checking = green, Credit = orange (use Tailwind classes via lookup map — no dynamic strings)
-- [ ] **UI-7** — Color-code the Status badge: Active = green, Inactive = red/muted
-- [ ] **UI-8** — Add row hover highlight (`hover:bg-muted/50`) and a subtle left-border accent color on the active/selected row
+- [x] **UI-4** — 4-cell summary bar (Total Balance, Total Accounts, Active, Filtered) added above filters section
+- [x] **UI-5** — Accounts table header is now `sticky top-0 z-10 bg-card`
+- [x] **UI-6** — Type badge uses `TYPE_BADGE_MAP` lookup: Savings=blue, Checking=green, Credit=orange (dark mode included)
+- [x] **UI-7** — Status badge uses `STATUS_BADGE_MAP` lookup: Active=green, Inactive=red (dark mode included)
+- [x] **UI-8** — Row hover: `hover:bg-muted/50 transition-colors border-l-2 border-l-transparent hover:border-l-purple-500`
 
 **Transactions Page**
 
-- [ ] **UI-9** — Add a summary bar above the table showing totals for the current filter: Total Deposits / Total Withdrawals / Net with colored pill badges
-- [ ] **UI-10** — Make the transaction type column use icon + text (ArrowDownCircle for deposit, ArrowUpCircle for withdrawal, ArrowLeftRight for transfer) from lucide-react
-- [ ] **UI-11** — Sticky header on transactions table
+- [x] **UI-9** — Summary pill bar above table: Deposits (green), Withdrawals (red), Net (blue/orange), count — computed from `sortedTransactions`
+- [x] **UI-10** — Transaction type column now uses `TX_TYPE_CONFIG` lookup: ArrowDownCircle/ArrowUpCircle/ArrowLeftRight + colored text
+- [x] **UI-11** — Transactions table header: `sticky top-0 z-10 bg-card`
 
 **Login Page**
 
-- [ ] **UI-12** — Add an animated gradient hero background (subtle, CSS-only) behind the login card
-- [ ] **UI-13** — Add "Demo Credentials" as a two-column table (Admin / Viewer) in the card footer after P3-B is done
-- [ ] **UI-14** — Add a `SecureBank` logo/icon above the card (Building2 icon in a coloured circle)
+- [x] **UI-12** — `bank-login-bg` keyframe animation added to `globals.css`; applied to login page container (purple→indigo→blue cycling, dark mode variant included)
+- [x] **UI-13** — Done in P3-B: two-column table (Admin / Read-only) with code-styled credential cells
+- [x] **UI-14** — Already present: Building2 icon in purple-to-pink gradient circle with bounce animation
 
 **Navigation**
 
-- [ ] **UI-15** — Add mobile hamburger menu for `BankNavbar` (collapse nav links on small screens into a Sheet)
-- [ ] **UI-16** — Add active route indicator (left border or underline) using `usePathname` from Next.js
-- [ ] **UI-17** — Upgrade the brand name to use the same purple-to-pink gradient as the rest of the app
+- [x] **UI-15** — Mobile hamburger (Menu icon, Sheet from shadcn) added: nav links hidden on `<md`, Sheet slides from right with all links, user info, logout
+- [x] **UI-16** — Already present: `pathname === link.href` applies `bg-gradient-to-r from-purple-600 to-pink-600 text-white`
+- [x] **UI-17** — Already present: brand name uses `bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent`
 
 **Global**
 
-- [ ] **UI-18** — Add a `<ScrollToTop />` floating button on pages where the table can get long
-- [ ] **UI-19** — Ensure all modals have a consistent max-width (`max-w-lg`) and smooth open/close animation (already done by shadcn, verify)
-- [ ] **UI-20** — Add `data-testid="empty-state"` to all empty state rows/sections for automation targeting
+- [x] **UI-18** — `components/bank/ScrollToTop.jsx` created; appears after 300px scroll, smooth scroll-to-top; added to accounts and transactions pages
+- [x] **UI-19** — Verified: Account Dialog `sm:max-w-[500px]`, Wizard `sm:max-w-[560px]`; shadcn/Radix handles open/close animation
+- [x] **UI-20** — Verified: `data-testid="empty-state"` already present on all empty states (accounts table, transactions table, dashboard recent-txns, dashboard accounts grid)
 
 ---
 

@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import BankNavbar from "@/components/bank/BankNavbar";
+import BankNavbar from "@/app/(bank)/bank/_components/BankNavbar";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
@@ -34,8 +34,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
-import TablePagination from "@/components/bank/TablePagination";
-import DatePickerInput from "@/components/bank/DatePickerInput";
+import TablePagination from "@/app/(bank)/bank/_components/TablePagination";
+import DatePickerInput from "@/app/(bank)/bank/_components/DatePickerInput";
+import ScrollToTop from "@/app/(bank)/bank/_components/ScrollToTop";
+import BankTestCases from "@/app/(bank)/bank/_components/BankTestCases";
+import { bankTransactionsTC } from "@/data/bankTestCases";
 import {
   getAccounts,
   getTransactions,
@@ -46,6 +49,7 @@ import {
   formatCurrency,
   formatDateTime,
   initializeData,
+  getCurrentSession,
 } from "@/lib/bankStorage";
 import {
   Plus,
@@ -54,14 +58,29 @@ import {
   ArrowUp,
   ArrowDown,
   ArrowUpDown,
+  ArrowDownCircle,
+  ArrowUpCircle,
+  ArrowLeftRight,
   Loader2,
 } from "lucide-react";
+
+// Transaction type display config (UI-10)
+const TX_TYPE_CONFIG = {
+  deposit: { icon: ArrowDownCircle, color: "text-green-600", label: "Deposit" },
+  withdrawal: {
+    icon: ArrowUpCircle,
+    color: "text-red-600",
+    label: "Withdrawal",
+  },
+  transfer: { icon: ArrowLeftRight, color: "text-blue-600", label: "Transfer" },
+};
 import { toast } from "sonner";
 
 function TransactionsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [username, setUsername] = useState("Admin");
+  const [role, setRole] = useState("admin");
   const [transactions, setTransactions] = useState([]);
   const [accounts, setAccounts] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -95,12 +114,13 @@ function TransactionsContent() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const currentUser = sessionStorage.getItem("currentUser");
-      if (!currentUser) {
+      const session = getCurrentSession();
+      if (!session) {
         router.push("/bank");
         return;
       }
-      setUsername(currentUser);
+      setUsername(session.username);
+      setRole(session.role || "admin");
       initializeData();
       loadData();
 
@@ -263,7 +283,7 @@ function TransactionsContent() {
           t.amount,
           t.balanceAfter,
           t.description || "",
-        ].join(",")
+        ].join(","),
       ),
     ].join("\n");
 
@@ -276,6 +296,22 @@ function TransactionsContent() {
     window.URL.revokeObjectURL(url);
     toast.success("Transactions exported successfully!");
   };
+
+  // 'n' keyboard shortcut → open New Transaction modal (P4-C)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key !== "n" && e.key !== "N") return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const tag = e.target.tagName;
+      if (tag === "INPUT" || tag === "TEXTAREA" || e.target.isContentEditable)
+        return;
+      if (role === "viewer") return;
+      e.preventDefault();
+      handleNewTransaction();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [role]);
 
   const handleColSort = (field) => {
     setColSort((prev) => {
@@ -302,10 +338,8 @@ function TransactionsContent() {
     return [...transactions].sort((a, b) => {
       if (colSort.field === "date")
         return (new Date(a.date) - new Date(b.date)) * dir;
-      if (colSort.field === "type")
-        return a.type.localeCompare(b.type) * dir;
-      if (colSort.field === "amount")
-        return (a.amount - b.amount) * dir;
+      if (colSort.field === "type") return a.type.localeCompare(b.type) * dir;
+      if (colSort.field === "amount") return (a.amount - b.amount) * dir;
       return 0;
     });
   })();
@@ -313,7 +347,7 @@ function TransactionsContent() {
   // Pagination slice
   const paginatedTransactions = sortedTransactions.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const getTransactionIcon = (type) => {
@@ -326,7 +360,8 @@ function TransactionsContent() {
       className="min-h-screen bg-background"
       id="transactions-page-container"
     >
-      <BankNavbar username={username} />
+      <BankNavbar username={username} role={role} />
+      <ScrollToTop />
 
       <main
         className="container mx-auto p-6 space-y-6"
@@ -343,15 +378,22 @@ function TransactionsContent() {
           >
             Transactions
           </h1>
-          <Button
-            onClick={handleNewTransaction}
-            className="bg-gradient-to-r from-purple-600 to-pink-600"
-            id="new-transaction-btn"
-            data-testid="new-transaction-button"
-            data-action="new-transaction"
-          >
-            <Plus className="mr-2 h-4 w-4" /> New Transaction
-          </Button>
+          {role !== "viewer" && (
+            <Button
+              onClick={handleNewTransaction}
+              className="bg-gradient-to-r from-purple-600 to-pink-600"
+              id="new-transaction-btn"
+              data-testid="new-transaction-button"
+              data-action="new-transaction"
+              data-permission="admin"
+              data-hotkey="n"
+            >
+              <Plus className="mr-2 h-4 w-4" /> New Transaction
+              <kbd className="ml-2 text-xs bg-white/20 px-1.5 py-0.5 rounded font-mono">
+                N
+              </kbd>
+            </Button>
+          )}
         </header>
 
         {/* Filters */}
@@ -431,10 +473,7 @@ function TransactionsContent() {
               />
             </div>
 
-            <div
-              className="flex items-end gap-2"
-              id="filter-actions-container"
-            >
+            <div className="flex items-end gap-2" id="filter-actions-container">
               <Button
                 onClick={applyFilters}
                 id="apply-filters-btn"
@@ -464,6 +503,67 @@ function TransactionsContent() {
           </div>
         </section>
 
+        {/* Summary bar (UI-9) */}
+        {sortedTransactions.length > 0 &&
+          (() => {
+            const deps = sortedTransactions
+              .filter((t) => t.type === "deposit")
+              .reduce((s, t) => s + t.amount, 0);
+            const wdrs = sortedTransactions
+              .filter((t) => t.type === "withdrawal")
+              .reduce((s, t) => s + t.amount, 0);
+            const net = deps - wdrs;
+            return (
+              <section
+                className="flex flex-wrap gap-3"
+                id="transactions-summary-bar"
+                data-testid="transactions-summary-bar"
+              >
+                <div
+                  className="flex items-center gap-2 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-full px-4 py-1.5"
+                  id="summary-deposits"
+                >
+                  <ArrowDownCircle className="h-4 w-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-700 dark:text-green-300">
+                    Deposits: {formatCurrency(deps)}
+                  </span>
+                </div>
+                <div
+                  className="flex items-center gap-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-full px-4 py-1.5"
+                  id="summary-withdrawals"
+                >
+                  <ArrowUpCircle className="h-4 w-4 text-red-600" />
+                  <span className="text-sm font-medium text-red-700 dark:text-red-300">
+                    Withdrawals: {formatCurrency(wdrs)}
+                  </span>
+                </div>
+                <div
+                  className={`flex items-center gap-2 rounded-full px-4 py-1.5 border ${net >= 0 ? "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800" : "bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800"}`}
+                  id="summary-net"
+                >
+                  <ArrowLeftRight
+                    className={`h-4 w-4 ${net >= 0 ? "text-blue-600" : "text-orange-600"}`}
+                  />
+                  <span
+                    className={`text-sm font-medium ${net >= 0 ? "text-blue-700 dark:text-blue-300" : "text-orange-700 dark:text-orange-300"}`}
+                  >
+                    Net: {net >= 0 ? "+" : ""}
+                    {formatCurrency(Math.abs(net))}
+                  </span>
+                </div>
+                <div
+                  className="flex items-center gap-2 bg-muted rounded-full px-4 py-1.5 border"
+                  id="summary-count"
+                >
+                  <span className="text-sm text-muted-foreground">
+                    {sortedTransactions.length} transaction
+                    {sortedTransactions.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+              </section>
+            );
+          })()}
+
         {/* Transactions Table */}
         <section
           className="bg-card rounded-lg shadow-md"
@@ -471,7 +571,10 @@ function TransactionsContent() {
         >
           <div className="rounded-md border" id="transactions-table-wrapper">
             <Table id="transactions-table" data-testid="transactions-table">
-              <TableHeader id="transactions-table-header">
+              <TableHeader
+                id="transactions-table-header"
+                className="sticky top-0 z-10 bg-card"
+              >
                 <TableRow id="transactions-header-row">
                   <TableHead data-column="id" id="header-transaction-id">
                     Transaction ID
@@ -534,10 +637,7 @@ function TransactionsContent() {
                 data-testid="transactions-tbody"
               >
                 {paginatedTransactions.length === 0 ? (
-                  <TableRow
-                    id="empty-transactions"
-                    data-testid="empty-state"
-                  >
+                  <TableRow id="empty-transactions" data-testid="empty-state">
                     <TableCell
                       colSpan={7}
                       className="text-center text-muted-foreground"
@@ -553,6 +653,7 @@ function TransactionsContent() {
                       data-transaction-id={transaction.id}
                       data-testid="transaction-row"
                       id={`transaction-row-${transaction.id}`}
+                      className="hover:bg-muted/50 transition-colors"
                     >
                       <TableCell
                         data-testid="transaction-id"
@@ -577,19 +678,20 @@ function TransactionsContent() {
                         data-testid="transaction-type"
                         id={`transaction-type-${transaction.id}`}
                       >
-                        <span
-                          className={`font-medium ${
-                            transaction.type === "deposit"
-                              ? "text-green-600"
-                              : transaction.type === "withdrawal"
-                              ? "text-red-600"
-                              : "text-blue-600"
-                          }`}
-                        >
-                          {getTransactionIcon(transaction.type)}{" "}
-                          {transaction.type.charAt(0).toUpperCase() +
-                            transaction.type.slice(1)}
-                        </span>
+                        {(() => {
+                          const cfg =
+                            TX_TYPE_CONFIG[transaction.type] ||
+                            TX_TYPE_CONFIG.deposit;
+                          const Icon = cfg.icon;
+                          return (
+                            <span
+                              className={`flex items-center gap-1.5 font-medium ${cfg.color}`}
+                            >
+                              <Icon className="h-4 w-4 shrink-0" />
+                              {cfg.label}
+                            </span>
+                          );
+                        })()}
                       </TableCell>
                       <TableCell
                         data-testid="transaction-account"
@@ -639,6 +741,12 @@ function TransactionsContent() {
             )}
           </div>
         </section>
+
+        {/* Test Cases */}
+        <BankTestCases
+          testCases={bankTransactionsTC}
+          title="Transactions Page — Test Cases"
+        />
       </main>
 
       {/* New Transaction Modal */}
@@ -774,7 +882,10 @@ function TransactionsContent() {
                     {formErrors.amount}
                   </p>
                 )}
-                <p className="text-sm text-muted-foreground" id="available-balance">
+                <p
+                  className="text-sm text-muted-foreground"
+                  id="available-balance"
+                >
                   Available balance: {formatCurrency(availableBalance)}
                 </p>
               </div>

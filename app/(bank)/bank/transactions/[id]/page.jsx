@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
-import BankNavbar from "@/components/bank/BankNavbar";
+import BankNavbar from "@/app/(bank)/bank/_components/BankNavbar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import {
   formatCurrency,
   formatDateTime,
   initializeData,
+  getCurrentSession,
 } from "@/lib/bankStorage";
 import {
   ArrowLeft,
@@ -53,12 +54,12 @@ export default function TransactionDetailPage() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const currentUser = sessionStorage.getItem("currentUser");
-      if (!currentUser) {
+      const session = getCurrentSession();
+      if (!session) {
         router.push("/bank");
         return;
       }
-      setUsername(currentUser);
+      setUsername(session.username);
       initializeData();
 
       const txn = getTransactionById(params.id);
@@ -218,7 +219,9 @@ export default function TransactionDetailPage() {
 
               {/* Date & Time */}
               <div id="detail-datetime">
-                <p className="text-sm text-muted-foreground mb-1">Date & Time</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  Date & Time
+                </p>
                 <p
                   className="font-semibold"
                   id="transaction-detail-datetime"
