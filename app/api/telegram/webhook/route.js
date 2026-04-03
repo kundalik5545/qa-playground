@@ -56,11 +56,13 @@ _Get token: qaplayground.com → Resources → Telegram Bot_`;
 
 export async function POST(request) {
   // ── 1. Verify webhook secret ──────────────────────────────────────────────
+  // Hard-fail if secret is not configured — never allow unauthenticated access.
+  if (!process.env.TELEGRAM_WEBHOOK_SECRET) {
+    console.error("[Webhook] TELEGRAM_WEBHOOK_SECRET is not set. Rejecting request.");
+    return new NextResponse(null, { status: 503 });
+  }
   const incomingSecret = request.headers.get("x-telegram-bot-api-secret-token");
-  if (
-    process.env.TELEGRAM_WEBHOOK_SECRET &&
-    incomingSecret !== process.env.TELEGRAM_WEBHOOK_SECRET
-  ) {
+  if (incomingSecret !== process.env.TELEGRAM_WEBHOOK_SECRET) {
     return new NextResponse(null, { status: 401 });
   }
 
