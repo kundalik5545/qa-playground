@@ -52,6 +52,21 @@ const TOOLS = [
     status: "live",
   },
   {
+    id: "markdown-html-convertor",
+    icon: "M⬇",
+    iconBg: "#f5f3ff",
+    iconColor: "#7c3aed",
+    accentColor: "#7c3aed",
+    label: "Markdown HTML Converter",
+    category: "Converter",
+    categoryBg: "#f5f3ff",
+    categoryColor: "#7c3aed",
+    description:
+      "Paste your Markdown text or upload a file. Convert it instantly to beautifully formatted HTML, ready for download.",
+    href: "/qa-tools/markdown-html-convertor",
+    status: "live",
+  },
+  {
     id: "json-formatter",
     icon: "{}",
     iconBg: "#f0fdf4",
@@ -167,33 +182,33 @@ const soonCount = TOOLS.filter((t) => t.status === "soon").length;
 
 export default function QaToolsPage() {
   return (
-    <div className="min-h-screen" style={{ background: "#f8f9fc", fontFamily: "'Inter', sans-serif" }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-
-        {/* ── Hero ── */}
-        <div style={{ marginBottom: 48 }}>
+    <div className="min-h-screen bg-background" style={{ fontFamily: "'Inter', sans-serif" }}>
+      {/* ── Hero ── */}
+      <div className="relative overflow-hidden border-b border-border mb-12">
+        <div
+          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06] pointer-events-none"
+          style={{
+            backgroundImage: "linear-gradient(#000 1px, transparent 1px), linear-gradient(90deg, #000 1px, transparent 1px)",
+            backgroundSize: "32px 32px",
+          }}
+        />
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-16">
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
             <span style={pill("#eff2ff", "#2563eb")}>{liveCount} Live</span>
             <span style={pill("#f3f4f6", "#6b7280")}>{soonCount} Coming Soon</span>
             <span style={pill("#f0fdf4", "#059669")}>{CHROME_EXTENSIONS.length} Chrome Extensions</span>
           </div>
-          <h1
-            style={{
-              fontSize: "clamp(1.8rem, 4vw, 2.6rem)",
-              fontWeight: 800,
-              color: "#1a1d23",
-              margin: "0 0 12px",
-              lineHeight: 1.15,
-              letterSpacing: "-0.5px",
-            }}
-          >
-            QA Tools
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.1] mb-4">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-violet-600 to-purple-600 dark:from-blue-400 dark:via-violet-400 dark:to-purple-400">QA Tools</span>
           </h1>
-          <p style={{ fontSize: "1.05rem", color: "#6b7280", margin: 0, maxWidth: 560, lineHeight: 1.65 }}>
+          <p className="text-base sm:text-lg text-muted-foreground max-w-2xl leading-relaxed m-0">
             Free online tools and Chrome extensions built for QA engineers — converters, formatters,
             encoders, screenshot tools, and resource clippers for your daily workflow.
           </p>
         </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-12">
 
         {/* ── Online Tools section header ── */}
         <div style={{ marginBottom: 20 }}>
@@ -251,56 +266,27 @@ export default function QaToolsPage() {
         </div>
 
         {/* ── Bottom callout ── */}
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid #e9eaed",
-            borderRadius: 16,
-            padding: "28px 32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 20,
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="bg-gradient-to-r from-blue-600/10 via-violet-600/10 to-blue-600/10 dark:from-blue-600/20 dark:via-violet-600/20 dark:to-blue-600/20 border border-blue-200 dark:border-blue-800 rounded-2xl px-6 py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           <div>
-            <div style={{ fontSize: "1rem", fontWeight: 700, color: "#1a1d23", marginBottom: 4 }}>
+            <p className="text-base font-bold text-foreground mb-1">
               Have a tool idea?
-            </div>
-            <div style={{ fontSize: "0.875rem", color: "#6b7280" }}>
+            </p>
+            <p className="text-sm text-muted-foreground">
               Suggest tools that would make your QA workflow faster on GitHub.
-            </div>
+            </p>
           </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+          <div className="flex gap-3 flex-wrap">
             <Link
               href="/study-tracker/dashboard"
               prefetch={false}
-              style={{
-                padding: "9px 18px",
-                borderRadius: 8,
-                background: "#f3f4f6",
-                color: "#374151",
-                fontSize: "0.84rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                border: "1px solid #e9eaed",
-              }}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-background border border-border hover:bg-muted text-foreground text-sm font-semibold transition-colors no-underline"
             >
               ← Study Tracker
             </Link>
             <Link
               href="/practice"
               prefetch={false}
-              style={{
-                padding: "9px 18px",
-                borderRadius: 8,
-                background: "#2563eb",
-                color: "#fff",
-                fontSize: "0.84rem",
-                fontWeight: 600,
-                textDecoration: "none",
-              }}
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold transition-colors no-underline shadow-sm shadow-blue-500/20"
             >
               Practice Elements →
             </Link>

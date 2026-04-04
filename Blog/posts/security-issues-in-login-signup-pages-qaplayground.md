@@ -8,7 +8,7 @@ lastModified: "2026-03-26"
 category: ["security", "general", "nextjs"]
 keywords: "web security, login page security, CSRF protection, brute force protection, XSS, clickjacking, account enumeration, password security, Next.js security headers, web application security"
 slug: "security-issues-in-login-signup-pages-qaplayground"
-image: "https://ik.imagekit.io/randomcoder/QAPlayground/id-02-people-in-meeting-with-laptop.webp?updatedAt=1759727596773"
+image: "https://res.cloudinary.com/jkcoder/image/upload/v1775291088/blog06-security-reasons-qaplayground_hhrn8j.webp"
 imageAlt: "Security audit of a login and signup page"
 draft: false
 ---
@@ -53,7 +53,7 @@ This is catastrophic for credentials because:
 Always use `method="POST"` on authentication forms:
 
 ```html
-<form method="POST" action="/login">
+<form method="POST" action="/login"></form>
 ```
 
 **In Next.js with a client-side auth library**, the risk is already mitigated if you call `e.preventDefault()` and handle submission via JavaScript — the form never does a native GET submission. But the correct pattern is still to set `method="POST"` explicitly, both as a security guarantee and as a signal to browsers to treat the form correctly.
@@ -72,7 +72,9 @@ Cross-Site Request Forgery (CSRF) attacks trick authenticated users into unknowi
   <input name="email" value="attacker@evil.com" />
   <input name="password" value="attackerpass" />
 </form>
-<script>document.getElementById('f').submit();</script>
+<script>
+  document.getElementById("f").submit();
+</script>
 ```
 
 Without CSRF protection, the server has no way to tell whether the request came from your own page or from an attacker's page.
@@ -245,7 +247,7 @@ const [showPassword, setShowPassword] = useState(false);
   >
     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
   </button>
-</div>
+</div>;
 ```
 
 Use `aria-label` on the button so screen reader users know what it does.
@@ -273,7 +275,7 @@ Link each input to its error message using `aria-describedby`:
   id="email"
   type="email"
   aria-describedby="email-error"
-  aria-invalid={!!emailError}
+  aria-invalid="{!!emailError}"
 />
 <p id="email-error" role="alert" className="text-sm text-red-500">
   Please enter a valid email address.
@@ -362,7 +364,7 @@ Always return the same generic error message regardless of whether the email exi
 
 ```js
 // Always show this, never differentiate
-"Invalid email or password. Please try again."
+"Invalid email or password. Please try again.";
 ```
 
 This prevents the attacker from learning anything useful from a failed login attempt.
@@ -407,7 +409,14 @@ Without `X-Frame-Options` or `frame-ancestors` CSP directive, an attacker can em
 ```html
 <!-- Attacker's page -->
 <style>
-  iframe { opacity: 0; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+  iframe {
+    opacity: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
 </style>
 <iframe src="https://yourapp.com/login"></iframe>
 ```
@@ -481,20 +490,20 @@ CSP is intentionally excluded from this block because it needs per-app tuning. S
 
 ## Priority Summary
 
-| Severity | Issue | Action |
-|----------|-------|--------|
-| ⛔ CRITICAL | Form method GET | Use POST + `e.preventDefault()` |
-| ⛔ CRITICAL | No CSRF protection | Use Better-Auth (already handles it) |
-| 🔴 HIGH | No rate limiting | Enable Better-Auth `rateLimit` plugin |
-| 🔴 HIGH | Weak password requirements | Add client + server validation |
-| 🔴 HIGH | No confirm password field | Add second password field + match check |
-| 🟡 MEDIUM | No password visibility toggle | Add eye icon toggle |
-| 🟡 MEDIUM | Error messages not accessible | Add `aria-describedby` + `role="alert"` |
-| 🟡 MEDIUM | No CSP headers | Add via `next.config.mjs` headers() |
-| 🟡 MEDIUM | Wrong autocomplete on login email | Change to `autocomplete="username"` |
-| 🟡 MEDIUM | Account enumeration via errors | Always return generic error message |
-| 🟢 LOW | HTTPS not enforced | Add HSTS header + Vercel handles prod |
-| 🟢 LOW | No clickjacking protection | Add X-Frame-Options: DENY |
+| Severity    | Issue                             | Action                                  |
+| ----------- | --------------------------------- | --------------------------------------- |
+| ⛔ CRITICAL | Form method GET                   | Use POST + `e.preventDefault()`         |
+| ⛔ CRITICAL | No CSRF protection                | Use Better-Auth (already handles it)    |
+| 🔴 HIGH     | No rate limiting                  | Enable Better-Auth `rateLimit` plugin   |
+| 🔴 HIGH     | Weak password requirements        | Add client + server validation          |
+| 🔴 HIGH     | No confirm password field         | Add second password field + match check |
+| 🟡 MEDIUM   | No password visibility toggle     | Add eye icon toggle                     |
+| 🟡 MEDIUM   | Error messages not accessible     | Add `aria-describedby` + `role="alert"` |
+| 🟡 MEDIUM   | No CSP headers                    | Add via `next.config.mjs` headers()     |
+| 🟡 MEDIUM   | Wrong autocomplete on login email | Change to `autocomplete="username"`     |
+| 🟡 MEDIUM   | Account enumeration via errors    | Always return generic error message     |
+| 🟢 LOW      | HTTPS not enforced                | Add HSTS header + Vercel handles prod   |
+| 🟢 LOW      | No clickjacking protection        | Add X-Frame-Options: DENY               |
 
 ---
 

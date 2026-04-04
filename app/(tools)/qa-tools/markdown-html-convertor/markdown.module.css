@@ -1,0 +1,208 @@
+/* app\(tools)\qa-tools\markdown-html-convertor\markdown.module.css */
+/* Main container for the tool */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* Header styles */
+.header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: #1a1d23;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+/* Tool area with side-by-side flexbox or stack on mobile */
+.workspace {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .workspace {
+    flex-direction: row;
+    height: 65vh;
+  }
+}
+
+/* Editor and Preview shared styles */
+.panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.panelHeader {
+  background: #f8f9fa;
+  padding: 1rem;
+  font-weight: 600;
+  color: #374151;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* The textarea for Markdown input */
+.textarea {
+  flex: 1;
+  width: 100%;
+  padding: 1.5rem;
+  font-family: 'Fira Code', 'Courier New', Courier, monospace;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  border: none;
+  resize: none;
+  outline: none;
+  background: #fafafa;
+  color: #1f2937;
+}
+
+/* The generated HTML preview */
+.preview {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  background: white;
+  color: #374151;
+  line-height: 1.6;
+}
+
+.preview h1, .preview h2, .preview h3, .preview h4, .preview h5, .preview h6 {
+  color: #111827;
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  font-weight: 700;
+}
+
+.preview p {
+  margin-bottom: 1em;
+}
+
+.preview a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.preview code {
+  background: #f1f5f9;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: monospace;
+}
+
+.preview pre {
+  background: #1e293b;
+  color: #f8fafc;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin-bottom: 1em;
+}
+
+.preview pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.preview blockquote {
+  border-left: 4px solid #e2e8f0;
+  padding-left: 1rem;
+  color: #64748b;
+  font-style: italic;
+  margin: 1rem 0;
+}
+
+.preview ul, .preview ol {
+  padding-left: 2rem;
+  margin-bottom: 1rem;
+}
+
+.preview ul { list-style-type: disc; }
+.preview ol { list-style-type: decimal; }
+
+/* Actions section */
+.actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.btnPrimary {
+  background: #2563eb;
+  color: white;
+}
+
+.btnPrimary:hover {
+  background: #1d4ed8;
+}
+
+.btnSecondary {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.btnSecondary:hover {
+  background: #e2e8f0;
+}
+
+.fileInputLabel {
+  background: #10b981;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s;
+  font-size: 0.95rem;
+}
+
+.fileInputLabel:hover {
+  background: #059669;
+}
+
+.fileInput {
+  display: none;
+}

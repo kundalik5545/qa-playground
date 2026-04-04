@@ -373,6 +373,10 @@ Bank pages check `sessionStorage` for auth on every load and redirect to `/bank`
 
 ## Design System
 
+### Project Design Style Guide
+We maintain a repository of reusable design templates, UI patterns, and styling blocks in `project-design-style.md`. 
+**For AI Assistants:** Reference `project-design-style.md` when asked to safely replicate a known card, banner, or styling format. Use the `Add new design template` skill when requested to document a new UI pattern in this guide.
+
 ### Colors & Theme
 
 Uses **CSS variables** defined in `app/globals.css` for light + dark mode, following shadcn/ui's `new-york` style with **slate** as base color.
