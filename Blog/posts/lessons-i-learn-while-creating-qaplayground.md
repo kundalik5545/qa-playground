@@ -30,6 +30,8 @@ Add new lessons at the top of the relevant section (newest first).
 
 ---
 
+> Impact-Site-Verification: 6a015468-0f7b-4e7c-be1c-7ebc230368f9
+
 ## Lesson Index
 
 | #   | Title                                                                | Section           | Date       |
